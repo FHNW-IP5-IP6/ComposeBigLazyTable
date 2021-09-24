@@ -1,0 +1,50 @@
+= Sample Documentation 
+Markus Schlichting <markus.schlichting@karakun.com>
+2019-11-01
+:icons: font
+:revnumber: 1.0
+:sourcedir: ../src/main/java
+
+[TIP] 
+Check out AsciiDocFx
+
+Some sample documentaiton to show AsciiDoctor capabilities.
+
+Build for: {targeted-env}
+
+== Section
+
+.Important Links
+* https://asciidoctor.org/docs/asciidoc-syntax-quick-reference/[Quick reference]
+* https://asciidoctor.org/docs/asciidoc-vs-markdown/[AsciiDoc vs Markdown]
+* https://asciidoctor.org/docs/asciidoc-writers-guide/[AsciiDoc Writers Guide]
+
+
+
+== Syntax Highlighting
+
+[source,java]
+----
+public class Presenter{ <1>
+
+    @GET <2>
+    @Transactional
+    public List<Appointment> list() {
+        return Appointment.listAll(); <3>
+    }
+
+
+}
+----
+<1> class definition
+<2> HTTP method mapping
+<3> response 
+
+
+== Includes
+
+[source,java]
+.demo/Business.java
+----
+include::{sourcedir}/demo/Business.java[tags=calculateKeyFigureMethod]
+----

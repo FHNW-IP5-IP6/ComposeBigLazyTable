@@ -1,0 +1,4 @@
+= Asciidoctor Beispiel
+
+Geht zurück auf einen Konferenz-Beitrag von Markus Schlichting.
+
