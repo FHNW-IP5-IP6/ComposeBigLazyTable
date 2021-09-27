@@ -81,3 +81,4 @@ scenicView.properties
 # NetBeans
 .nb-gradle/
 nbproject/
+local.properties
