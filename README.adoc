@@ -1,4 +1,6 @@
-= Asciidoctor Beispiel
+= Compose BigLazyTable (Compose BLT)
+Author M. Sprenger, L. Näf
+v0.1, 2021-09-29
+:toc: left
 
-Geht zurück auf einen Konferenz-Beitrag von Markus Schlichting.
-
+== Installation
