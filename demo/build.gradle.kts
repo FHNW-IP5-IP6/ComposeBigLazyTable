@@ -23,6 +23,8 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation(project(":common"))
                 implementation(project(":desktop"))
+                // TODO: Does not work yet - Could not resolve com.github.FHNW-IP5-IP6:ComposeForms:master-SNAPSHOT.
+                //  implementation("com.github.FHNW-IP5-IP6:ComposeForms:master-SNAPSHOT")
             }
         }
     }

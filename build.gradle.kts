@@ -21,5 +21,7 @@ allprojects {
         google()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        // TODO: Not working with jitpack until now
+        //  maven("https://jitpack.io") // try also https://www.jitpack.io
     }
 }
