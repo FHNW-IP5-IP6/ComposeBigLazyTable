@@ -13,6 +13,7 @@ sourceSets {
     named("main") {
         dependencies {
             implementation(compose.desktop.currentOs)
+            implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.1.0")
         }
     }
 }

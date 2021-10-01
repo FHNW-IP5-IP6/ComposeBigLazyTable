@@ -36,8 +36,8 @@ kotlin {
                 //    }
                 //}
 
-                // Variant 3 git submodules
-                implementation(project(":compose-forms"))
+                // TODO: Variant 3 git submodules
+                //implementation(project(":compose-forms"))
             }
         }
     }
