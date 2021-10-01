@@ -23,8 +23,21 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation(project(":common"))
                 implementation(project(":desktop"))
-                // TODO: Does not work yet - Could not resolve com.github.FHNW-IP5-IP6:ComposeForms:master-SNAPSHOT.
+
+                // TODO: Variant 1 Jitpack
+                //  https://stackoverflow.com/questions/18748436/is-it-possible-to-declare-git-repository-as-dependency-in-android-gradle
+                //  Does not work yet - Could not resolve com.github.FHNW-IP5-IP6:ComposeForms:master-SNAPSHOT.
                 //  implementation("com.github.FHNW-IP5-IP6:ComposeForms:master-SNAPSHOT")
+
+                // TODO: Variant 2 add source dependencies from git
+                //  implementation("org.gradle.cpp-samples:utilities") {
+                //    version {
+                //        branch = "master"
+                //    }
+                //}
+
+                // Variant 3 git submodules
+                implementation(project(":compose-forms"))
             }
         }
     }
