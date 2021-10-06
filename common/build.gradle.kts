@@ -14,6 +14,9 @@ sourceSets {
         dependencies {
             implementation(compose.desktop.currentOs)
             implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.1.0")
+
+            implementation(project(":compose-forms:common"))
+            implementation(project(":compose-forms:desktop"))
         }
     }
 }

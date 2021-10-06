@@ -24,6 +24,6 @@ include(":desktop")
 include(":demo")
 include(":compose-forms")
 include(":compose-forms:common")
-include(":compose-forms:demo")
+//include(":compose-forms:demo") //TODO: Problems :downloadWix
 include(":compose-forms:desktop")
-include(":compose-forms:smartphone")
+//include(":compose-forms:smartphone") //TODO: Problem million times unresolved reference
