@@ -1,8 +1,6 @@
-package service
+package data
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.asFlow
 import java.io.File
 
 class DataServiceImpl : DataService {
