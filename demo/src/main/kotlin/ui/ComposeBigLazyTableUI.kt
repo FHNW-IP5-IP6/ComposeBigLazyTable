@@ -22,7 +22,7 @@ import model.Person
 
 @Composable
 @Preview
-fun App() {
+fun ComposeBigLazyTableUI() {
     var text by remember { mutableStateOf("Hello, World!") }
 
     DesktopMaterialTheme {
