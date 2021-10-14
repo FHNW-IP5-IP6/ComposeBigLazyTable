@@ -25,7 +25,6 @@ sourceSets {
             testImplementation("io.mockk:mockk:1.11.0")
 
             implementation(compose.desktop.currentOs)
-            implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.1.0")
         }
     }
 }
