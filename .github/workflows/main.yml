@@ -40,7 +40,7 @@ jobs:
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v1.6
         with:
-          fetch-depth: projectBaseDir
+          fetch-depth: 'projectBaseDir'
           # Additional arguments to the sonarcloud scanner
           # args: # optional
           # Set the sonar.projectBaseDir analysis property
