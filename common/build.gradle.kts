@@ -7,7 +7,13 @@ plugins {
 
     //kotlin("plugin.serialization") version("1.4.32")
     id("jacoco")
-    //id("org.sonarqube") version "3.1"
+    id("org.sonarqube") version "3.3"
+}
+
+sonarqube {
+    properties {
+        property("sonar.projectKey", "common")
+    }
 }
 
 group = "ch.fhnw"
