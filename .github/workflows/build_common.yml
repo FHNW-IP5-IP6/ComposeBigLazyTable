@@ -1,12 +1,14 @@
-name: Build
+name: Sonar Common Build
 on:
   push:
     branches:
       - master # or the name of your main branch
+      - premaster
+      - develop
 
 jobs:
   build:
-    name: Build
+    name: common
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
