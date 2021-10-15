@@ -37,11 +37,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v1.6
-        with:
-          # fetch-depth: 'projectBaseDir'
-          # Additional arguments to the sonarcloud scanner
-          # args: # optional
-          # Set the sonar.projectBaseDir analysis property
-          projectBaseDir: . # optional, default is .
+      - name: Official SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v1.0.0
