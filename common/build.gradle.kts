@@ -5,7 +5,7 @@ plugins {
     kotlin("jvm")
     id("org.jetbrains.compose") version "1.0.0-alpha3"
 
-    //kotlin("plugin.serialization") version("1.4.32")
+    kotlin("plugin.serialization") version("1.4.32")
     id("jacoco")
     id("org.sonarqube") version "3.3"
 }
@@ -13,6 +13,7 @@ plugins {
 sonarqube {
     properties {
         property("sonar.projectKey", "common")
+        property("sonar.login", "043a9791e1e6b593759abe6c1435ba1fd74f7955")
     }
 }
 
@@ -23,7 +24,7 @@ sourceSets {
     named("main") {
         dependencies {
             // COmpose Forms
-            //api(compose.desktop.currentOs)
+            api(compose.desktop.currentOs)
             api("org.jetbrains.kotlin:kotlin-reflect:1.4.32")
             api("org.junit.jupiter:junit-jupiter:5.7.1")
             api("com.hivemq:hivemq-mqtt-client:1.2.1")

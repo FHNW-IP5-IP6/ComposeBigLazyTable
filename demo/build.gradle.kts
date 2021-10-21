@@ -5,6 +5,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm")
     id("org.jetbrains.compose") version "1.0.0-alpha3"
+    id("org.sonarqube") version "3.3"
+}
+
+sonarqube {
+    properties {
+        property("sonar.projectKey", "demo")
+        property("sonar.login", "043a9791e1e6b593759abe6c1435ba1fd74f7955")
+    }
 }
 
 group = "ch.fhnw"
@@ -43,8 +51,9 @@ kotlin {
     }
 }
 
-tasks.withType<KotlinCompile>() {
-    kotlinOptions.jvmTarget = "11"
+tasks.apply {
+    withType<Test> { useJUnitPlatform() }
+    withType<KotlinCompile> { kotlinOptions.jvmTarget = "11" }
 }
 
 compose.desktop {
@@ -56,8 +65,4 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
 }

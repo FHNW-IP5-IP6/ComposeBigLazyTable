@@ -6,5 +6,4 @@ pluginManagement {
     }
 
 }
-systemProp.sonar.host.url="http://localhost:9000"
 rootProject.name = "ch.fhnw.forms.common"
