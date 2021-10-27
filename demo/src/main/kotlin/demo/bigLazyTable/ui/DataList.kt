@@ -1,14 +1,16 @@
 package demo.bigLazyTable.ui
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -20,26 +22,26 @@ fun PlaylistList(model: BigLazyTablesModel, playlists: List<Playlist>) {
     Column(
         content = {
             LazyRow(
-                modifier = Modifier.background(Color.LightGray).fillMaxWidth().defaultMinSize(minWidth = 30.dp),
+                modifier = Modifier.background(Color.Red).fillMaxWidth().defaultMinSize(minWidth = 30.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 item {
                     Box(
-                        modifier = Modifier.background(Color.LightGray).border(width = 2.dp, color = Color.White)
+                        modifier = Modifier.background(Color.Red).border(width = 2.dp, color = Color.White)
                     ) {
                         Text(text = "name", color = Color.Blue)
                     }
                 }
                 item {
                     Box(
-                        modifier = Modifier.background(Color.LightGray).border(width = 2.dp, color = Color.White)
+                        modifier = Modifier.background(Color.Red).border(width = 2.dp, color = Color.White)
                     ) {
                         Text(text = "collaborative", color = Color.Blue)
                     }
                 }
                 item {
                     Box(
-                        modifier = Modifier.background(Color.LightGray).border(width = 2.dp, color = Color.White)
+                        modifier = Modifier.background(Color.Red).border(width = 2.dp, color = Color.White)
                     ) {
                         Text(text = "modified_at", color = Color.Blue)
                     }
@@ -112,12 +114,32 @@ fun PlaylistList(model: BigLazyTablesModel, playlists: List<Playlist>) {
                 }*/
             }
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+            val listState = rememberLazyListState()
+            val scrollbarStyle = ScrollbarStyle(
+                minimalHeight = 16.dp,
+                thickness = 12.dp,
+                shape = RoundedCornerShape(4.dp),
+                hoverDurationMillis = 1000,
+                unhoverColor = Color.Red.copy(alpha = 0.3f),
+                hoverColor = Color.Red.copy(alpha = 0.8f)
+            )
+            Box(
+                modifier = Modifier.fillMaxSize()
             ) {
-                items(playlists) { playlist ->
-                    PlaylistRow(model, playlist)
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    state = listState
+                ) {
+                    items(playlists) { playlist ->
+                        PlaylistRow(model, playlist)
+                    }
                 }
+
+                VerticalScrollbar(
+                    adapter = rememberScrollbarAdapter(listState),
+                    modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+                    style = scrollbarStyle
+                )
             }
         }
     )
