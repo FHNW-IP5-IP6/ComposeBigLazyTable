@@ -1,4 +1,4 @@
-package demo.bigLazyTable
+package demo.bigLazyTable.ui
 
 import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.desktop.ui.tooling.preview.Preview
@@ -18,13 +18,18 @@ import demo.bigLazyTable.model.Playlist
 
 /**
  * @author Marco Sprenger
+ * @author Livio Näf
  */
 @Composable
 @Preview
 fun ComposeListsUI(model: BigLazyTablesModel) {
     with(model) {
         DesktopMaterialTheme {
-            PlaylistList(playlists)
+            if (dataChooserStatus.value) {
+                PlaylistList(playlists)
+            } else {
+                DataChooser(model)
+            }
         }
     }
 }
