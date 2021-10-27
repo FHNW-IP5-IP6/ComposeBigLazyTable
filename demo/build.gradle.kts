@@ -11,7 +11,7 @@ plugins {
 sonarqube {
     properties {
         property("sonar.projectKey", "demo")
-        property("sonar.login", "043a9791e1e6b593759abe6c1435ba1fd74f7955")
+        property("sonar.login", "e11521286d382bb374dbf68bc8642d4486e24ee3")
     }
 }
 
@@ -32,20 +32,6 @@ kotlin {
                 implementation(project(":common"))
                 implementation(project(":desktop"))
                 implementation("com.opencsv:opencsv:5.5.2")
-                // TODO: Variant 1 Jitpack
-                //  https://stackoverflow.com/questions/18748436/is-it-possible-to-declare-git-repository-as-dependency-in-android-gradle
-                //  Does not work yet - Could not resolve com.github.FHNW-IP5-IP6:ComposeForms:master-SNAPSHOT.
-                //  implementation("com.github.FHNW-IP5-IP6:ComposeForms:master-SNAPSHOT")
-
-                // TODO: Variant 2 add source dependencies from git
-                //  implementation("org.gradle.cpp-samples:utilities") {
-                //    version {
-                //        branch = "master"
-                //    }
-                //}
-
-                // TODO: Variant 3 git submodules
-                //implementation(project(":compose-forms"))
             }
         }
     }

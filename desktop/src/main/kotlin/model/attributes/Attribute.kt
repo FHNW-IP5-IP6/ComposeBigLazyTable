@@ -23,7 +23,7 @@
 package model.attributes
 
 import androidx.compose.runtime.mutableStateOf
-import convertibles.*
+import composeForms.convertibles.*
 import kotlinx.coroutines.*
 import model.ILabel
 import model.IModel
@@ -34,7 +34,7 @@ import model.validators.SyntaxValidator
 import model.validators.ValidationResult
 import model.validators.ValidatorType
 import model.validators.semanticValidators.SemanticValidator
-import util.Utilities
+import composeForms.util.Utilities
 import java.util.*
 
 /**

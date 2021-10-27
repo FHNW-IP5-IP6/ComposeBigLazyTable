@@ -13,7 +13,7 @@ plugins {
 sonarqube {
     properties {
         property("sonar.projectKey", "common")
-        property("sonar.login", "043a9791e1e6b593759abe6c1435ba1fd74f7955")
+        property("sonar.login", "e11521286d382bb374dbf68bc8642d4486e24ee3")
     }
 }
 

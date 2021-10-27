@@ -141,7 +141,7 @@ which are not part of the work.  For example, Corresponding Source
 includes interface definition files associated with source files for
 the work, and the source code for shared libraries and dynamically
 linked subprograms that the work is specifically designed to require,
-such as by intimate data communication or control flow between those
+such as by intimate bigLazyTable.data composeForms.communication or control flow between those
 subprograms and other parts of the work.
 
   The Corresponding Source need not include anything that users
@@ -332,7 +332,7 @@ for a work that has been modified or installed by the recipient, or for
 the User Product in which it has been modified or installed.  Access to a
 network may be denied when the modification itself materially and
 adversely affects the operation of the network or violates the rules and
-protocols for communication across the network.
+protocols for composeForms.communication across the network.
 
   Corresponding Source conveyed, and Installation Information provided,
 in accord with this section must be in a format that is publicly

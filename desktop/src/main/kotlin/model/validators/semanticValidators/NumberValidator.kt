@@ -24,7 +24,7 @@ package model.validators.semanticValidators
 
 import model.ILabel
 import model.validators.ValidationResult
-import util.Utilities
+import composeForms.util.Utilities
 import java.lang.Math.abs
 
 /**

@@ -20,27 +20,20 @@
  *
  */
 
-package server
+package composeForms.convertibles
 
-import composeForms.communication.DTOValidation
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
+import kotlinx.serialization.Serializable
 
 /**
- * @author Louisa Reinger
- * @author Steve Vogel
+ * A [ReplacementPair] has the following two parameters:
+ * @param convertibleRegex : String. Regex pattern that is used to transform an string.
+ * @param convertIntoRegex : String. Regex pattern that defines into what string a fitting string should transform.
+ * 
+ * Example:
+ * ConvertIntoRegex could be "(\d+)(\,)(\d*)". This would extract all numbers before and all numbers after the comma.
+ * ConvertIntoRegex could be "$1,$3". With this convertIntoRegex the split value will get put together with a point in between.
+ *
+ * @author Louisa Reinger, Steve Vogel
  */
-internal class DTOValidationTest{
-
-
-    @Test
-    fun testDefaultValues(){
-        //when
-        val dtoValidation = DTOValidation()
-
-        //then
-        assertEquals(true, dtoValidation.onRightTrack)
-        assertEquals(true, dtoValidation.isValid)
-        assertEquals(listOf<String>(), dtoValidation.errorMessages)
-    }
-}
+@Serializable
+class ReplacementPair(val convertibleRegex : String, val convertIntoRegex : String)

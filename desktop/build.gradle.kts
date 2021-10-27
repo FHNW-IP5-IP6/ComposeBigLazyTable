@@ -11,7 +11,7 @@ plugins {
 sonarqube {
     properties {
         property("sonar.projectKey", "desktop")
-        property("sonar.login", "9c5888b7f8bb7f1af8bbb955f1544088a5f68a5d")
+        property("sonar.login", "e11521286d382bb374dbf68bc8642d4486e24ee3")
     }
 }
 

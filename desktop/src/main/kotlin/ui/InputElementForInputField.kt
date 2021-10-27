@@ -57,9 +57,9 @@ import model.attributes.SelectionAttribute
 import model.meanings.Default
 import model.modelElements.Group
 import model.modelElements.HeaderGroup
-import ui.theme.ColorsUtil
-import ui.theme.DropdownColors
-import ui.theme.FormColors
+import composeForms.ui.theme.ColorsUtil
+import composeForms.ui.theme.DropdownColors
+import composeForms.ui.theme.FormColors
 import ui.util.CustomSwitch
 
 val normalChars = listOf('a','b','c','d','e','f','g','h','i','j','k','l','n','o','p','q','r','s','t','u','v','x','y','z')

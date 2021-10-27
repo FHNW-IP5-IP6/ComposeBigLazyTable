@@ -22,8 +22,6 @@
 
 package ui
 
-import androidx.compose.desktop.AppManager
-import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -37,13 +35,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.Key.Companion.Window
 //import androidx.compose.ui.input.key.KeysSet TODO: How to replace this?
 import model.IModel
-import model.attributes.DualAttribute
 import model.modelElements.HeaderGroup
-import ui.theme.ColorsUtil.Companion.get
-import ui.theme.FormColors
+import composeForms.ui.theme.ColorsUtil.Companion.get
+import composeForms.ui.theme.FormColors
 
 
 /**

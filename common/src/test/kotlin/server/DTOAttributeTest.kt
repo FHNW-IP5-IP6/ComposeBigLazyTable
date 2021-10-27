@@ -22,8 +22,8 @@
 
 package server
 
-import communication.AttributeType
-import communication.DTOAttribute
+import composeForms.communication.AttributeType
+import composeForms.communication.DTOAttribute
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 

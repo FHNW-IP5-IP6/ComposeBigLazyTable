@@ -20,27 +20,15 @@
  *
  */
 
-package server
-
-import composeForms.communication.DTOValidation
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
+package composeForms.convertibles
 
 /**
- * @author Louisa Reinger
- * @author Steve Vogel
+ * ConvertibleResult is the result of a [CustomConvertible]. It has the following information:
+ * @param isConvertible : is the valueAsText convertible?,
+ * @param convertedValueAsText : converted string,
+ * @param convertUserView : should valueAsText get converted or not? (value gets converted in any case),
+ * @param convertImmediately : should be converted immediately or only when the user leaves the attribute?
+ *
+ * @author Louisa Reinger, Steve Vogel
  */
-internal class DTOValidationTest{
-
-
-    @Test
-    fun testDefaultValues(){
-        //when
-        val dtoValidation = DTOValidation()
-
-        //then
-        assertEquals(true, dtoValidation.onRightTrack)
-        assertEquals(true, dtoValidation.isValid)
-        assertEquals(listOf<String>(), dtoValidation.errorMessages)
-    }
-}
+class ConvertibleResult(val isConvertible : Boolean, val convertedValueAsText : String, val convertUserView : Boolean, val convertImmediately : Boolean)

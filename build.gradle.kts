@@ -26,8 +26,5 @@ allprojects {
         google()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        // TODO: Variant 1 with jitpack
-        //  https://stackoverflow.com/questions/18748436/is-it-possible-to-declare-git-repository-as-dependency-in-android-gradle
-        //  maven("https://jitpack.io") // try also https://www.jitpack.io
     }
 }

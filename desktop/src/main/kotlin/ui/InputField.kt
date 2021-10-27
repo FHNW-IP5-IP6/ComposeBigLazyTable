@@ -60,8 +60,8 @@ import model.IModel
 import model.attributes.Attribute
 import model.attributes.DualAttribute
 import model.modelElements.Group
-import ui.theme.ColorsUtil.Companion.get
-import ui.theme.FormColors
+import composeForms.ui.theme.ColorsUtil.Companion.get
+import composeForms.ui.theme.FormColors
 
 /**
  * Thi file contains the function for specific input field.

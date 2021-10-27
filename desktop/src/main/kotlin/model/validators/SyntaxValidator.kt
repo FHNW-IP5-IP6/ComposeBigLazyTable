@@ -23,7 +23,7 @@
 package model.validators
 
 import model.ILabel
-import util.Utilities
+import composeForms.util.Utilities
 
 /**
  * [SyntaxValidator] is an implementation of [Validator] for checking the type of a value. That the string is able to be

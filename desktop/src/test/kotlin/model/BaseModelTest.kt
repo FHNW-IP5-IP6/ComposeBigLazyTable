@@ -22,7 +22,7 @@
 
 package model
 
-import communication.AttributeType
+import composeForms.communication.AttributeType
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import model.attributes.*
