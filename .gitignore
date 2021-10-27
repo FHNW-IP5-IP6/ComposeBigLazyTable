@@ -82,3 +82,6 @@ scenicView.properties
 .nb-gradle/
 nbproject/
 local.properties
+
+# Datasets
+demo/src/main/resources/spotify_playlist_dataset.csv
