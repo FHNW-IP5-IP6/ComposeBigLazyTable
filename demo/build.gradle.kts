@@ -32,6 +32,10 @@ kotlin {
                 implementation(project(":common"))
                 implementation(project(":desktop"))
                 implementation("com.opencsv:opencsv:5.5.2")
+                implementation("org.jetbrains.exposed:exposed-core:0.35.3")
+                implementation("org.jetbrains.exposed:exposed-dao:0.35.3")
+                implementation("org.jetbrains.exposed:exposed-jdbc:0.35.3")
+                implementation("org.xerial:sqlite-jdbc:3.30.1")
             }
         }
     }

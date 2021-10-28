@@ -1,20 +1,27 @@
 package demo.bigLazyTable.model
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.Color
-import demo.bigLazyTable.data.CSVService
+import demo.bigLazyTable.data.DBService
 import model.BaseModel
 import model.attributes.BooleanAttribute
 import model.attributes.StringAttribute
 import model.modelElements.Field
 import model.modelElements.FieldSize
 import model.modelElements.HeaderGroup
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.TransactionManager
+import java.sql.Connection
 
 class BigLazyTablesModel : BaseModel<ComposeFormsBigLazyTableLabels>(title = ComposeFormsBigLazyTableLabels.TITLE) {
 
+    init {
+        setupDatabase()
+    }
+
+
     var dataChooserStatus = mutableStateOf(false)
 
-    private val csvService: CSVService = CSVService()
+    private val dbService = DBService()
 
     lateinit var playlists: List<Playlist>
 
@@ -22,31 +29,32 @@ class BigLazyTablesModel : BaseModel<ComposeFormsBigLazyTableLabels>(title = Com
     var currentPlaylistIndex = mutableStateOf(0)
 
     fun loadTestData() {
-        playlists = csvService.requestDataPage(1, 30)
-        currentPlaylist.value = playlists[0]
-        name.setValueAsText(currentPlaylist.value.name)
-        collaborative.setValueAsText(currentPlaylist.value.collaborative.toString())
-        modifiedAt.setValueAsText(currentPlaylist.value.modified_at)
+        playlists = dbService.getPage(0, 30, "")
+        initPlaylist()
     }
 
     fun loadProdData() {
-        playlists = csvService.requestAllData()
-        currentPlaylist.value = playlists[0]
-        name.setValueAsText(currentPlaylist.value.name)
-        collaborative.setValueAsText(currentPlaylist.value.collaborative.toString())
-        modifiedAt.setValueAsText(currentPlaylist.value.modified_at)
+        //playlists = csvService.requestAllData()
+        initPlaylist()
     }
 
     fun loadCustomizedData(noOfData: Int) {
-        playlists = csvService.requestDataPage(1, noOfData)
-        currentPlaylist.value = playlists[0]
-        name.setValueAsText(currentPlaylist.value.name)
-        collaborative.setValueAsText(currentPlaylist.value.collaborative.toString())
-        modifiedAt.setValueAsText(currentPlaylist.value.modified_at)
+        //playlists = csvService.requestDataPage(1, noOfData)
+        initPlaylist()
     }
 
     fun setCurrentPlaylist() {
         currentPlaylist.value = playlists[currentPlaylistIndex.value]
+        changeFormsContent()
+    }
+
+    // Helper Functions
+    private fun initPlaylist() {
+        currentPlaylist.value = playlists[0]
+        changeFormsContent()
+    }
+
+    private fun changeFormsContent() {
         name.setValueAsText(currentPlaylist.value.name)
         collaborative.setValueAsText(currentPlaylist.value.collaborative.toString())
         modifiedAt.setValueAsText(currentPlaylist.value.modified_at)
@@ -80,4 +88,22 @@ class BigLazyTablesModel : BaseModel<ComposeFormsBigLazyTableLabels>(title = Com
         Field(collaborative, FieldSize.SMALL),
         Field(modifiedAt, FieldSize.NORMAL)
     )
+
+    // Database
+    private fun setupDatabase() {
+        Database.connect("jdbc:sqlite:./demo/src/main/resources/spotify_playlist_dataset.db", "org.sqlite.JDBC")
+        TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
+
+        val dbService = DBService()
+        println("Anzahl db Einträge: " + dbService.getTotalCount())
+        println("Anzahl gefilterte coutry: " + dbService.getFilteredCount("country"))
+        //println(dbService.get(2).name)
+        dbService.getPage(5, 10, "").forEach {
+            println("${it.id} ${it.name}")
+        }
+        println()
+        dbService.getPage(59, 5, "country").forEach {
+            println("${it.id} ${it.name}")
+        }
+    }
 }

@@ -8,7 +8,7 @@ data class Playlist(
     val name: String = "",
     val collaborative: Boolean = false,
     val modified_at: String = "",
-    val num_tracks: String = "",
+/*    val num_tracks: String = "",
     val num_albums: String = "",
     val num_followers: String = "",
     val num_edits: String = "",
@@ -29,6 +29,6 @@ data class Playlist(
     val track3_artist_name: String = "",
     val track3_track_name: String = "",
     val track3_duration_ms: String = "",
-    val track3_album_name: String = "",
-    val id: Int = 0
+    val track3_album_name: String = "",*/
+    val id: Long = 0
 )
