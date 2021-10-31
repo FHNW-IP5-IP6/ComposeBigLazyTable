@@ -14,10 +14,11 @@ import java.sql.Connection
 
 class BigLazyTablesModel : BaseModel<ComposeFormsBigLazyTableLabels>(title = ComposeFormsBigLazyTableLabels.TITLE) {
 
+    val ITEMS_FOR_SCREEN_SIZE = 30
+
     init {
         setupDatabase()
     }
-
 
     var dataChooserStatus = mutableStateOf(false)
 
@@ -29,17 +30,19 @@ class BigLazyTablesModel : BaseModel<ComposeFormsBigLazyTableLabels>(title = Com
     var currentPlaylistIndex = mutableStateOf(0)
 
     fun loadTestData() {
-        playlists = dbService.getPage(0, 30, "")
+        playlists = dbService.getPage(0, 30)
         initPlaylist()
     }
 
     fun loadProdData() {
         //playlists = csvService.requestAllData()
+        playlists = dbService.getAll()
         initPlaylist()
     }
 
     fun loadCustomizedData(noOfData: Int) {
         //playlists = csvService.requestDataPage(1, noOfData)
+        playlists = dbService.getPage(0, noOfData)
         initPlaylist()
     }
 

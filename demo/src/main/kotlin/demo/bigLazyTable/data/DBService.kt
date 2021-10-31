@@ -11,6 +11,10 @@ import org.jetbrains.exposed.sql.transactions.transaction
  */
 class DBService : IPagingService<Playlist> {
 
+    fun getAll(): List<Playlist> = transaction {
+        DatabasePlaylists.selectAll().map { mapResultRowToPlaylist(it) }
+    }
+
     override fun getPage(start: Int, pageSize: Int, filter: String): List<Playlist> {
         val startIndex: Long = if (filter == "") start.toLong() else 0
         return transaction {

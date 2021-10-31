@@ -22,11 +22,8 @@ import demo.bigLazyTable.model.BigLazyTablesModel
 fun ComposeListsUI(model: BigLazyTablesModel) {
     with(model) {
         DesktopMaterialTheme {
-            if (dataChooserStatus.value) {
-                MainContent(model)
-            } else {
-                DataChooser(model)
-            }
+            if (dataChooserStatus.value) MainContent(this)
+            else DataChooser(this)
         }
     }
 }
@@ -36,17 +33,11 @@ fun ComposeListsUI(model: BigLazyTablesModel) {
 @Composable
 private fun MainContent(model: BigLazyTablesModel) {
     with(model) {
-        Row(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Box(
-                modifier = Modifier.weight(1f)
-            ) {
+        Row(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.weight(1f)) {
                 PlaylistList(model, playlists)
             }
-            Box(
-                modifier = Modifier.weight(1f)
-            ) {
+            Box(modifier = Modifier.weight(1f)) {
                 DataForm(model)
             }
         }

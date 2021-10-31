@@ -19,243 +19,84 @@ import demo.bigLazyTable.model.Playlist
 
 @Composable
 fun PlaylistList(model: BigLazyTablesModel, playlists: List<Playlist>) {
-    Column(
-        content = {
-            LazyRow(
-                modifier = Modifier.background(Color.Red).fillMaxWidth().defaultMinSize(minWidth = 30.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+    Column {
+        HeaderRow(model = model, playlists.first())
+
+        val listState = rememberLazyListState()
+        val scrollbarStyle = ScrollbarStyle(
+            minimalHeight = 16.dp,
+            thickness = 12.dp,
+            shape = RoundedCornerShape(4.dp),
+            hoverDurationMillis = 1000,
+            unhoverColor = Color.Red.copy(alpha = 0.3f),
+            hoverColor = Color.Red.copy(alpha = 0.8f)
+        )
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                state = listState
             ) {
-                item {
-                    Box(
-                        modifier = Modifier.background(Color.Red).border(width = 2.dp, color = Color.White)
-                    ) {
-                        Text(text = "name", color = Color.Blue)
-                    }
+                items(playlists) { playlist ->
+                    PlaylistRow(model, playlist)
                 }
-                item {
-                    Box(
-                        modifier = Modifier.background(Color.Red).border(width = 2.dp, color = Color.White)
-                    ) {
-                        Text(text = "collaborative", color = Color.Blue)
-                    }
-                }
-                item {
-                    Box(
-                        modifier = Modifier.background(Color.Red).border(width = 2.dp, color = Color.White)
-                    ) {
-                        Text(text = "modified_at", color = Color.Blue)
-                    }
-                }
-                /*item {
-                    Text(text = "num_tracks", color = Color.White)
-                }
-                item {
-                    Text(text = "num_albums", color = Color.White)
-                }
-                item {
-                    Text(text = "num_followers", color = Color.White)
-                }
-                item {
-                    Text(text = "num_edits", color = Color.White)
-                }
-                item {
-                    Text(text = "duration_ms", color = Color.White)
-                }
-                item {
-                    Text(text = "num_artists", color = Color.White)
-                }
-                item {
-                    Text(text = "track0_artist_name", color = Color.White)
-                }
-                item {
-                    Text(text = "track0_track_name", color = Color.White)
-                }
-                item {
-                    Text(text = "track0_duration_ms", color = Color.White)
-                }
-                item {
-                    Text(text = "track0_album_name", color = Color.White)
-                }
-                item {
-                    Text(text = "track1_artist_name", color = Color.White)
-                }
-                item {
-                    Text(text = "track1_track_name", color = Color.White)
-                }
-                item {
-                    Text(text = "track1_duration_ms", color = Color.White)
-                }
-                item {
-                    Text(text = "track1_album_name", color = Color.White)
-                }
-                item {
-                    Text(text = "track2_artist_name", color = Color.White)
-                }
-                item {
-                    Text(text = "track2_track_name", color = Color.White)
-                }
-                item {
-                    Text(text = "track2_duration_ms", color = Color.White)
-                }
-                item {
-                    Text(text = "track2_album_name", color = Color.White)
-                }
-                item {
-                    Text(text = "track3_artist_name", color = Color.White)
-                }
-                item {
-                    Text(text = "track3_track_name", color = Color.White)
-                }
-                item {
-                    Text(text = "track3_duration_ms", color = Color.White)
-                }
-                item {
-                    Text(text = "track3_album_name", color = Color.White)
-                }*/
             }
 
-            val listState = rememberLazyListState()
-            val scrollbarStyle = ScrollbarStyle(
-                minimalHeight = 16.dp,
-                thickness = 12.dp,
-                shape = RoundedCornerShape(4.dp),
-                hoverDurationMillis = 1000,
-                unhoverColor = Color.Red.copy(alpha = 0.3f),
-                hoverColor = Color.Red.copy(alpha = 0.8f)
+            VerticalScrollbar(
+                adapter = rememberScrollbarAdapter(listState),
+                modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+                style = scrollbarStyle
             )
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    state = listState
-                ) {
-                    items(playlists) { playlist ->
-                        PlaylistRow(model, playlist)
-                    }
-                }
-
-                VerticalScrollbar(
-                    adapter = rememberScrollbarAdapter(listState),
-                    modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
-                    style = scrollbarStyle
-                )
-            }
         }
-    )
+    }
+}
 
+// Helpers to get all attributes of an object
+private fun Any.getNumberOfAttributes() = javaClass.declaredFields.size - 2 // no id & no $stable
+private fun Any.getFieldNameOfIndex(index: Int) = javaClass.declaredFields[index].name
+private fun Any.getFieldValueOfIndex(index: Int): Any {
+    val field = javaClass.declaredFields[index]
+    field.isAccessible = true
+    return field.get(this)
 }
 
 @Composable
-private fun PlaylistRow(model: BigLazyTablesModel, playlist: Playlist) {
-    LazyRow(
-        modifier = Modifier.background(Color.LightGray).fillMaxWidth().defaultMinSize(minWidth = 30.dp).selectable(
+private fun HeaderRow(model: BigLazyTablesModel, playlist: Playlist) = LazyRow(
+    modifier = Modifier.background(Color.Red).fillMaxWidth().defaultMinSize(minWidth = 30.dp),
+    horizontalArrangement = Arrangement.spacedBy(10.dp)
+) {
+    items(count = playlist.getNumberOfAttributes()) { attributeIndex ->
+        Box(modifier = Modifier.background(Color.Red).border(width = 2.dp, color = Color.White)) {
+            Text(text = playlist.getFieldNameOfIndex(attributeIndex), color = Color.Blue)
+        }
+    }
+}
+
+@Composable
+private fun PlaylistRow(model: BigLazyTablesModel, playlist: Playlist) = LazyRow(
+    modifier = Modifier
+        .background(Color.LightGray)
+        .fillMaxWidth()
+        .defaultMinSize(minWidth = 30.dp)
+        .selectable(
             selected = model.currentPlaylistIndex.value == model.playlists.indexOf(playlist),
             onClick = {
                 model.currentPlaylistIndex.value = model.playlists.indexOf(playlist)
                 model.setCurrentPlaylist()
             }
         ),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    horizontalArrangement = Arrangement.spacedBy(10.dp)
+) {
+    items(count = playlist.getNumberOfAttributes()) { attributeIndex ->
+        Box(
+            if (model.currentPlaylistIndex.value == model.playlists.indexOf(playlist)) {
+                Modifier.background(Color.White).border(width = 2.dp, color = Color.White)
+            } else {
+                Modifier.background(Color.LightGray).border(width = 2.dp, color = Color.White)
+            }
         ) {
-        item {
-            Box(
-                if (model.currentPlaylistIndex.value == model.playlists.indexOf(playlist)) {
-                    Modifier.background(Color.White).border(width = 2.dp, color = Color.White)
-                } else {
-                    Modifier.background(Color.LightGray).border(width = 2.dp, color = Color.White)
-                }
-            ) {
-                Text(text = playlist.name, color = Color.Blue)
-            }
+            Text(text = playlist.getFieldValueOfIndex(attributeIndex).toString(), color = Color.Blue)
         }
-        item {
-            Box(
-                if (model.currentPlaylistIndex.value == model.playlists.indexOf(playlist)) {
-                    Modifier.background(Color.White).border(width = 2.dp, color = Color.White)
-                } else {
-                    Modifier.background(Color.LightGray).border(width = 2.dp, color = Color.White)
-                }
-            ) {
-                Text(text = playlist.collaborative.toString(), color = Color.Blue)
-            }
-        }
-        item {
-            Box(
-                if (model.currentPlaylistIndex.value == model.playlists.indexOf(playlist)) {
-                    Modifier.background(Color.White).border(width = 2.dp, color = Color.White)
-                } else {
-                    Modifier.background(Color.LightGray).border(width = 2.dp, color = Color.White)
-                }
-            ) {
-                Text(text = playlist.modified_at, color = Color.Blue)
-            }
-        }
-        /*item {
-            Text(text = playlist.num_tracks, color = Color.White)
-        }
-        item {
-            Text(text = playlist.num_albums, color = Color.White)
-        }
-        item {
-            Text(text = playlist.num_followers, color = Color.White)
-        }
-        item {
-            Text(text = playlist.num_edits, color = Color.White)
-        }
-        item {
-            Text(text = playlist.duration_ms, color = Color.White)
-        }
-        item {
-            Text(text = playlist.num_artists, color = Color.White)
-        }
-        item {
-            Text(text = playlist.track0_artist_name, color = Color.White)
-        }
-        item {
-            Text(text = playlist.track0_track_name, color = Color.White)
-        }
-        item {
-            Text(text = playlist.track0_duration_ms, color = Color.White)
-        }
-        item {
-            Text(text = playlist.track0_album_name, color = Color.White)
-        }
-        item {
-            Text(text = playlist.track1_artist_name, color = Color.White)
-        }
-        item {
-            Text(text = playlist.track1_track_name, color = Color.White)
-        }
-        item {
-            Text(text = playlist.track1_duration_ms, color = Color.White)
-        }
-        item {
-            Text(text = playlist.track1_album_name, color = Color.White)
-        }
-        item {
-            Text(text = playlist.track2_artist_name, color = Color.White)
-        }
-        item {
-            Text(text = playlist.track2_track_name, color = Color.White)
-        }
-        item {
-            Text(text = playlist.track2_duration_ms, color = Color.White)
-        }
-        item {
-            Text(text = playlist.track2_album_name, color = Color.White)
-        }
-        item {
-            Text(text = playlist.track3_artist_name, color = Color.White)
-        }
-        item {
-            Text(text = playlist.track3_track_name, color = Color.White)
-        }
-        item {
-            Text(text = playlist.track3_duration_ms, color = Color.White)
-        }
-        item {
-            Text(text = playlist.track3_album_name, color = Color.White)
-        }*/
     }
 }
