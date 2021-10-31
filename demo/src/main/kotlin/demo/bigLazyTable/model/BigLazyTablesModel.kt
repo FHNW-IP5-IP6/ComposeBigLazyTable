@@ -1,6 +1,7 @@
 package demo.bigLazyTable.model
 
 import androidx.compose.runtime.mutableStateOf
+import bigLazyTable.paging.PAGE_SIZE
 import demo.bigLazyTable.data.DBService
 import model.BaseModel
 import model.attributes.BooleanAttribute
@@ -11,10 +12,19 @@ import model.modelElements.HeaderGroup
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import java.sql.Connection
+import kotlin.math.ceil
 
+// TODO: Is this the ViewModel?
 class BigLazyTablesModel : BaseModel<ComposeFormsBigLazyTableLabels>(title = ComposeFormsBigLazyTableLabels.TITLE) {
 
-    val ITEMS_FOR_SCREEN_SIZE = 30
+    val firstPage = 0
+
+    var previousPage: Int? = null
+    var currentPage: Int = firstPage
+    var nextPage: Int? = currentPage + 1
+
+    // pageNr : all items of that Page
+    private var cache: MutableMap<Int, List<Playlist>> = mutableMapOf()
 
     init {
         setupDatabase()
@@ -24,20 +34,45 @@ class BigLazyTablesModel : BaseModel<ComposeFormsBigLazyTableLabels>(title = Com
 
     private val dbService = DBService()
 
+    // rounds to the next int -> 10 / 3 = 4 -> because we would need 4 pages if pageSize=3
+    private val lastPage = getNumberOfPages()
+
     lateinit var playlists: List<Playlist>
 
     private var currentPlaylist = mutableStateOf(Playlist())
     var currentPlaylistIndex = mutableStateOf(0)
 
+    private fun getNumberOfPages() = ceil(dbService.getAll().size / PAGE_SIZE.toDouble()).toInt()
+
     fun loadTestData() {
-        playlists = dbService.getPage(0, 30)
+        playlists = dbService.getPage(0)
         initPlaylist()
     }
 
     fun loadProdData() {
-        //playlists = csvService.requestAllData()
-        playlists = dbService.getAll()
+        // TODO: Check if its start, middle or bottom of list
+
+        // load this, prev and next page
+        previousPage?.let { cache[it] = dbService.getPage(it) } ?: println("previousPage $previousPage == null -> deshalb wurde der Service nicht aufgerufen")
+        cache[currentPage] = dbService.getPage(currentPage)
+        nextPage?.let { cache[it] = dbService.getPage(it) } ?: println("nextPage $nextPage == null -> deshalb wurde der Service nicht aufgerufen")
+
+        // set playlist to current page
+        playlists = cache[currentPage] ?: emptyList()
+
         initPlaylist()
+    }
+
+    fun goToNextPage() {
+        previousPage = currentPage
+        currentPage = nextPage ?: lastPage
+        nextPage = if (nextPage == lastPage) null else nextPage!!.plus(1)
+    }
+
+    fun goToPreviousPage() {
+        nextPage = currentPage
+        currentPage = previousPage ?: firstPage
+        previousPage = if (previousPage == firstPage) null else previousPage!!.minus(1)
     }
 
     fun loadCustomizedData(noOfData: Int) {
@@ -53,7 +88,7 @@ class BigLazyTablesModel : BaseModel<ComposeFormsBigLazyTableLabels>(title = Com
 
     // Helper Functions
     private fun initPlaylist() {
-        currentPlaylist.value = playlists[0]
+        currentPlaylist.value = playlists.first()
         changeFormsContent()
     }
 

@@ -35,7 +35,7 @@ private fun MainContent(model: BigLazyTablesModel) {
     with(model) {
         Row(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.weight(1f)) {
-                PlaylistList(model, playlists)
+                PlaylistList(model)
             }
             Box(modifier = Modifier.weight(1f)) {
                 DataForm(model)

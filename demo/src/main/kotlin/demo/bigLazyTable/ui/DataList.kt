@@ -2,10 +2,7 @@ package demo.bigLazyTable.ui
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
@@ -18,11 +15,15 @@ import demo.bigLazyTable.model.BigLazyTablesModel
 import demo.bigLazyTable.model.Playlist
 
 @Composable
-fun PlaylistList(model: BigLazyTablesModel, playlists: List<Playlist>) {
+fun PlaylistList(model: BigLazyTablesModel) {
+    var playlists = model.playlists
+
     Column {
         HeaderRow(model = model, playlists.first())
 
         val listState = rememberLazyListState()
+        println("visible items:" + listState.layoutInfo.visibleItemsInfo.size)
+
         val scrollbarStyle = ScrollbarStyle(
             minimalHeight = 16.dp,
             thickness = 12.dp,
@@ -34,6 +35,16 @@ fun PlaylistList(model: BigLazyTablesModel, playlists: List<Playlist>) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
+            val info = listState.layoutInfo.visibleItemsInfo
+            val timeToLoadNextPage = if (info.isNotEmpty()) info.last().index == playlists.lastIndex else false // TODO: When position is at the last item of the list
+
+            // TODO: Now its buggy and loads all new items immediately -> specify timeToLoadNextPage more specific
+            if (timeToLoadNextPage) {
+                model.goToNextPage()
+                model.loadProdData()
+                playlists = model.playlists // TODO: Maybe unnessecary when playlist variable is automatically updating when loadProdData is called...
+            }
+
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 state = listState
@@ -42,6 +53,8 @@ fun PlaylistList(model: BigLazyTablesModel, playlists: List<Playlist>) {
                     PlaylistRow(model, playlist)
                 }
             }
+
+            println("last visible index:" + if (info.isNotEmpty()) info.last().index else "empty")
 
             VerticalScrollbar(
                 adapter = rememberScrollbarAdapter(listState),

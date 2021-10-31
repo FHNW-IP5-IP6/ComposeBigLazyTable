@@ -27,7 +27,7 @@ fun DataChooser(model: BigLazyTablesModel) {
                 onClick = {
                     loadTestData()
                     dataChooserStatus.value = true
-                          },
+                },
                 content = {
                     Text("Load test data (30 items)")
                 }
@@ -36,7 +36,7 @@ fun DataChooser(model: BigLazyTablesModel) {
                 onClick = {
                     loadProdData()
                     dataChooserStatus.value = true
-                          },
+                },
                 content = {
                     Text("Load prod data (1MIO items)")
                 }
@@ -51,7 +51,7 @@ fun DataChooser(model: BigLazyTablesModel) {
                     onClick = {
                         loadCustomizedData((noOfData.value.text.toInt()))
                         dataChooserStatus.value = true
-                              },
+                    },
                     content = {
                         Text("Load customized data (${noOfData.value.text} items)")
                     }
