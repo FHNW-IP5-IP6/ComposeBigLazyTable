@@ -1,7 +1,6 @@
 package demo.bigLazyTable.model
 
 import androidx.compose.runtime.mutableStateOf
-import bigLazyTable.paging.PAGE_SIZE
 import demo.bigLazyTable.data.DBService
 import model.BaseModel
 import model.attributes.BooleanAttribute
@@ -11,13 +10,19 @@ import model.modelElements.FieldSize
 import model.modelElements.HeaderGroup
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.TransactionManager
+import org.junit.platform.commons.util.LruCache
 import java.sql.Connection
 import kotlin.math.ceil
 
-// TODO: Is this the ViewModel?
-class BigLazyTablesModel : BaseModel<ComposeFormsBigLazyTableLabels>(title = ComposeFormsBigLazyTableLabels.TITLE) {
+class BigLazyTablesViewModel : BaseModel<ComposeFormsBigLazyTableLabels>(title = ComposeFormsBigLazyTableLabels.TITLE) {
 
-    val firstPage = 0
+    init {
+        setupDatabase()
+    }
+
+    private val pageSize = 30
+
+    private val firstPage = 0
 
     var previousPage: Int? = null
     var currentPage: Int = firstPage
@@ -25,77 +30,82 @@ class BigLazyTablesModel : BaseModel<ComposeFormsBigLazyTableLabels>(title = Com
 
     // pageNr : all items of that Page
     private var cache: MutableMap<Int, List<Playlist>> = mutableMapOf()
-
-    init {
-        setupDatabase()
-    }
-
-    var dataChooserStatus = mutableStateOf(false)
+    private var lruCache: LruCache<Int, List<Playlist>> = LruCache(3)
 
     private val dbService = DBService()
 
     // rounds to the next int -> 10 / 3 = 4 -> because we would need 4 pages if pageSize=3
     private val lastPage = getNumberOfPages()
 
-    lateinit var playlists: List<Playlist>
+    lateinit var playlists: MutableList<Playlist>
 
     private var currentPlaylist = mutableStateOf(Playlist())
     var currentPlaylistIndex = mutableStateOf(0)
 
-    private fun getNumberOfPages() = ceil(dbService.getAll().size / PAGE_SIZE.toDouble()).toInt()
+    private fun getNumberOfPages() = ceil(dbService.getTotalCount() / pageSize.toDouble()).toInt()
 
-    fun loadTestData() {
-        playlists = dbService.getPage(0)
+    fun initialLoad() {
+        cache[currentPage] = dbService.getPage(start = currentPage, pageSize = pageSize)
+        cache[nextPage!!] = dbService.getPage(start = nextPage!!, pageSize = pageSize)
+        playlists = buildPlaylists(cache)
         initPlaylist()
+    }
+
+    fun loadNextPage() {
+        goToNextPage()
+        previousPage?.let { cache.remove(it) }
+        val startIndexOfNextPage = nextPage?.times(pageSize)!! -1 // = nextPage * pageSize
+        val lastIndexOfCurrentPage = cache[currentPage]!!.lastIndex
+        nextPage?.let { cache[it] = dbService.getPage(it, pageSize) }
+        playlists = buildPlaylists(cache)
+    }
+
+    private fun buildPlaylists(map: MutableMap<Int, List<Playlist>>): MutableList<Playlist> {
+        val result: MutableList<Playlist> = mutableListOf()
+        map.values.forEach { list ->
+            result.addAll(list)
+        }
+        return result
     }
 
     fun loadProdData() {
         // TODO: Check if its start, middle or bottom of list
 
         // load this, prev and next page
-        previousPage?.let { cache[it] = dbService.getPage(it) } ?: println("previousPage $previousPage == null -> deshalb wurde der Service nicht aufgerufen")
-        cache[currentPage] = dbService.getPage(currentPage)
-        nextPage?.let { cache[it] = dbService.getPage(it) } ?: println("nextPage $nextPage == null -> deshalb wurde der Service nicht aufgerufen")
+        // TODO: BUG --> refactor
+        previousPage?.let { cache[it] = dbService.getPage(it, pageSize) } ?: println("previousPage $previousPage == null -> deshalb wurde der Service nicht aufgerufen")
+        cache[currentPage] = dbService.getPage(currentPage, pageSize)
+        nextPage?.let { cache[it] = dbService.getPage(it, pageSize) } ?: println("nextPage $nextPage == null -> deshalb wurde der Service nicht aufgerufen")
 
         // set playlist to current page
-        playlists = cache[currentPage] ?: emptyList()
+        if (this::playlists.isInitialized) {
+            cache[currentPage]?.let { playlists.addAll(it) }
+        } else {
+            playlists = cache[currentPage] as MutableList<Playlist>
+        }
 
         initPlaylist()
     }
 
-    fun goToNextPage() {
+    private fun goToNextPage() {
         previousPage = currentPage
         currentPage = nextPage ?: lastPage
         nextPage = if (nextPage == lastPage) null else nextPage!!.plus(1)
     }
 
-    fun goToPreviousPage() {
+    private fun goToPreviousPage() {
         nextPage = currentPage
         currentPage = previousPage ?: firstPage
         previousPage = if (previousPage == firstPage) null else previousPage!!.minus(1)
     }
 
-    fun loadCustomizedData(noOfData: Int) {
-        //playlists = csvService.requestDataPage(1, noOfData)
-        playlists = dbService.getPage(0, noOfData)
-        initPlaylist()
-    }
-
     fun setCurrentPlaylist() {
         currentPlaylist.value = playlists[currentPlaylistIndex.value]
-        changeFormsContent()
     }
 
     // Helper Functions
     private fun initPlaylist() {
         currentPlaylist.value = playlists.first()
-        changeFormsContent()
-    }
-
-    private fun changeFormsContent() {
-        name.setValueAsText(currentPlaylist.value.name)
-        collaborative.setValueAsText(currentPlaylist.value.collaborative.toString())
-        modifiedAt.setValueAsText(currentPlaylist.value.modified_at)
     }
 
     // Compose Forms

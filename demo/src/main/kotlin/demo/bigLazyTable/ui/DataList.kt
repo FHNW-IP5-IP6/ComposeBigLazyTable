@@ -11,12 +11,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import demo.bigLazyTable.model.BigLazyTablesModel
+import demo.bigLazyTable.model.BigLazyTablesViewModel
 import demo.bigLazyTable.model.Playlist
 
 @Composable
-fun PlaylistList(model: BigLazyTablesModel) {
-    var playlists = model.playlists
+fun PlaylistList(model: BigLazyTablesViewModel) {
+    val playlists = model.playlists
 
     Column {
         HeaderRow(model = model, playlists.first())
@@ -40,9 +40,7 @@ fun PlaylistList(model: BigLazyTablesModel) {
 
             // TODO: Now its buggy and loads all new items immediately -> specify timeToLoadNextPage more specific
             if (timeToLoadNextPage) {
-                model.goToNextPage()
-                model.loadProdData()
-                playlists = model.playlists // TODO: Maybe unnessecary when playlist variable is automatically updating when loadProdData is called...
+                model.loadNextPage()
             }
 
             LazyColumn(
@@ -66,7 +64,7 @@ fun PlaylistList(model: BigLazyTablesModel) {
 }
 
 // Helpers to get all attributes of an object
-private fun Any.getNumberOfAttributes() = javaClass.declaredFields.size - 2 // no id & no $stable
+private fun Any.getNumberOfAttributes() = javaClass.declaredFields.size - 1 // no id & no $stable
 private fun Any.getFieldNameOfIndex(index: Int) = javaClass.declaredFields[index].name
 private fun Any.getFieldValueOfIndex(index: Int): Any {
     val field = javaClass.declaredFields[index]
@@ -75,7 +73,7 @@ private fun Any.getFieldValueOfIndex(index: Int): Any {
 }
 
 @Composable
-private fun HeaderRow(model: BigLazyTablesModel, playlist: Playlist) = LazyRow(
+private fun HeaderRow(model: BigLazyTablesViewModel, playlist: Playlist) = LazyRow(
     modifier = Modifier.background(Color.Red).fillMaxWidth().defaultMinSize(minWidth = 30.dp),
     horizontalArrangement = Arrangement.spacedBy(10.dp)
 ) {
@@ -87,7 +85,7 @@ private fun HeaderRow(model: BigLazyTablesModel, playlist: Playlist) = LazyRow(
 }
 
 @Composable
-private fun PlaylistRow(model: BigLazyTablesModel, playlist: Playlist) = LazyRow(
+private fun PlaylistRow(model: BigLazyTablesViewModel, playlist: Playlist) = LazyRow(
     modifier = Modifier
         .background(Color.LightGray)
         .fillMaxWidth()

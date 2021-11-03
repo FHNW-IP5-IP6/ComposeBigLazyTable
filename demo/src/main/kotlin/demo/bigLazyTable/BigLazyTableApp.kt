@@ -5,7 +5,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.remember
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import demo.bigLazyTable.model.BigLazyTablesModel
+import demo.bigLazyTable.model.BigLazyTablesViewModel
 import demo.bigLazyTable.ui.ComposeListsUI
 
 /**
@@ -18,7 +18,7 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "ComposeLists"
     ) {
-        val model = remember { BigLazyTablesModel() }
+        val model = remember { BigLazyTablesViewModel() }
         ComposeListsUI(model = model)
     }
 }

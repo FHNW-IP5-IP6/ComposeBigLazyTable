@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import demo.bigLazyTable.model.BigLazyTablesModel
+import demo.bigLazyTable.model.BigLazyTablesViewModel
 
 /**
  * @author Marco Sprenger
@@ -19,11 +19,11 @@ import demo.bigLazyTable.model.BigLazyTablesModel
 @ExperimentalMaterialApi
 @Composable
 @Preview
-fun ComposeListsUI(model: BigLazyTablesModel) {
+fun ComposeListsUI(model: BigLazyTablesViewModel) {
+    model.initialLoad()
     with(model) {
         DesktopMaterialTheme {
-            if (dataChooserStatus.value) MainContent(this)
-            else DataChooser(this)
+            MainContent(this)
         }
     }
 }
@@ -31,7 +31,7 @@ fun ComposeListsUI(model: BigLazyTablesModel) {
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-private fun MainContent(model: BigLazyTablesModel) {
+private fun MainContent(model: BigLazyTablesViewModel) {
     with(model) {
         Row(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.weight(1f)) {
