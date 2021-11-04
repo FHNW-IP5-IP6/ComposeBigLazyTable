@@ -36,9 +36,8 @@ fun PlaylistList(model: BigLazyTablesViewModel) {
             modifier = Modifier.fillMaxSize()
         ) {
             val info = listState.layoutInfo.visibleItemsInfo
-            val timeToLoadNextPage = if (info.isNotEmpty()) info.last().index == playlists.lastIndex else false // TODO: When position is at the last item of the list
+            val timeToLoadNextPage = if (info.isNotEmpty()) info.last().index == playlists.lastIndex else false
 
-            // TODO: Now its buggy and loads all new items immediately -> specify timeToLoadNextPage more specific
             if (timeToLoadNextPage) {
                 model.loadNextPage()
             }

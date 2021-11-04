@@ -32,14 +32,12 @@ fun ComposeListsUI(model: BigLazyTablesViewModel) {
 @ExperimentalMaterialApi
 @Composable
 private fun MainContent(model: BigLazyTablesViewModel) {
-    with(model) {
-        Row(modifier = Modifier.fillMaxSize()) {
-            Box(modifier = Modifier.weight(1f)) {
-                PlaylistList(model)
-            }
-            Box(modifier = Modifier.weight(1f)) {
-                DataForm(model)
-            }
+    Row(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.weight(1f)) {
+            PlaylistList(model)
+        }
+        Box(modifier = Modifier.weight(1f)) {
+            DataForm(model)
         }
     }
 }

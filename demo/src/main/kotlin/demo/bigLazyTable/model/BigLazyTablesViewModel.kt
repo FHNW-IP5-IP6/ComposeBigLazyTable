@@ -48,7 +48,7 @@ class BigLazyTablesViewModel : BaseModel<ComposeFormsBigLazyTableLabels>(title =
         cache[currentPage] = dbService.getPage(start = currentPage, pageSize = pageSize)
         cache[nextPage!!] = dbService.getPage(start = nextPage!!, pageSize = pageSize)
         playlists = buildPlaylists(cache)
-        initPlaylist()
+        initCurrentPlaylist()
     }
 
     fun loadNextPage() {
@@ -68,25 +68,6 @@ class BigLazyTablesViewModel : BaseModel<ComposeFormsBigLazyTableLabels>(title =
         return result
     }
 
-    fun loadProdData() {
-        // TODO: Check if its start, middle or bottom of list
-
-        // load this, prev and next page
-        // TODO: BUG --> refactor
-        previousPage?.let { cache[it] = dbService.getPage(it, pageSize) } ?: println("previousPage $previousPage == null -> deshalb wurde der Service nicht aufgerufen")
-        cache[currentPage] = dbService.getPage(currentPage, pageSize)
-        nextPage?.let { cache[it] = dbService.getPage(it, pageSize) } ?: println("nextPage $nextPage == null -> deshalb wurde der Service nicht aufgerufen")
-
-        // set playlist to current page
-        if (this::playlists.isInitialized) {
-            cache[currentPage]?.let { playlists.addAll(it) }
-        } else {
-            playlists = cache[currentPage] as MutableList<Playlist>
-        }
-
-        initPlaylist()
-    }
-
     private fun goToNextPage() {
         previousPage = currentPage
         currentPage = nextPage ?: lastPage
@@ -103,8 +84,7 @@ class BigLazyTablesViewModel : BaseModel<ComposeFormsBigLazyTableLabels>(title =
         currentPlaylist.value = playlists[currentPlaylistIndex.value]
     }
 
-    // Helper Functions
-    private fun initPlaylist() {
+    private fun initCurrentPlaylist() {
         currentPlaylist.value = playlists.first()
     }
 
@@ -144,14 +124,5 @@ class BigLazyTablesViewModel : BaseModel<ComposeFormsBigLazyTableLabels>(title =
 
         val dbService = DBService()
         println("Anzahl db Einträge: " + dbService.getTotalCount())
-        println("Anzahl gefilterte coutry: " + dbService.getFilteredCount("country"))
-        //println(dbService.get(2).name)
-        dbService.getPage(5, 10, "").forEach {
-            println("${it.id} ${it.name}")
-        }
-        println()
-        dbService.getPage(59, 5, "country").forEach {
-            println("${it.id} ${it.name}")
-        }
     }
 }
