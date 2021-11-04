@@ -46,7 +46,7 @@ class BigLazyTablesViewModel : BaseModel<ComposeFormsBigLazyTableLabels>(title =
 
     fun initialLoad() {
         cache[currentPage] = dbService.getPage(start = currentPage, pageSize = pageSize)
-        cache[nextPage!!] = dbService.getPage(start = nextPage!!, pageSize = pageSize)
+        cache[nextPage!!] = dbService.getPage(start = nextPage!!*pageSize, pageSize = pageSize)
         playlists = buildPlaylists(cache)
         initCurrentPlaylist()
     }
@@ -54,9 +54,9 @@ class BigLazyTablesViewModel : BaseModel<ComposeFormsBigLazyTableLabels>(title =
     fun loadNextPage() {
         goToNextPage()
         previousPage?.let { cache.remove(it) }
-        val startIndexOfNextPage = nextPage?.times(pageSize)!! -1 // = nextPage * pageSize
-        val lastIndexOfCurrentPage = cache[currentPage]!!.lastIndex
-        nextPage?.let { cache[it] = dbService.getPage(it, pageSize) }
+        val startIndexOfNextPage = nextPage?.times(pageSize)!! // = nextPage * pageSize
+        //val lastIndexOfCurrentPage = cache[currentPage]!!.lastIndex
+        nextPage?.let { cache[it] = dbService.getPage(startIndexOfNextPage, pageSize) }
         playlists = buildPlaylists(cache)
     }
 
