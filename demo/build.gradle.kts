@@ -8,12 +8,12 @@ plugins {
     id("org.sonarqube") version "3.3"
 }
 
-sonarqube {
-    properties {
-        property("sonar.projectKey", "demo")
-        property("sonar.login", "e11521286d382bb374dbf68bc8642d4486e24ee3")
-    }
-}
+//sonarqube {
+//    properties {
+//        property("sonar.projectKey", "demo")
+//        property("sonar.login", "e11521286d382bb374dbf68bc8642d4486e24ee3")
+//    }
+//}
 
 group = "ch.fhnw"
 version = "1.0"
