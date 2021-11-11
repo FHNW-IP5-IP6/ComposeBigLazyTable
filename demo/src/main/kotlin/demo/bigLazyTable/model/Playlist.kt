@@ -7,7 +7,7 @@ package demo.bigLazyTable.model
 data class Playlist(
     val name: String = "",
     val collaborative: Boolean = false,
-    val modified_at: String = "",
+    val modifiedAt: String = "",
 /*    val num_tracks: String = "",
     val num_albums: String = "",
     val num_followers: String = "",

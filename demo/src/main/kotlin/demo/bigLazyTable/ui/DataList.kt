@@ -19,7 +19,7 @@ fun PlaylistList(model: BigLazyTablesViewModel) {
     val playlists = model.playlists
 
     Column {
-        HeaderRow(model = model, playlists.first())
+        HeaderRow(playlists.first())
 
         val listState = rememberLazyListState()
         println("visible items:" + listState.layoutInfo.visibleItemsInfo.size)
@@ -72,7 +72,7 @@ private fun Any.getFieldValueOfIndex(index: Int): Any {
 }
 
 @Composable
-private fun HeaderRow(model: BigLazyTablesViewModel, playlist: Playlist) = LazyRow(
+private fun HeaderRow(playlist: Playlist) = LazyRow(
     modifier = Modifier.background(Color.Red).fillMaxWidth().defaultMinSize(minWidth = 30.dp),
     horizontalArrangement = Arrangement.spacedBy(10.dp)
 ) {

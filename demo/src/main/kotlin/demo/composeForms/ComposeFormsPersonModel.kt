@@ -248,8 +248,8 @@ class ComposeFormsPersonModel : BaseModel<ComposeFormsPersonLabels>(title = Comp
 
     //add Change-Listener
     init {
-        imageUrl.addOnChangeListener{ imgUrlValue -> loadImgFromUrl()}
-        employmentTitle.addOnChangeListener{ emplTVal -> employmentTitleText.value = employmentTitle.getValue()}
+        imageUrl.addOnChangeListener{ _ -> loadImgFromUrl()}
+        employmentTitle.addOnChangeListener{ _ -> employmentTitleText.value = employmentTitle.getValue()}
     }
 
     //create a composable function

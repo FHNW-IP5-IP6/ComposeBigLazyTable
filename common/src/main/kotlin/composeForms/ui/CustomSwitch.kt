@@ -20,7 +20,7 @@
  *
  */
 
-package ui.util
+package composeForms.ui
 
 
 import androidx.compose.animation.core.AnimationSpec
@@ -63,7 +63,7 @@ private val standard = 20   //do not change this
 private val size = 20       //effective size
 
 private fun getSize(value: Int): Dp {
-    return (value*size/standard).dp
+    return (value* size / standard).dp
 }
 
 //modifiable CustomSwitch parameters
@@ -79,7 +79,7 @@ private val  DefaultSwitchPadding       = getSize(2)
 private var  SWITCHWIDTH                = TRACKWIDTH
 private val  SwitchHeight               = THUMBDIAMETER
 private var  THUMBPATHLENGTH            = TRACKWIDTH - THUMBDIAMETER
-private var  THUMBWIDTH                 = SWITCHWIDTH/2
+private var  THUMBWIDTH                 = SWITCHWIDTH /2
 private val  AnimationSpec              = TweenSpec<Float>(durationMillis = 100)
 private val  ThumbDefaultElevation      = 1.dp
 private val  ThumbPressedElevation      = 6.dp
@@ -126,7 +126,7 @@ fun CustomSwitch(
         THUMBDIAMETER   = thumbHeight
 
         SWITCHWIDTH     = if(MAXTRACKWIDTH) maxWidth else TRACKWIDTH
-        THUMBWIDTH      = if(CIRCLETHUMB) THUMBDIAMETER else SWITCHWIDTH/2
+        THUMBWIDTH      = if(CIRCLETHUMB) THUMBDIAMETER else SWITCHWIDTH /2
         THUMBPATHLENGTH = SWITCHWIDTH - THUMBWIDTH
 
         val interactionSource   : MutableInteractionSource  = remember { MutableInteractionSource() }
@@ -286,7 +286,7 @@ private fun BoxScope.customSwitchImpl(
                 interactionSource = interactionSource,
                 indication = rememberRipple(bounded = false, radius = ThumbRippleRadius)
             )
-            .requiredSize(if(CIRCLETHUMB) THUMBDIAMETER else SWITCHWIDTH/2, THUMBDIAMETER),
+            .requiredSize(if(CIRCLETHUMB) THUMBDIAMETER else SWITCHWIDTH /2, THUMBDIAMETER),
         content = {}
     )
 }

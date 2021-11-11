@@ -107,7 +107,7 @@ class BigLazyTablesViewModel : BaseModel<ComposeFormsBigLazyTableLabels>(title =
         model = this,
         label = ComposeFormsBigLazyTableLabels.MODIFIED_AT,
         required = true,
-        value = currentPlaylist.value.modified_at
+        value = currentPlaylist.value.modifiedAt
     )
 
     val headerGroup = HeaderGroup(
