@@ -14,6 +14,9 @@ import androidx.compose.ui.unit.dp
 import demo.bigLazyTable.model.BigLazyTablesViewModel
 import demo.bigLazyTable.model.Playlist
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 @Composable
 fun PlaylistList(model: BigLazyTablesViewModel) {
     val playlists = model.playlists

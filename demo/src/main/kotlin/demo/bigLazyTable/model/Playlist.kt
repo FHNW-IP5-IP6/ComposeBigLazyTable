@@ -1,8 +1,7 @@
 package demo.bigLazyTable.model
 
 /**
- * @author Marco Sprenger
- * @author Livio Näf
+ * @author Marco Sprenger, Livio Näf
  */
 data class Playlist(
     val name: String = "",

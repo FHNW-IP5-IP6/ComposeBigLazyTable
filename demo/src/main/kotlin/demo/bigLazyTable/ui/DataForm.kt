@@ -7,6 +7,9 @@ import androidx.compose.runtime.Composable
 import demo.bigLazyTable.model.BigLazyTablesViewModel
 import ui.Form
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable

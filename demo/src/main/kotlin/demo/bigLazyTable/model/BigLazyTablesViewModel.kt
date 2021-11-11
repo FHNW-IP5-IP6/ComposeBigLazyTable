@@ -1,7 +1,7 @@
 package demo.bigLazyTable.model
 
 import androidx.compose.runtime.mutableStateOf
-import demo.bigLazyTable.data.DBService
+import demo.bigLazyTable.data.database.DBService
 import model.BaseModel
 import model.attributes.BooleanAttribute
 import model.attributes.StringAttribute
@@ -10,10 +10,12 @@ import model.modelElements.FieldSize
 import model.modelElements.HeaderGroup
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.TransactionManager
-import org.junit.platform.commons.util.LruCache
 import java.sql.Connection
 import kotlin.math.ceil
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 class BigLazyTablesViewModel : BaseModel<ComposeFormsBigLazyTableLabels>(title = ComposeFormsBigLazyTableLabels.TITLE) {
 
     init {
@@ -28,9 +30,7 @@ class BigLazyTablesViewModel : BaseModel<ComposeFormsBigLazyTableLabels>(title =
     var currentPage: Int = firstPage
     var nextPage: Int? = currentPage + 1
 
-    // pageNr : all items of that Page
     private var cache: MutableMap<Int, List<Playlist>> = mutableMapOf()
-    private var lruCache: LruCache<Int, List<Playlist>> = LruCache(3)
 
     private val dbService = DBService()
 
@@ -45,8 +45,8 @@ class BigLazyTablesViewModel : BaseModel<ComposeFormsBigLazyTableLabels>(title =
     private fun getNumberOfPages() = ceil(dbService.getTotalCount() / pageSize.toDouble()).toInt()
 
     fun initialLoad() {
-        cache[currentPage] = dbService.getPage(start = currentPage, pageSize = pageSize)
-        cache[nextPage!!] = dbService.getPage(start = nextPage!!*pageSize, pageSize = pageSize)
+        cache[currentPage] = dbService.getPage(startIndex = currentPage, pageSize = pageSize)
+        cache[nextPage!!] = dbService.getPage(startIndex = nextPage!!*pageSize, pageSize = pageSize)
         playlists = buildPlaylists(cache)
         initCurrentPlaylist()
     }

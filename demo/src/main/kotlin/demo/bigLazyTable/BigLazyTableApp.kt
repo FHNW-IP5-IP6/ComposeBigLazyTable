@@ -9,7 +9,7 @@ import demo.bigLazyTable.model.BigLazyTablesViewModel
 import demo.bigLazyTable.ui.ComposeListsUI
 
 /**
- * @author Marco Sprenger
+ * @author Marco Sprenger, Livio Näf
  */
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi

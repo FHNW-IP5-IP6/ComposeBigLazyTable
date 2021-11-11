@@ -1,4 +1,4 @@
-package demo.bigLazyTable.data
+package demo.bigLazyTable.data.database
 
 import bigLazyTable.paging.IPagingService
 import demo.bigLazyTable.model.Playlist
@@ -6,32 +6,18 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
 /**
- * @author Marco Sprenger
- * @author Livio Näf
+ * @author Marco Sprenger, Livio Näf
  */
 class DBService : IPagingService<Playlist> {
 
-    fun getAll(): List<Playlist> = transaction {
-        DatabasePlaylists.selectAll().map { mapResultRowToPlaylist(it) }
-    }
-
-    override fun getPage(start: Int, pageSize: Int, filter: String): List<Playlist> {
-        val startIndex: Long = if (filter == "") start.toLong() else 0
+    override fun getPage(startIndex: Int, pageSize: Int, filter: String): List<Playlist> {
+        val start: Long = if (filter == "") startIndex.toLong() else 0
         return transaction {
             DatabasePlaylists
                 .select { DatabasePlaylists.name like "%${filter}%" }
-                .limit(pageSize, startIndex)
+                .limit(pageSize, start)
                 .map { mapResultRowToPlaylist(it) }
         }
-    }
-
-    private fun mapResultRowToPlaylist(resultRow: ResultRow) = resultRow.let {
-        Playlist(
-            it[DatabasePlaylists.name],
-            it[DatabasePlaylists.collaborative],
-            it[DatabasePlaylists.modified_at],
-            it[DatabasePlaylists.id]
-        )
     }
 
     override fun getFilteredCount(filter: String): Int = transaction {
@@ -53,6 +39,16 @@ class DBService : IPagingService<Playlist> {
     }
 
     override fun indexOf(id: Long, filter: String): Int = transaction {
-        TODO()
+        TODO("Implement indexOf function in DBService")
+    }
+
+    // Helper functions
+    private fun mapResultRowToPlaylist(resultRow: ResultRow) = resultRow.let {
+        Playlist(
+            it[DatabasePlaylists.name],
+            it[DatabasePlaylists.collaborative],
+            it[DatabasePlaylists.modified_at],
+            it[DatabasePlaylists.id]
+        )
     }
 }

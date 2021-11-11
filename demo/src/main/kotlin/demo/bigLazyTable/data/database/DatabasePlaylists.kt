@@ -1,10 +1,9 @@
-package demo.bigLazyTable.data
+package demo.bigLazyTable.data.database
 
 import org.jetbrains.exposed.sql.Table
 
 /**
- * @author Marco Sprenger
- * @author Livio Näf
+ * @author Marco Sprenger, Livio Näf
  */
 object DatabasePlaylists : Table() {
     val id = long("id")

@@ -1,11 +1,13 @@
-package demo.bigLazyTable.data
+package demo.bigLazyTable.data.csv
 
 import com.opencsv.CSVParserBuilder
 import com.opencsv.CSVReaderBuilder
 import demo.bigLazyTable.model.Playlist
 import java.io.FileReader
 
-
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 class CSVService {
 
     fun requestDataPage(startIndex: Int, pageSize: Int): MutableList<Playlist> {
