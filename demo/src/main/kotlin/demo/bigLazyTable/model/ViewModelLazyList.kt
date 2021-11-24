@@ -35,9 +35,7 @@ class ViewModelLazyList<PlaylistFormModel>(private val dbService: DBService) {
     var currentPage: Int = firstPage
     var nextPage: Int? = currentPage + 1
 
-    private var cache: MutableMap<Int, List<Playlist>> = mutableMapOf()
-
-    private val dbService = DBService()
+    private var cacheOld: MutableMap<Int, List<Playlist>> = mutableMapOf()
 
     // rounds to the next int -> 10 / 3 = 4 -> because we would need 4 pages if pageSize=3
     private val lastPage = getNumberOfPages()

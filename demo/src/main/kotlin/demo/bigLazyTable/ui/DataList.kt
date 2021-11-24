@@ -3,7 +3,6 @@ package demo.bigLazyTable.ui
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -56,8 +55,6 @@ fun PlaylistList(model: ViewModelLazyList<PlaylistFormModel>) {
                     PlaylistRow(model, playlistFormModel.playlist)
                 }
             }
-
-            println("last visible index:" + if (info.isNotEmpty()) info.last().index else "empty")
 
             VerticalScrollbar(
                 adapter = rememberScrollbarAdapter(listState),
