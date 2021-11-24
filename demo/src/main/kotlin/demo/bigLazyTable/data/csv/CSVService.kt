@@ -31,6 +31,7 @@ class CSVService {
         while (nextLine != null && numbersOfElementsLoaded < pageSize) {
             playlists.add(
                 Playlist(
+                    ind,
                     nextLine[0],
                     nextLine[1].toBoolean(),
                     nextLine[2],
@@ -56,7 +57,6 @@ class CSVService {
                     nextLine[22],
                     nextLine[23],
                     nextLine[24],*/
-                    ind
                 )
             )
             ind++

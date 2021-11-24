@@ -11,18 +11,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import demo.bigLazyTable.model.BigLazyTablesViewModel
+import demo.bigLazyTable.model.AppState
+import demo.bigLazyTable.model.ViewModelLazyList
 import demo.bigLazyTable.model.Playlist
+import demo.bigLazyTable.model.PlaylistFormModel
 
 /**
  * @author Marco Sprenger, Livio Näf
  */
 @Composable
-fun PlaylistList(model: BigLazyTablesViewModel) {
-    val playlists = model.playlists
+fun PlaylistList(model: ViewModelLazyList<PlaylistFormModel>) {
+    val playlists = AppState.uiList
 
     Column {
-        HeaderRow(playlists.first())
+        //HeaderRow(playlists.first().playlist)
 
         val listState = rememberLazyListState()
         println("visible items:" + listState.layoutInfo.visibleItemsInfo.size)
@@ -38,19 +40,20 @@ fun PlaylistList(model: BigLazyTablesViewModel) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            val info = listState.layoutInfo.visibleItemsInfo
-            val timeToLoadNextPage = if (info.isNotEmpty()) info.last().index == playlists.lastIndex else false
+            //val lastIndex = listState.layoutInfo.visibleItemsInfo
+            //val timeToLoadNextPage = if (lastIndex.isNotEmpty()) lastIndex.last().index == playlists.lastIndex else false
+            val timeToLoadNextPage = listState.firstVisibleItemIndex == (playlists.size*0.25).toInt()
 
             if (timeToLoadNextPage) {
-                model.loadNextPage()
+                model.get()
             }
 
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 state = listState
             ) {
-                items(playlists) { playlist ->
-                    PlaylistRow(model, playlist)
+                items(playlists) { playlistFormModel ->
+                    PlaylistRow(model, playlistFormModel.playlist)
                 }
             }
 
@@ -87,18 +90,18 @@ private fun HeaderRow(playlist: Playlist) = LazyRow(
 }
 
 @Composable
-private fun PlaylistRow(model: BigLazyTablesViewModel, playlist: Playlist) = LazyRow(
+private fun PlaylistRow(model: ViewModelLazyList<PlaylistFormModel>, playlist: Playlist) = LazyRow(
     modifier = Modifier
         .background(Color.LightGray)
         .fillMaxWidth()
-        .defaultMinSize(minWidth = 30.dp)
-        .selectable(
-            selected = model.currentPlaylistIndex.value == model.playlists.indexOf(playlist),
-            onClick = {
-                model.currentPlaylistIndex.value = model.playlists.indexOf(playlist)
-                model.setCurrentPlaylist()
-            }
-        ),
+        .defaultMinSize(minWidth = 30.dp),
+//        .selectable(
+//            selected = model.currentPlaylistIndex.value == model.playlists.indexOf(playlist),
+//            onClick = {
+//                model.currentPlaylistIndex.value = model.playlists.indexOf(playlist)
+//                model.setCurrentPlaylist()
+//            }
+//        ),
     horizontalArrangement = Arrangement.spacedBy(10.dp)
 ) {
     items(count = playlist.getNumberOfAttributes()) { attributeIndex ->

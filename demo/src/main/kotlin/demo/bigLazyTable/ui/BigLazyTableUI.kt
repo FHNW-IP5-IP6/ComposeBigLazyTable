@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import demo.bigLazyTable.model.BigLazyTablesViewModel
+import demo.bigLazyTable.model.AppState
+import demo.bigLazyTable.model.PlaylistFormModel
+import demo.bigLazyTable.model.ViewModelLazyList
 
 /**
  * @author Marco Sprenger
@@ -19,7 +21,7 @@ import demo.bigLazyTable.model.BigLazyTablesViewModel
 @ExperimentalMaterialApi
 @Composable
 @Preview
-fun ComposeListsUI(model: BigLazyTablesViewModel) {
+fun ComposeListsUI(model: ViewModelLazyList<PlaylistFormModel>) {
     model.initialLoad()
     with(model) {
         DesktopMaterialTheme {
@@ -31,13 +33,13 @@ fun ComposeListsUI(model: BigLazyTablesViewModel) {
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-private fun MainContent(model: BigLazyTablesViewModel) {
+private fun MainContent(model: ViewModelLazyList<PlaylistFormModel>) {
     Row(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.weight(1f)) {
             PlaylistList(model)
         }
         Box(modifier = Modifier.weight(1f)) {
-            DataForm(model)
+            //DataForm(AppState.selectedPlaylist)
         }
     }
 }

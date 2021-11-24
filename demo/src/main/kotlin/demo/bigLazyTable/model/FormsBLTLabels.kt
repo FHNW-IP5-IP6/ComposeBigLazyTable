@@ -5,7 +5,7 @@ import model.ILabel
 /**
  * @author Marco Sprenger, Livio Näf
  */
-enum class ComposeFormsBigLazyTableLabels(val deutsch: String, val english: String) : ILabel {
+enum class FormsBLTLabels(val deutsch: String, val english: String) : ILabel {
     TITLE("Spotify Daten","Spotify data"),
     HEADERGROUP("Playlist Übersicht", "Playlist Overview"),
 

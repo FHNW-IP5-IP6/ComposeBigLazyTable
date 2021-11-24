@@ -45,10 +45,10 @@ class DBService : IPagingService<Playlist> {
     // Helper functions
     private fun mapResultRowToPlaylist(resultRow: ResultRow) = resultRow.let {
         Playlist(
+            it[DatabasePlaylists.id],
             it[DatabasePlaylists.name],
             it[DatabasePlaylists.collaborative],
-            it[DatabasePlaylists.modified_at],
-            it[DatabasePlaylists.id]
+            it[DatabasePlaylists.modified_at]
         )
     }
 }
