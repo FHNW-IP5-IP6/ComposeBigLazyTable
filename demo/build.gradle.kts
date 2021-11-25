@@ -36,6 +36,7 @@ kotlin {
                 implementation("org.jetbrains.exposed:exposed-dao:0.35.3")
                 implementation("org.jetbrains.exposed:exposed-jdbc:0.35.3")
                 implementation("org.xerial:sqlite-jdbc:3.30.1")
+                implementation("io.github.microutils:kotlin-logging:1.12.5")
             }
         }
     }
