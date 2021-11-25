@@ -3,19 +3,19 @@ package bigLazyTable.paging
 /**
  * @author Marco Sprenger, Livio Näf
  */
-interface IPagingService<Full, Short> {
+interface IPagingService<T> {
 
-    fun getPage(startIndex: Int, pageSize: Int, filter: String = ""): List<Full>
+    fun getPage(startIndex: Int, pageSize: Int, filter: String = ""): List<T>
 
     fun getFilteredCount(filter: String): Int
 
     fun getTotalCount(): Int
 
-    fun get(id: Long): Short
+    fun get(id: Long): T
 
     fun indexOf(id: Long, filter: String): Int
 
-    fun update(dao: Full): Boolean
+    //fun update(dao: T): Boolean
 
     //fun create(): EntityKey
 
