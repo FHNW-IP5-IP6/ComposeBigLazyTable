@@ -18,6 +18,7 @@ class PlaylistFormModel(val playlist: Playlist): BaseModel<FormsBLTLabels>(title
         value = playlist.name
     )
 
+    // TODO: setValue statt setValueAsText
     private val collaborative = BooleanAttribute(
         model = this,
         label = FormsBLTLabels.COLLABORATIVE,

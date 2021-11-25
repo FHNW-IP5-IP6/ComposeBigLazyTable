@@ -53,8 +53,12 @@ fun PlaylistList(model: ViewModelLazyList) {
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 state = listState
             ) {
+                // LazyList
                 items(playlists) { playlistFormModel ->
                     PlaylistRow(model, playlistFormModel.playlist)
+                }
+                items(count = 1_000_000) { index ->
+
                 }
             }
 
