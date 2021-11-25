@@ -1,8 +1,9 @@
 package demo.bigLazyTable.model
 
 object AppState {
-    val uiList: MutableList<PlaylistFormModel> = mutableListOf()
 
-    lateinit var selectedPlaylist: PlaylistFormModel
+    var uiList: List<PlaylistFormModel> = listOf()
+
+    //lateinit var selectedPlaylist: PlaylistFormModel
 
 }

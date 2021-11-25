@@ -1,33 +1,44 @@
 package demo.bigLazyTable.model
 
-import androidx.compose.runtime.mutableStateOf
 import demo.bigLazyTable.data.database.DBService
-import kotlin.math.ceil
+import org.junit.platform.commons.util.LruCache
+import mu.KotlinLogging
+
+private val Log = KotlinLogging.logger {}
 
 /**
  * @author Marco Sprenger, Livio Näf
  */
-class ViewModelLazyList<PlaylistFormModel>(private val dbService: DBService) {
+class ViewModelLazyList(private val dbService: DBService) {
 
     val totalCount = dbService.getTotalCount()
     var firstIndex = 0
-    val pageSize = 30
+    private val pageSize = 30
 
-    private val cache: MutableMap<Int, PlaylistFormModel> = mutableMapOf()
+    var nextPage = 0
+
+    private val cache: LruCache<Int, List<PlaylistFormModel>> = LruCache(3)
 
     fun get(index: Int) {
-//        if (cache.contains(index)) {
-//            AppState.uiList.add(cache[index])
-//        } else {
-//            val playlists = dbService.getPage(startIndex = index, pageSize = pageSize)
-//            val playlistFormModels = playlists.map { PlaylistFormModel(it) }
-//            playlistFormModels.forEach { cache[it.playlist.id.toInt()] = it }
-//        }
-        //AppState.uiList = playlistFormModels
+        Log.info { "Info test" }
+        Log.error { "$index" }
+        val pageNr = index*nextPage / pageSize
+        nextPage = pageNr + 1
+
+        if (!cache.contains(pageNr)) {
+            Log.error { "!cache.contains(pageNr=$pageNr)" }
+            val startIndex = pageNr * pageSize
+            Log.error { "startIndex=$startIndex" }
+            val playlists = dbService.getPage(startIndex = startIndex, pageSize = pageSize)
+            val playlistFormModels = playlists.map { PlaylistFormModel(it) }
+            cache[pageNr] = playlistFormModels
+            Log.error { cache.keys.toString() }
+            AppState.uiList = cache[pageNr]!!
+        }
     }
 
 
-
+/*
 
     private val firstPage = 0
 
@@ -90,5 +101,6 @@ class ViewModelLazyList<PlaylistFormModel>(private val dbService: DBService) {
     private fun initCurrentPlaylist() {
         currentPlaylist.value = playlists.first()
     }
+*/
 
 }

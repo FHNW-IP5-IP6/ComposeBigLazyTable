@@ -3,6 +3,7 @@ package demo.bigLazyTable.ui
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -19,14 +20,14 @@ import demo.bigLazyTable.model.PlaylistFormModel
  * @author Marco Sprenger, Livio Näf
  */
 @Composable
-fun PlaylistList(model: ViewModelLazyList<PlaylistFormModel>) {
+fun PlaylistList(model: ViewModelLazyList) {
     val playlists = AppState.uiList
 
     Column {
         //HeaderRow(playlists.first().playlist)
 
-        val listState = rememberLazyListState()
-        println("visible items:" + listState.layoutInfo.visibleItemsInfo.size)
+        var listState = rememberLazyListState()
+        //println("visible items:" + listState.layoutInfo.visibleItemsInfo.size)
 
         val scrollbarStyle = ScrollbarStyle(
             minimalHeight = 16.dp,
@@ -39,12 +40,13 @@ fun PlaylistList(model: ViewModelLazyList<PlaylistFormModel>) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            //val lastIndex = listState.layoutInfo.visibleItemsInfo
-            //val timeToLoadNextPage = if (lastIndex.isNotEmpty()) lastIndex.last().index == playlists.lastIndex else false
+            val last = listState.layoutInfo.visibleItemsInfo
+            //val timeToLoadNextPage = if (last.isNotEmpty()) last.last().index == playlists.lastIndex else false
             val timeToLoadNextPage = listState.firstVisibleItemIndex == (playlists.size*0.25).toInt()
 
             if (timeToLoadNextPage) {
-                model.get()
+                //listState = rememberLazyListState()
+                model.get(last.last().index + 1)
             }
 
             LazyColumn(
@@ -87,13 +89,14 @@ private fun HeaderRow(playlist: Playlist) = LazyRow(
 }
 
 @Composable
-private fun PlaylistRow(model: ViewModelLazyList<PlaylistFormModel>, playlist: Playlist) = LazyRow(
+private fun PlaylistRow(model: ViewModelLazyList, playlist: Playlist) = LazyRow(
     modifier = Modifier
         .background(Color.LightGray)
         .fillMaxWidth()
         .defaultMinSize(minWidth = 30.dp),
 //        .selectable(
-//            selected = model.currentPlaylistIndex.value == model.playlists.indexOf(playlist),
+//            selected = AppState.selectedPlaylist ==
+//            model.currentPlaylistIndex.value == model.playlists.indexOf(playlist),
 //            onClick = {
 //                model.currentPlaylistIndex.value = model.playlists.indexOf(playlist)
 //                model.setCurrentPlaylist()
@@ -103,11 +106,12 @@ private fun PlaylistRow(model: ViewModelLazyList<PlaylistFormModel>, playlist: P
 ) {
     items(count = playlist.getNumberOfAttributes()) { attributeIndex ->
         Box(
-            if (model.currentPlaylistIndex.value == model.playlists.indexOf(playlist)) {
-                Modifier.background(Color.White).border(width = 2.dp, color = Color.White)
-            } else {
-                Modifier.background(Color.LightGray).border(width = 2.dp, color = Color.White)
-            }
+            Modifier.background(Color.White).border(width = 2.dp, color = Color.White)
+//            if (model.currentPlaylistIndex.value == model.playlists.indexOf(playlist)) {
+//                Modifier.background(Color.White).border(width = 2.dp, color = Color.White)
+//            } else {
+//                Modifier.background(Color.LightGray).border(width = 2.dp, color = Color.White)
+//            }
         ) {
             Text(text = playlist.getFieldValueOfIndex(attributeIndex).toString(), color = Color.Blue)
         }

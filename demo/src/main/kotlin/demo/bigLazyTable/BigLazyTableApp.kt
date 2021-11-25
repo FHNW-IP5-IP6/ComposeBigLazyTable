@@ -24,7 +24,7 @@ fun main() = application {
         title = "ComposeLists"
     ) {
         setupDatabase()
-        val model = remember { ViewModelLazyList<PlaylistFormModel>(DBService()) }
+        val model = remember { ViewModelLazyList(DBService()) }
         model.get(0)
         ComposeListsUI(model = model)
     }

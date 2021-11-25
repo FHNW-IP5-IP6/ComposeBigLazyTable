@@ -21,8 +21,7 @@ import demo.bigLazyTable.model.ViewModelLazyList
 @ExperimentalMaterialApi
 @Composable
 @Preview
-fun ComposeListsUI(model: ViewModelLazyList<PlaylistFormModel>) {
-    model.initialLoad()
+fun ComposeListsUI(model: ViewModelLazyList) {
     with(model) {
         DesktopMaterialTheme {
             MainContent(this)
@@ -33,7 +32,7 @@ fun ComposeListsUI(model: ViewModelLazyList<PlaylistFormModel>) {
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-private fun MainContent(model: ViewModelLazyList<PlaylistFormModel>) {
+private fun MainContent(model: ViewModelLazyList) {
     Row(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.weight(1f)) {
             PlaylistList(model)
