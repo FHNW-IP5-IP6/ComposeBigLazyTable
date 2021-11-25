@@ -26,7 +26,7 @@ fun PlaylistList(model: ViewModelLazyList) {
     Column {
         //HeaderRow(playlists.first().playlist)
 
-        var listState = rememberLazyListState()
+        val listState = rememberLazyListState()
         //println("visible items:" + listState.layoutInfo.visibleItemsInfo.size)
 
         val scrollbarStyle = ScrollbarStyle(
