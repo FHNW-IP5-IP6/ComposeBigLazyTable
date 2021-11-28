@@ -38,7 +38,9 @@ private fun MainContent(model: ViewModelLazyList) {
             PlaylistList(model)
         }
         Box(modifier = Modifier.weight(1f)) {
-            //DataForm(AppState.selectedPlaylist)
+            /*if (AppState.selectedPlaylist != null) {
+                DataForm(AppState.selectedPlaylist)
+            }*/
         }
     }
 }
