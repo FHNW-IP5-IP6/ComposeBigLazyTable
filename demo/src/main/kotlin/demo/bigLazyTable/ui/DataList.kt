@@ -21,7 +21,7 @@ import demo.bigLazyTable.model.PlaylistFormModel
  */
 @Composable
 fun PlaylistList(model: ViewModelLazyList) {
-    val testPlaylist = AppState.testList
+    val testPlaylist = AppState.uiList
 
     Column {
         HeaderRow(Playlist())
@@ -39,33 +39,16 @@ fun PlaylistList(model: ViewModelLazyList) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            //val last = listState.layoutInfo.visibleItemsInfo
-            //val timeToLoadNextPage = if (last.isNotEmpty()) last.last().index == playlists.lastIndex else false
-            //val timeToLoadNextPage = listState.firstVisibleItemIndex == (playlists.size*0.25).toInt()
-
-            //val check = listState.firstVisibleItemIndex+1 % model.pageSize == 1
-
-            /*
-            if (check) {
-                model.get(listState.firstVisibleItemIndex)
-            }
-            */
-
             if (listState.firstVisibleItemIndex != model.firstIndex) {
                 model.get(listState.firstVisibleItemIndex)
             }
-
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 state = listState
             ) {
-                // LazyList
-//                items(playlists) { playlistFormModel ->
-//                    PlaylistRow(model, playlistFormModel.playlist)
-//                }
                 items(testPlaylist) { playlistFormModel ->
                     if (playlistFormModel != null) {
-                        PlaylistRow(model, playlistFormModel.playlist)
+                        PlaylistRow(model, playlistFormModel)
                     } else {
                         PlaylistRowPlaceholder()
                     }
@@ -96,38 +79,38 @@ private fun HeaderRow(playlist: Playlist) = LazyRow(
     horizontalArrangement = Arrangement.spacedBy(10.dp)
 ) {
     items(count = playlist.getNumberOfAttributes()) { attributeIndex ->
-        Box(modifier = Modifier.background(Color.Red).border(width = 2.dp, color = Color.White)) {
-            Text(text = playlist.getFieldNameOfIndex(attributeIndex), color = Color.Blue)
+        Box(modifier = Modifier.background(Color.Red).border(width = 2.dp, color = Color.Red)) {
+            Text(text = playlist.getFieldNameOfIndex(attributeIndex), color = Color.Black)
         }
     }
 }
 
 @Composable
-private fun PlaylistRow(model: ViewModelLazyList, playlist: Playlist) = LazyRow(
+private fun PlaylistRow(model: ViewModelLazyList, playlistFormModel: PlaylistFormModel) {
+    val isSelected = AppState.selectedPlaylist.value == playlistFormModel
+    val backgroundColor = if (isSelected) { Color.Yellow } else { Color.LightGray }
+
+    LazyRow(
     modifier = Modifier
-        .background(Color.LightGray)
+        .background(backgroundColor)
         .fillMaxWidth()
-        .defaultMinSize(minWidth = 50.dp),
-        /*.selectable(
-            selected = if (AppState.selectedPlaylist != null) {AppState.selectedPlaylist.playlist.id == playlist.id} else false,
+        .defaultMinSize(minWidth = 50.dp)
+        .selectable(
+            selected = isSelected,
             onClick = {
-                model.selectPlaylist(playlist.id.toInt())
+                model.selectPlaylist(playlistFormModel)
             }
-        ),*/
+        ),
     horizontalArrangement = Arrangement.spacedBy(10.dp)
 ) {
-    items(count = playlist.getNumberOfAttributes()) { attributeIndex ->
+    items(count = playlistFormModel.playlist.getNumberOfAttributes()) { attributeIndex ->
         Box(
-            Modifier.background(Color.White).border(width = 2.dp, color = Color.White)
-            /*if (AppState.selectedPlaylist != null && AppState.selectedPlaylist.playlist.id == playlist.id) {
-                Modifier.background(Color.Red).border(width = 2.dp, color = Color.Red).fillMaxWidth()
-            } else {
-                Modifier.background(Color.LightGray).border(width = 2.dp, color = Color.LightGray).fillMaxWidth()
-            }*/
+            Modifier.background(backgroundColor).border(width = 2.dp, color = backgroundColor).fillMaxWidth()
         ) {
-            Text(text = playlist.getFieldValueOfIndex(attributeIndex).toString(), color = Color.Blue, modifier = Modifier.background(Color.LightGray))
+            Text(text = playlistFormModel.playlist.getFieldValueOfIndex(attributeIndex).toString(), color = Color.Black, modifier = Modifier.background(backgroundColor))
         }
     }
+}
 }
 
 @Composable
@@ -140,7 +123,7 @@ private fun PlaylistRowPlaceholder() = LazyRow(
 ) {
     item {
         Box(
-            Modifier.background(Color.White).border(width = 2.dp, color = Color.White)
+            Modifier.background(Color.LightGray).border(width = 2.dp, color = Color.LightGray)
         ) {
             Text("")
         }

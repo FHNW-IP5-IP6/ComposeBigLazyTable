@@ -9,6 +9,7 @@ enum class FormsBLTLabels(val deutsch: String, val english: String) : ILabel {
     TITLE("Spotify Daten","Spotify data"),
     HEADERGROUP("Playlist Übersicht", "Playlist Overview"),
 
+    ID("ID", "ID"),
     NAME("Name", "Name"),
     COLLABORATIVE("Gemeinsam", "Collaborative"),
     SELECTIONYES("Ja", "Yes"),

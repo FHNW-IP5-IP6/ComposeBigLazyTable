@@ -37,7 +37,7 @@ class ViewModelLazyList(private val dbService: DBService) {
         if (index != firstIndex) {
             // Calculate next index to load
             val indexToLoad = if (index > firstIndex) { index + (2 * pageSize) } else { index - (2 * pageSize) }
-            //
+            // Boolean if page is added at the end of the list
             val end = index > firstIndex
             // Set firstIndex to new value
             firstIndex = index
@@ -63,7 +63,7 @@ class ViewModelLazyList(private val dbService: DBService) {
         // Add new page to list
         for (i in index until index+pageSize) {
             if (i in 0 until totalCount) {
-                AppState.testList.set(index = i, element = cache[newPage]!![i%pageSize])
+                AppState.uiList.set(index = i, element = cache[newPage]!![i%pageSize])
             }
         }
     }
@@ -73,79 +73,13 @@ class ViewModelLazyList(private val dbService: DBService) {
         val startIndexOldPage = if (end) { index - 4*pageSize } else { index + 4*pageSize }
         for (i in startIndexOldPage until startIndexOldPage+pageSize) {
             if (i in 0 until totalCount) {
-                AppState.testList.set(index = i, element = null)
+                AppState.uiList.set(index = i, element = null)
             }
         }
     }
 
-    fun selectPlaylist(id: Int) {
-        //AppState.selectedPlaylist = AppState.testList.find { playlistFormModel -> playlistFormModel.playlist.id.toInt() == id }!!
+    fun selectPlaylist(playlistFormModel: PlaylistFormModel) {
+        AppState.selectedPlaylist.value = playlistFormModel
     }
-
-
-/*
-
-    private val firstPage = 0
-
-    var previousPage: Int? = null
-    var currentPage: Int = firstPage
-    var nextPage: Int? = currentPage + 1
-
-    private var cacheOld: MutableMap<Int, List<Playlist>> = mutableMapOf()
-
-    // rounds to the next int -> 10 / 3 = 4 -> because we would need 4 pages if pageSize=3
-    private val lastPage = getNumberOfPages()
-
-    lateinit var playlists: MutableList<Playlist>
-
-    private var currentPlaylist = mutableStateOf(Playlist())
-    var currentPlaylistIndex = mutableStateOf(0)
-
-    private fun getNumberOfPages() = ceil(dbService.getTotalCount() / pageSize.toDouble()).toInt()
-
-    fun initialLoad() {
-        cacheOld[currentPage] = dbService.getPage(startIndex = currentPage, pageSize = pageSize)
-        cacheOld[nextPage!!] = dbService.getPage(startIndex = nextPage!!*pageSize, pageSize = pageSize)
-        playlists = buildPlaylists(cacheOld)
-        initCurrentPlaylist()
-    }
-
-    fun loadNextPage() {
-        goToNextPage()
-        previousPage?.let { cacheOld.remove(it) }
-        val startIndexOfNextPage = nextPage?.times(pageSize)!! // = nextPage * pageSize
-        //val lastIndexOfCurrentPage = cache[currentPage]!!.lastIndex
-        nextPage?.let { cacheOld[it] = dbService.getPage(startIndexOfNextPage, pageSize) }
-        playlists = buildPlaylists(cacheOld)
-    }
-
-    private fun buildPlaylists(map: MutableMap<Int, List<Playlist>>): MutableList<Playlist> {
-        val result: MutableList<Playlist> = mutableListOf()
-        map.values.forEach { list ->
-            result.addAll(list)
-        }
-        return result
-    }
-
-    private fun goToNextPage() {
-        previousPage = currentPage
-        currentPage = nextPage ?: lastPage
-        nextPage = if (nextPage == lastPage) null else nextPage!!.plus(1)
-    }
-
-    private fun goToPreviousPage() {
-        nextPage = currentPage
-        currentPage = previousPage ?: firstPage
-        previousPage = if (previousPage == firstPage) null else previousPage!!.minus(1)
-    }
-
-    fun setCurrentPlaylist() {
-        currentPlaylist.value = playlists[currentPlaylistIndex.value]
-    }
-
-    private fun initCurrentPlaylist() {
-        currentPlaylist.value = playlists.first()
-    }
-*/
 
 }

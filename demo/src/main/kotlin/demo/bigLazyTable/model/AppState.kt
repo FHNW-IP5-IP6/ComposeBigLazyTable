@@ -1,13 +1,13 @@
 package demo.bigLazyTable.model
 
+import androidx.compose.runtime.mutableStateOf
 import demo.bigLazyTable.data.database.DBService
 import java.util.*
 
 object AppState {
 
-    var uiList: List<PlaylistFormModel> = listOf()
-    val testList: MutableList<PlaylistFormModel?> = ArrayList(Collections.nCopies(DBService().getTotalCount(), null))
+    val uiList: MutableList<PlaylistFormModel?> = ArrayList(Collections.nCopies(DBService().getTotalCount(), null))
 
-    //var selectedPlaylist: PlaylistFormModel = testList[0]!!
+    val selectedPlaylist = mutableStateOf(PlaylistFormModel(Playlist()))
 
 }

@@ -34,13 +34,11 @@ fun ComposeListsUI(model: ViewModelLazyList) {
 @Composable
 private fun MainContent(model: ViewModelLazyList) {
     Row(modifier = Modifier.fillMaxSize()) {
-        Box(modifier = Modifier.weight(1f)) {
+        Box(modifier = Modifier.weight(2f)) {
             PlaylistList(model)
         }
-        Box(modifier = Modifier.weight(1f)) {
-            /*if (AppState.selectedPlaylist != null) {
-                DataForm(AppState.selectedPlaylist)
-            }*/
+        Box(modifier = Modifier.weight(3f)) {
+            DataForm(AppState.selectedPlaylist.value)
         }
     }
 }
