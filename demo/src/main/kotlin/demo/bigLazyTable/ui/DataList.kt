@@ -10,7 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import composeForms.ui.theme.ColorsUtil.Companion.get
+import composeForms.ui.theme.FormColors
 import demo.bigLazyTable.model.AppState
 import demo.bigLazyTable.model.ViewModelLazyList
 import demo.bigLazyTable.model.Playlist
@@ -23,7 +26,9 @@ import demo.bigLazyTable.model.PlaylistFormModel
 fun PlaylistList(model: ViewModelLazyList) {
     val testPlaylist = AppState.uiList
 
-    Column {
+    Column(
+        modifier = Modifier.padding(horizontal = 5.dp)
+    ) {
         HeaderRow(Playlist())
 
         val listState = rememberLazyListState(initialFirstVisibleItemIndex = 0)
@@ -75,13 +80,11 @@ private fun Any.getFieldValueOfIndex(index: Int): Any {
 
 @Composable
 private fun HeaderRow(playlist: Playlist) = LazyRow(
-    modifier = Modifier.background(Color.Red).fillMaxWidth().defaultMinSize(minWidth = 30.dp),
-    horizontalArrangement = Arrangement.spacedBy(10.dp)
+    modifier = Modifier.background(get(FormColors.BACKGROUND_COLOR_HEADER)).fillMaxWidth().padding(horizontal = 5.dp),
+    horizontalArrangement = Arrangement.SpaceBetween
 ) {
     items(count = playlist.getNumberOfAttributes()) { attributeIndex ->
-        Box(modifier = Modifier.background(Color.Red).border(width = 2.dp, color = Color.Red)) {
-            Text(text = playlist.getFieldNameOfIndex(attributeIndex), color = Color.Black)
-        }
+        Text(text = playlist.getFieldNameOfIndex(attributeIndex), color = Color.White, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -94,21 +97,21 @@ private fun PlaylistRow(model: ViewModelLazyList, playlistFormModel: PlaylistFor
     modifier = Modifier
         .background(backgroundColor)
         .fillMaxWidth()
-        .defaultMinSize(minWidth = 50.dp)
+        .padding(horizontal = 5.dp)
         .selectable(
             selected = isSelected,
             onClick = {
                 model.selectPlaylist(playlistFormModel)
             }
         ),
-    horizontalArrangement = Arrangement.spacedBy(10.dp)
+    horizontalArrangement = Arrangement.SpaceBetween
 ) {
     items(count = playlistFormModel.playlist.getNumberOfAttributes()) { attributeIndex ->
-        Box(
-            Modifier.background(backgroundColor).border(width = 2.dp, color = backgroundColor).fillMaxWidth()
-        ) {
-            Text(text = playlistFormModel.playlist.getFieldValueOfIndex(attributeIndex).toString(), color = Color.Black, modifier = Modifier.background(backgroundColor))
-        }
+        Text(
+            text = playlistFormModel.playlist.getFieldValueOfIndex(attributeIndex).toString(),
+            color = Color.Black,
+            modifier = Modifier.background(backgroundColor)
+        )
     }
 }
 }
@@ -118,14 +121,10 @@ private fun PlaylistRowPlaceholder() = LazyRow(
     modifier = Modifier
         .background(Color.LightGray)
         .fillMaxWidth()
-        .defaultMinSize(minWidth = 30.dp),
+        .padding(horizontal = 5.dp),
     horizontalArrangement = Arrangement.spacedBy(10.dp)
 ) {
     item {
-        Box(
-            Modifier.background(Color.LightGray).border(width = 2.dp, color = Color.LightGray)
-        ) {
-            Text("")
-        }
+        Text("")
     }
 }
