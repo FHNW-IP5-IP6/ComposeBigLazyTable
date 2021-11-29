@@ -142,6 +142,11 @@ abstract class Attribute <A,T,L> (
     //******************************************************************************************************************
     //User Input
 
+    // TODO:
+    fun setValue() {
+        TODO()
+    }
+
     /**
      * If the attribute is not readonly, valueAsText is set to the new input value.
      * This method also handles the undo and redo lists, checks if there are any changes compared to the savedValue
