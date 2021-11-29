@@ -72,17 +72,21 @@ class ViewModelLazyList(private val dbService: DBService) {
 
     private fun addToAppStateList(index: Int, newPage: Int) {
         // Add new page to list
-        for (i in index until index+pageSize) {
+        for (i in index until index + pageSize) {
             if (i in 0 until totalCount) {
-                AppState.uiList.set(index = i, element = cache[newPage]!![i%pageSize])
+                AppState.uiList.set(index = i, element = cache[newPage]!![i % pageSize])
             }
         }
     }
 
     private fun removeFromAppStateList(index: Int, end: Boolean) {
         // Remove old page from list
-        val startIndexOldPage = if (end) { index - 4*pageSize } else { index + 4*pageSize }
-        for (i in startIndexOldPage until startIndexOldPage+pageSize) {
+        val startIndexOldPage = if (end) {
+            index - 4 * pageSize
+        } else {
+            index + 4 * pageSize
+        }
+        for (i in startIndexOldPage until startIndexOldPage + pageSize) {
             if (i in 0 until totalCount) {
                 AppState.uiList.set(index = i, element = null)
             }
