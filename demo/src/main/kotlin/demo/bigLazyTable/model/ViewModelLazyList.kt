@@ -13,7 +13,7 @@ class ViewModelLazyList(private val dbService: DBService) {
 
     private val totalCount = dbService.getTotalCount()
     var firstIndex = 0
-    private val pageSize = 30
+    private val pageSize = 40
 
     private val cache: LruCache<Int, List<PlaylistFormModel>> = LruCache(4)
 
@@ -29,33 +29,44 @@ class ViewModelLazyList(private val dbService: DBService) {
     }
 
     fun get(index: Int) {
-        Log.info { "Index passed by UI List: $index" }
+        //Log.info { "Index passed by UI List: $index" }
         /*
         If index > firstIndex --> scrolled down
         If index < firstIndex --> scrolled up
          */
-        if (index != firstIndex) {
-            // Calculate next index to load
-            val indexToLoad = if (index > firstIndex) { index + (2 * pageSize) } else { index - (2 * pageSize) }
-            // Boolean if page is added at the end of the list
-            val end = index > firstIndex
-            // Set firstIndex to new value
-            firstIndex = index
-            // Calculate page of indexToLoad
-            val pageToLoad = indexToLoad / pageSize
-            // check if pageToLoad is not loaded in cache
-            if (pageToLoad >= 0 && !cache.contains(pageToLoad)) {
-                // Calculate pageStartIndexToLoad
-                val pageStartIndexToLoad = indexToLoad - (indexToLoad%30)
-                // Load page from service
-                val playlists = dbService.getPage(startIndex = pageStartIndexToLoad, pageSize = pageSize)
-                val playlistFormModels = playlists.map { PlaylistFormModel(it) }
-                // Save new page to cache
-                cache[pageToLoad] = playlistFormModels
-                // Update AppState List
-                addToAppStateList(index = pageStartIndexToLoad, newPage = pageToLoad)
-                removeFromAppStateList(index = pageStartIndexToLoad, end = end)
+        // Calculate next index to load
+        if (index > firstIndex) {
+            for (i in -1 until 3) {
+                val indexToLoad = index + (i * pageSize)
+                methode(index, indexToLoad)
             }
+        } else {
+            for (i in -1 until 3) {
+                val indexToLoad = index - (i * pageSize)
+                methode(index, indexToLoad)
+            }
+        }
+    }
+
+    private fun methode(index: Int, indexToLoad: Int) {
+        // Boolean if page is added at the end of the list
+        val end = index > firstIndex
+        // Set firstIndex to new value
+        firstIndex = index
+        // Calculate page of indexToLoad
+        val pageToLoad = indexToLoad / pageSize
+        // check if pageToLoad is not loaded in cache
+        if (pageToLoad >= 0 && !cache.contains(pageToLoad)) {
+            // Calculate pageStartIndexToLoad
+            val pageStartIndexToLoad = indexToLoad - (indexToLoad % pageSize)
+            // Load page from service
+            val playlists = dbService.getPage(startIndex = pageStartIndexToLoad, pageSize = pageSize)
+            val playlistFormModels = playlists.map { PlaylistFormModel(it) }
+            // Save new page to cache
+            cache[pageToLoad] = playlistFormModels
+            // Update AppState List
+            addToAppStateList(index = pageStartIndexToLoad, newPage = pageToLoad)
+            removeFromAppStateList(index = pageStartIndexToLoad, end = end)
         }
     }
 

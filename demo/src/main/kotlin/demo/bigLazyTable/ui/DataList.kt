@@ -90,7 +90,7 @@ private fun HeaderRow(playlist: Playlist) = LazyRow(
 
 @Composable
 private fun PlaylistRow(model: ViewModelLazyList, playlistFormModel: PlaylistFormModel) {
-    val isSelected = AppState.selectedPlaylist.value == playlistFormModel
+    val isSelected = AppState.selectedPlaylist.value.playlist.id == playlistFormModel.playlist.id
     val backgroundColor = if (isSelected) { Color.Yellow } else { Color.LightGray }
 
     LazyRow(

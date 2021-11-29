@@ -3,7 +3,10 @@ package demo.bigLazyTable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.remember
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import demo.bigLazyTable.data.database.DBService
 import demo.bigLazyTable.model.ViewModelLazyList
@@ -22,6 +25,7 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "ComposeLists"
     ) {
+        window.placement = WindowPlacement.Maximized
         setupDatabase()
         val model = remember { ViewModelLazyList(DBService()) }
         model.init()
