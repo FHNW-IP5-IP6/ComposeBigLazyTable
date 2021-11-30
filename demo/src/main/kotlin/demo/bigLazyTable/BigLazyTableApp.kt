@@ -3,8 +3,6 @@ package demo.bigLazyTable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.remember
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
@@ -25,10 +23,14 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "ComposeLists"
     ) {
+        // Set window size to Window-Fullscreen
         window.placement = WindowPlacement.Maximized
+        // Initialize database connection
         setupDatabase()
+        // Initialize model and load first batch of data to display the UI
         val model = remember { ViewModelLazyList(DBService()) }
         model.init()
+        // Initialize UI
         ComposeListsUI(model = model)
     }
 }

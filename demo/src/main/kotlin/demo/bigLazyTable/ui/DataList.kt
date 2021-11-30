@@ -24,7 +24,7 @@ import demo.bigLazyTable.model.PlaylistFormModel
  */
 @Composable
 fun PlaylistList(model: ViewModelLazyList) {
-    val testPlaylist = AppState.uiList
+    val lazyListItems = AppState.lazyModelList
 
     Column(
         modifier = Modifier.padding(horizontal = 5.dp)
@@ -51,7 +51,7 @@ fun PlaylistList(model: ViewModelLazyList) {
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 state = listState
             ) {
-                items(testPlaylist) { playlistFormModel ->
+                items(lazyListItems) { playlistFormModel ->
                     if (playlistFormModel != null) {
                         PlaylistRow(model, playlistFormModel)
                     } else {

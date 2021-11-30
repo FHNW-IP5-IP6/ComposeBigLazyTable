@@ -3,6 +3,9 @@ package demo.bigLazyTable.model
 import model.attributes.Attribute
 import java.util.concurrent.ConcurrentHashMap
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 /*
 class AttributeStore<T> {
 

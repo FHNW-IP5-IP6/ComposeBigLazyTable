@@ -13,8 +13,7 @@ import demo.bigLazyTable.model.AppState
 import demo.bigLazyTable.model.ViewModelLazyList
 
 /**
- * @author Marco Sprenger
- * @author Livio Näf
+ * @author Marco Sprenger, Livio Näf
  */
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi

@@ -2,6 +2,9 @@ package demo.bigLazyTable.model
 
 import java.util.*
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 class EntityKey(private val type: String, private val id: Long) {
     fun getType() = type
 
