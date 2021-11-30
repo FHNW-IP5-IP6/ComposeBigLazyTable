@@ -2,6 +2,9 @@ import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+dependencies {
+    implementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
+}
 plugins {
     kotlin("jvm")
     id("org.jetbrains.compose") version "1.0.0-alpha3"

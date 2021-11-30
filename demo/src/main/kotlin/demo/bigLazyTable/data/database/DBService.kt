@@ -10,6 +10,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
  */
 class DBService : IPagingService<Playlist> {
 
+    // TODO: Validate startIndex -> should not be bigger than what getTotalCount() returns
     override fun getPage(startIndex: Int, pageSize: Int, filter: String): List<Playlist> {
         val start: Long = if (filter == "") startIndex.toLong() else 0
         return transaction {
