@@ -83,8 +83,8 @@ private fun HeaderRow(playlist: Playlist) = LazyRow(
     modifier = Modifier.background(get(FormColors.BACKGROUND_COLOR_HEADER)).fillMaxWidth().padding(horizontal = 5.dp),
     horizontalArrangement = Arrangement.SpaceBetween
 ) {
-    items(count = playlist.getNumberOfAttributes()) { attributeIndex ->
-        Text(text = playlist.getFieldNameOfIndex(attributeIndex), color = Color.White, fontWeight = FontWeight.Bold)
+    items(model.allAttributes(playlistFormModel)) { attribute ->
+        Text(text = attribute.getLabel(), color = Color.White, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -106,9 +106,9 @@ private fun PlaylistRow(model: ViewModelLazyList, playlistFormModel: PlaylistFor
         ),
     horizontalArrangement = Arrangement.SpaceBetween
 ) {
-    items(count = playlistFormModel.playlist.getNumberOfAttributes()) { attributeIndex ->
+    items(model.allAttributes(playlistFormModel)) { attribute ->
         Text(
-            text = playlistFormModel.playlist.getFieldValueOfIndex(attributeIndex).toString(),
+            text = attribute.getValueAsText(),
             color = Color.Black,
             modifier = Modifier.background(backgroundColor)
         )

@@ -20,13 +20,13 @@ class PlaylistFormModel(val playlist: Playlist): BaseModel<FormsBLTLabels>(title
         readOnly = true
     )
 
-    private val name = StringAttribute(
+    val name = StringAttribute(
         model = this,
         label = FormsBLTLabels.NAME,
         value = playlist.name
     )
 
-    private val collaborative = BooleanAttribute(
+    val collaborative = BooleanAttribute(
         model = this,
         label = FormsBLTLabels.COLLABORATIVE,
         trueText = FormsBLTLabels.SELECTIONYES,
