@@ -1,6 +1,7 @@
 package demo.bigLazyTable.model
 
 import model.BaseModel
+import model.attributes.Attribute
 import model.attributes.BooleanAttribute
 import model.attributes.LongAttribute
 import model.attributes.StringAttribute
@@ -11,9 +12,9 @@ import model.modelElements.HeaderGroup
 /**
  * @author Marco Sprenger, Livio Näf
  */
-class PlaylistFormModel(val playlist: Playlist): BaseModel<FormsBLTLabels>(title = FormsBLTLabels.TITLE) {
+class PlaylistFormModel(playlist: Playlist): BaseModel<FormsBLTLabels>(title = FormsBLTLabels.TITLE) {
 
-    private val id = LongAttribute(
+    val id = LongAttribute(
         model = this,
         label = FormsBLTLabels.ID,
         value = playlist.id,
@@ -34,14 +35,16 @@ class PlaylistFormModel(val playlist: Playlist): BaseModel<FormsBLTLabels>(title
         value = playlist.collaborative
     )
 
-    private val modifiedAt = StringAttribute(
+    val modifiedAt = StringAttribute(
         model = this,
         label = FormsBLTLabels.MODIFIED_AT,
         required = true,
         value = playlist.modifiedAt
     )
 
-    val headerGroup = HeaderGroup(
+    val attributes = listOf<Attribute<*, *, *>>(id, name, modifiedAt, collaborative)
+
+    private val headerGroup = HeaderGroup(
         model = this, title = FormsBLTLabels.HEADERGROUP,
         Field(id, FieldSize.SMALL),
         Field(name, FieldSize.NORMAL),

@@ -1,8 +1,10 @@
 package demo.bigLazyTable.model
 
+import androidx.compose.runtime.mutableStateOf
 import demo.bigLazyTable.data.database.DBService
-import org.junit.platform.commons.util.LruCache
 import mu.KotlinLogging
+import org.junit.platform.commons.util.LruCache
+import kotlin.math.ceil
 
 private val Log = KotlinLogging.logger {}
 
@@ -14,6 +16,8 @@ class ViewModelLazyList(private val dbService: DBService) {
     private val totalCount = dbService.getTotalCount()
     var firstIndex = 0
     private val pageSize = 40
+    var currentPage = mutableStateOf(0)
+    val maxPages = ceil(totalCount.toDouble() / pageSize).toInt()
 
     private val cache: LruCache<Int, List<PlaylistFormModel>> = LruCache(4)
 
@@ -30,26 +34,20 @@ class ViewModelLazyList(private val dbService: DBService) {
     }
 
     fun get(index: Int) {
-        //Log.info { "Index passed by UI List: $index" }
         /*
         If index > firstIndex --> scrolled down
         If index < firstIndex --> scrolled up
          */
-        // Calculate next index to load
-        if (index > firstIndex) {
-            for (i in -1 until 3) {
-                val indexToLoad = index + (i * pageSize)
-                methode(index, indexToLoad)
-            }
-        } else {
-            for (i in -1 until 3) {
-                val indexToLoad = index - (i * pageSize)
-                methode(index, indexToLoad)
-            }
+        currentPage.value = index / pageSize
+        val scrolledDown = index > firstIndex
+        // load 4 pages
+        for (i in -1 until 3) {
+            val indexToLoad = if (scrolledDown) index + (i * pageSize) else index - (i * pageSize)
+            loadPage(index, indexToLoad)
         }
     }
 
-    private fun methode(index: Int, indexToLoad: Int) {
+    private fun loadPage(index: Int, indexToLoad: Int) {
         // Boolean if page is added at the end of the list
         val end = index > firstIndex
         // Set firstIndex to new value
@@ -98,4 +96,5 @@ class ViewModelLazyList(private val dbService: DBService) {
         AppState.selectedPlaylist.value = playlistFormModel
     }
 
+    fun allAttributes(playlistFormModel: PlaylistFormModel) = playlistFormModel.attributes
 }

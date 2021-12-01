@@ -15,8 +15,8 @@ import androidx.compose.ui.unit.dp
 import composeForms.ui.theme.ColorsUtil.Companion.get
 import composeForms.ui.theme.FormColors
 import demo.bigLazyTable.model.AppState
-import demo.bigLazyTable.model.ViewModelLazyList
 import demo.bigLazyTable.model.Playlist
+import demo.bigLazyTable.model.ViewModelLazyList
 import demo.bigLazyTable.model.PlaylistFormModel
 
 /**
@@ -24,62 +24,60 @@ import demo.bigLazyTable.model.PlaylistFormModel
  */
 @Composable
 fun PlaylistList(model: ViewModelLazyList) {
-    val lazyListItems = AppState.lazyModelList
 
     Column(
-        modifier = Modifier.padding(horizontal = 5.dp)
+        modifier = Modifier.padding(horizontal = 5.dp),
+        verticalArrangement = Arrangement.Top
     ) {
-        HeaderRow(Playlist())
+        PageInfoRow(model)
+        HeaderRow(model, PlaylistFormModel(Playlist()))
+        LazyColumn(model)
 
-        val listState = rememberLazyListState(initialFirstVisibleItemIndex = 0)
-
-        val scrollbarStyle = ScrollbarStyle(
-            minimalHeight = 16.dp,
-            thickness = 12.dp,
-            shape = RoundedCornerShape(4.dp),
-            hoverDurationMillis = 1000,
-            unhoverColor = Color.Red.copy(alpha = 0.3f),
-            hoverColor = Color.Red.copy(alpha = 0.8f)
-        )
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            if (listState.firstVisibleItemIndex != model.firstIndex) {
-                model.get(listState.firstVisibleItemIndex)
-            }
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-                state = listState
-            ) {
-                items(lazyListItems) { playlistFormModel ->
-                    if (playlistFormModel != null) {
-                        PlaylistRow(model, playlistFormModel)
-                    } else {
-                        PlaylistRowPlaceholder()
-                    }
-                }
-            }
-
-            VerticalScrollbar(
-                adapter = rememberScrollbarAdapter(listState),
-                modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
-                style = scrollbarStyle
-            )
-        }
     }
 }
 
-// Helpers to get all attributes of an object
-private fun Any.getNumberOfAttributes() = javaClass.declaredFields.size - 1 // no id & no $stable
-private fun Any.getFieldNameOfIndex(index: Int) = javaClass.declaredFields[index].name
-private fun Any.getFieldValueOfIndex(index: Int): Any {
-    val field = javaClass.declaredFields[index]
-    field.isAccessible = true
-    return field.get(this)
+@Composable
+private fun LazyColumn(model: ViewModelLazyList) {
+    val lazyListItems = AppState.lazyModelList
+    val listState = rememberLazyListState(initialFirstVisibleItemIndex = 0)
+    val scrollbarStyle = ScrollbarStyle(
+        minimalHeight = 16.dp,
+        thickness = 12.dp,
+        shape = RoundedCornerShape(4.dp),
+        hoverDurationMillis = 1000,
+        unhoverColor = Color.Red.copy(alpha = 0.3f),
+        hoverColor = Color.Red.copy(alpha = 0.8f)
+    )
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        if (listState.firstVisibleItemIndex != model.firstIndex) {
+            model.get(listState.firstVisibleItemIndex)
+        }
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            state = listState
+        ) {
+            items(lazyListItems) { playlistFormModel ->
+                if (playlistFormModel != null) {
+                    PlaylistRow(model, playlistFormModel)
+                } else {
+                    PlaylistRowPlaceholder()
+                }
+            }
+        }
+
+        VerticalScrollbar(
+            adapter = rememberScrollbarAdapter(listState),
+            modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+            style = scrollbarStyle
+        )
+    }
 }
 
 @Composable
-private fun HeaderRow(playlist: Playlist) = LazyRow(
+private fun HeaderRow(model: ViewModelLazyList, playlistFormModel: PlaylistFormModel) = LazyRow(
     modifier = Modifier.background(get(FormColors.BACKGROUND_COLOR_HEADER)).fillMaxWidth().padding(horizontal = 5.dp),
     horizontalArrangement = Arrangement.SpaceBetween
 ) {
@@ -89,8 +87,18 @@ private fun HeaderRow(playlist: Playlist) = LazyRow(
 }
 
 @Composable
+private fun PageInfoRow(model: ViewModelLazyList) = LazyRow(
+    modifier = Modifier.background(get(FormColors.BACKGROUND_COLOR_HEADER)).fillMaxWidth().padding(horizontal = 5.dp),
+    horizontalArrangement = Arrangement.Start
+) {
+    item {
+        Text(text = "Page: ${model.currentPage.value}/${model.maxPages}", color = Color.White, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
 private fun PlaylistRow(model: ViewModelLazyList, playlistFormModel: PlaylistFormModel) {
-    val isSelected = AppState.selectedPlaylist.value.playlist.id == playlistFormModel.playlist.id
+    val isSelected = AppState.selectedPlaylist.value.id.getValue() == playlistFormModel.id.getValue()
     val backgroundColor = if (isSelected) { Color.Yellow } else { Color.LightGray }
 
     LazyRow(
