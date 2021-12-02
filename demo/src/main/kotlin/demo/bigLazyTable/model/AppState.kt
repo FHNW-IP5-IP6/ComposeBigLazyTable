@@ -9,7 +9,9 @@ import java.util.*
  */
 object AppState {
 
-    val lazyModelList: MutableList<PlaylistFormModel?> = ArrayList(Collections.nCopies(DBService().getTotalCount(), null))
+    val defaultPlaylistFormModel = mutableStateOf(PlaylistFormModel(Playlist()))
+
+    val lazyModelList: MutableList<PlaylistFormModel> = ArrayList(Collections.nCopies(DBService().getTotalCount(), defaultPlaylistFormModel.value))
 
     val selectedPlaylist = mutableStateOf(PlaylistFormModel(Playlist()))
 

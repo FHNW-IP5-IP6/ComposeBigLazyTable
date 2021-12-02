@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import composeForms.ui.theme.ColorsUtil.Companion.get
 import composeForms.ui.theme.FormColors
 import demo.bigLazyTable.model.AppState
-import demo.bigLazyTable.model.Playlist
 import demo.bigLazyTable.model.ViewModelLazyList
 import demo.bigLazyTable.model.PlaylistFormModel
 
@@ -30,7 +29,7 @@ fun PlaylistList(model: ViewModelLazyList) {
         verticalArrangement = Arrangement.Top
     ) {
         PageInfoRow(model)
-        HeaderRow(model, PlaylistFormModel(Playlist()))
+        HeaderRow()
         LazyColumn(model)
 
     }
@@ -60,11 +59,7 @@ private fun LazyColumn(model: ViewModelLazyList) {
             state = listState
         ) {
             items(lazyListItems) { playlistFormModel ->
-                if (playlistFormModel != null) {
-                    PlaylistRow(model, playlistFormModel)
-                } else {
-                    PlaylistRowPlaceholder()
-                }
+                PlaylistRow(model, playlistFormModel)
             }
         }
 
@@ -77,11 +72,11 @@ private fun LazyColumn(model: ViewModelLazyList) {
 }
 
 @Composable
-private fun HeaderRow(model: ViewModelLazyList, playlistFormModel: PlaylistFormModel) = LazyRow(
+private fun HeaderRow() = LazyRow(
     modifier = Modifier.background(get(FormColors.BACKGROUND_COLOR_HEADER)).fillMaxWidth().padding(horizontal = 5.dp),
     horizontalArrangement = Arrangement.SpaceBetween
 ) {
-    items(model.allAttributes(playlistFormModel)) { attribute ->
+    items(AppState.defaultPlaylistFormModel.value.lazyListAttributes) { attribute ->
         Text(text = attribute.getLabel(), color = Color.White, fontWeight = FontWeight.Bold)
     }
 }
@@ -109,38 +104,27 @@ private fun PlaylistRow(model: ViewModelLazyList, playlistFormModel: PlaylistFor
         Color.LightGray
     }
 
-    LazyRow(
-        modifier = Modifier
-            .background(backgroundColor)
-            .fillMaxWidth()
-            .padding(horizontal = 5.dp)
-            .selectable(
-                selected = isSelected,
-                onClick = {
-                    model.selectPlaylist(playlistFormModel)
-                }
-            ),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        items(model.allAttributes(playlistFormModel)) { attribute ->
-            Text(
-                text = attribute.getValueAsText(),
-                color = Color.Black,
-                modifier = Modifier.background(backgroundColor)
-            )
+    with(model) {
+        LazyRow(
+            modifier = Modifier
+                .background(backgroundColor)
+                .fillMaxWidth()
+                .padding(horizontal = 5.dp)
+                .selectable(
+                    selected = isSelected,
+                    onClick = {
+                        selectPlaylist(playlistFormModel)
+                    }
+                ),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            items(getLazyListAttributes(playlistFormModel)) { attribute ->
+                Text(
+                    text = if (attribute.getValueAsText() != (-999_999).toString()) attribute.getValueAsText() else "...",
+                    color = Color.Black,
+                    modifier = Modifier.background(backgroundColor)
+                )
+            }
         }
-    }
-}
-
-@Composable
-private fun PlaylistRowPlaceholder() = LazyRow(
-    modifier = Modifier
-        .background(Color.LightGray)
-        .fillMaxWidth()
-        .padding(horizontal = 5.dp),
-    horizontalArrangement = Arrangement.spacedBy(10.dp)
-) {
-    item {
-        Text("")
     }
 }

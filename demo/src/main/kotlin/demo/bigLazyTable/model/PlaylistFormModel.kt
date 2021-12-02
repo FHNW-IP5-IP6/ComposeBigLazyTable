@@ -196,7 +196,7 @@ class PlaylistFormModel(playlist: Playlist) : BaseModel<FormsBLTLabels>(title = 
         value = playlist.track4AlbumName
     )
 
-    val attributes = listOf<Attribute<*, *, *>>(id, name, numTracks, numFollowers, durationMs)
+    val lazyListAttributes = listOf<Attribute<*, *, *>>(id, name, numTracks, numFollowers, durationMs)
 
     private val headerGroup = HeaderGroup(
         model = this,

@@ -5,10 +5,10 @@ package demo.bigLazyTable.model
  */
 
 const val loadingPlaceholderString = "..."
-const val loadingPlaceholderNumber = 0
+const val loadingPlaceholderNumber = -999_999
 
 data class Playlist(
-    val id: Long = -1,
+    val id: Long = loadingPlaceholderNumber.toLong(),
     val name: String = loadingPlaceholderString,
     val collaborative: Boolean = false,
     val modifiedAt: String = loadingPlaceholderString,

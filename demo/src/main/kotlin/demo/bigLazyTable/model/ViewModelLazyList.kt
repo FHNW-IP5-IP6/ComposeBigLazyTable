@@ -30,7 +30,7 @@ class ViewModelLazyList(private val dbService: DBService) {
         cache[1] = playlistFormModels2
         addToAppStateList(0, 0)
         addToAppStateList(pageSize, 1)
-        selectPlaylist(AppState.lazyModelList[0]!!)
+        selectPlaylist(AppState.lazyModelList[0])
     }
 
     fun get(index: Int) {
@@ -87,7 +87,7 @@ class ViewModelLazyList(private val dbService: DBService) {
         }
         for (i in startIndexOldPage until startIndexOldPage + pageSize) {
             if (i in 0 until totalCount) {
-                AppState.lazyModelList.set(index = i, element = null)
+                AppState.lazyModelList.set(index = i, element = AppState.defaultPlaylistFormModel.value)
             }
         }
     }
@@ -96,5 +96,5 @@ class ViewModelLazyList(private val dbService: DBService) {
         AppState.selectedPlaylist.value = playlistFormModel
     }
 
-    fun allAttributes(playlistFormModel: PlaylistFormModel) = playlistFormModel.attributes
+    fun getLazyListAttributes(playlistFormModel: PlaylistFormModel) = playlistFormModel.lazyListAttributes
 }
