@@ -75,7 +75,7 @@ class DBService : IPagingService<Playlist> {
             it[DatabasePlaylists.track4_artist_name],
             it[DatabasePlaylists.track4_track_name],
             it[DatabasePlaylists.track4_duration_ms],
-            it[DatabasePlaylists.track4_album_name],
+            it[DatabasePlaylists.track4_album_name]
         )
     }
 }
