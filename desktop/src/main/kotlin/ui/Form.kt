@@ -22,8 +22,6 @@
 
 package ui
 
-import androidx.compose.desktop.AppManager
-import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -37,13 +35,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.Key.Companion.Window
-//import androidx.compose.ui.input.key.KeysSet TODO: How to replace this?
 import model.IModel
-import model.attributes.DualAttribute
 import model.modelElements.HeaderGroup
-import ui.theme.ColorsUtil.Companion.get
-import ui.theme.FormColors
+import composeForms.ui.theme.ColorsUtil.Companion.get
+import composeForms.ui.theme.FormColors
 
 
 /**
@@ -64,7 +59,7 @@ class Form {
         val keyEventsFromUIElement = remember { mutableMapOf<Key, MutableMap<Int, ()->Unit>>() }
         val showValidations = remember { mutableStateOf(false) }
 
-        addDefaultKeyBehaviour(model, keyEventsFromUIElement){ showValidations.value = it }
+        //addDefaultKeyBehaviour(model, keyEventsFromUIElement){ showValidations.value = it }
 
         Column(modifier = Modifier.fillMaxSize().background(get(FormColors.BODY_BACKGROUND))) {
             Header(model) { showValidations.value = it }
@@ -123,75 +118,77 @@ private fun StickyBody(model: IModel<*>){
     }
 }
 
+/*
 /**
  * Adds default behaviour for key events. Therefore the key events have to be passed further if some field specific
  * events are made.
  * @param model: [IModel] that receives the command clicked on the keyboard.
  */
+
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun addDefaultKeyBehaviour(model: IModel<*>, keyListener: Map<Key, MutableMap<Int, ()->Unit>>,
                                    changeShowError: (Boolean) -> Unit){
 
     val key: Key = if(System.getProperty("os.name") == "Mac OS X") Key.MetaLeft else Key.CtrlLeft
-    // TODO: What is new way in compose to do this???
-//    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.S))){
-//        changeShowError(!model.save())
-//    }
-//    // TODO: What is new way in compose to do this???
-//    LocalAppWindow.current.keyboard.setShortcut(Key.Tab){
-//        model.focusNext()
-//        keyListener[Key.Tab]?.map { it.value }?.forEach{ it()}
-//    }
-//    // TODO: What is new way in compose to do this???
-//    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(Key.Tab, Key.ShiftLeft))){
-//        model.focusPrevious()
-//        keyListener[Key.Tab]?.forEach {
-//            it.value()
-//        }
-//    }
-//    // TODO: What is new way in compose to do this???
-//    LocalAppWindow.current.keyboard.setShortcut(Key.Spacebar){
-//        if(model.getCurrentFocusedAttribute() is DualAttribute<*,*,*>){
-//            (model.getCurrentFocusedAttribute() as DualAttribute<*,*,*>).changeDecision()
-//        }
-//        keyListener[Key.Spacebar]?.map { it.value }?.forEach{ it()}
-//    }
-//    // TODO: What is new way in compose to do this???
-//    LocalAppWindow.current.keyboard.setShortcut(Key.Enter){
-//        keyListener[Key.Enter]?.map { it.value }?.forEach{ it()}
-//    }
-//    // TODO: What is new way in compose to do this???
-//    LocalAppWindow.current.keyboard.setShortcut(Key.DirectionUp){
-//        keyListener[Key.DirectionUp]?.map { it.value }?.forEach{ it()}
-//    }
-//    // TODO: What is new way in compose to do this???
-//    LocalAppWindow.current.keyboard.setShortcut(Key.DirectionDown){
-//        keyListener[Key.DirectionDown]?.map { it.value }?.forEach{ it()}
-//    }
-//    // TODO: What is new way in compose to do this???
-//    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.R))){
-//        model.reset()
-//    }
-//    // TODO: What is new way in compose to do this???
-//    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.B))){
-//        if(model.getCurrentGroupIndex() != 0){
-//            model.previousWizardGroup()
-//        }
-//    }
-//    // TODO: What is new way in compose to do this???
-//    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.N))){
-//        changeShowError(!model.save())
-//    }
-//    // TODO: What is new way in compose to do this???
-//    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.E))){
-//        if(model.isWizardMode() && model.isLastWizardGroup() && model.isValidForWizardGroup()) {
-//            AppManager.focusedWindow?.close()
-//        }
-//    }
-//    // TODO: What is new way in compose to do this???
-//    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.M))){
-//        keyListener[Key.M]?.map { it.value }?.forEach{ it()}
-//    }
+    // What is new way in compose to do this???
+    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.S))){
+        changeShowError(!model.save())
+    }
+    // What is new way in compose to do this???
+    LocalAppWindow.current.keyboard.setShortcut(Key.Tab){
+        model.focusNext()
+        keyListener[Key.Tab]?.map { it.value }?.forEach{ it()}
+    }
+    // What is new way in compose to do this???
+    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(Key.Tab, Key.ShiftLeft))){
+        model.focusPrevious()
+        keyListener[Key.Tab]?.forEach {
+            it.value()
+        }
+    }
+    // What is new way in compose to do this???
+    LocalAppWindow.current.keyboard.setShortcut(Key.Spacebar){
+        if(model.getCurrentFocusedAttribute() is DualAttribute<*,*,*>){
+            (model.getCurrentFocusedAttribute() as DualAttribute<*,*,*>).changeDecision()
+        }
+        keyListener[Key.Spacebar]?.map { it.value }?.forEach{ it()}
+    }
+    // What is new way in compose to do this???
+    LocalAppWindow.current.keyboard.setShortcut(Key.Enter){
+        keyListener[Key.Enter]?.map { it.value }?.forEach{ it()}
+    }
+    // What is new way in compose to do this???
+    LocalAppWindow.current.keyboard.setShortcut(Key.DirectionUp){
+        keyListener[Key.DirectionUp]?.map { it.value }?.forEach{ it()}
+    }
+    // What is new way in compose to do this???
+    LocalAppWindow.current.keyboard.setShortcut(Key.DirectionDown){
+        keyListener[Key.DirectionDown]?.map { it.value }?.forEach{ it()}
+    }
+    // What is new way in compose to do this???
+    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.R))){
+        model.reset()
+    }
+    // What is new way in compose to do this???
+    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.B))){
+        if(model.getCurrentGroupIndex() != 0){
+            model.previousWizardGroup()
+        }
+    }
+    // What is new way in compose to do this???
+    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.N))){
+        changeShowError(!model.save())
+    }
+    // What is new way in compose to do this???
+    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.E))){
+        if(model.isWizardMode() && model.isLastWizardGroup() && model.isValidForWizardGroup()) {
+            AppManager.focusedWindow?.close()
+        }
+    }
+    // What is new way in compose to do this???
+    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.M))){
+        keyListener[Key.M]?.map { it.value }?.forEach{ it()}
+    }
 
-}
+}*/

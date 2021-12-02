@@ -22,8 +22,8 @@
 
 package model.attributes
 
-import convertibles.CustomConvertible
-import convertibles.ReplacementPair
+import composeForms.convertibles.CustomConvertible
+import composeForms.convertibles.ReplacementPair
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import model.BaseModel

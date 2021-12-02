@@ -41,8 +41,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import model.IModel
-import ui.theme.ColorsUtil.Companion.get
-import ui.theme.FormColors
+import composeForms.ui.theme.ColorsUtil.Companion.get
+import composeForms.ui.theme.FormColors
 
 /**
  * External Window for showing thrown exceptions the model : [IModel] has been informed of.

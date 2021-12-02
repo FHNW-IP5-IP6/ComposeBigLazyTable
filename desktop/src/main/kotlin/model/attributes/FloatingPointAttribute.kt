@@ -22,7 +22,7 @@
 
 package model.attributes
 
-import convertibles.CustomConvertible
+import composeForms.convertibles.CustomConvertible
 import model.ILabel
 import model.IModel
 import model.formatter.IFormatter

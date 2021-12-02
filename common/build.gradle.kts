@@ -10,10 +10,10 @@ plugins {
     id("org.sonarqube") version "3.3"
 }
 
+// sonarqube configuration
 sonarqube {
     properties {
         property("sonar.projectKey", "common")
-        property("sonar.login", "043a9791e1e6b593759abe6c1435ba1fd74f7955")
     }
 }
 
@@ -23,7 +23,7 @@ version = "1.0"
 sourceSets {
     named("main") {
         dependencies {
-            // COmpose Forms
+            // Compose Forms
             api(compose.desktop.currentOs)
             api("org.jetbrains.kotlin:kotlin-reflect:1.4.32")
             api("org.junit.jupiter:junit-jupiter:5.7.1")

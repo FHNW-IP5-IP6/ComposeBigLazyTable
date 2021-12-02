@@ -64,7 +64,7 @@ class QRCodeService {
                                 onSuccess: (bitmap: ImageBitmap) -> Unit = {},
                                 onError:   (exception: Exception) -> Unit = {}) {
 
-        val fullURL = "$url?size=${size}x${size}&data=$text"
+        val fullURL = "$url?size=${size}x${size}&bigLazyTable.data=$text"
         with(URL(fullURL).openConnection() as HttpsURLConnection) {
             setRequestProperty("User-Agent", "Compose Forms")
             try {

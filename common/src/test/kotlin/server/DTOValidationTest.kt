@@ -22,7 +22,7 @@
 
 package server
 
-import communication.DTOValidation
+import composeForms.communication.DTOValidation
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 

@@ -8,10 +8,10 @@ plugins {
     id("org.sonarqube") version "3.3"
 }
 
+// sonarqube configuration
 sonarqube {
     properties {
         property("sonar.projectKey", "desktop")
-        property("sonar.login", "9c5888b7f8bb7f1af8bbb955f1544088a5f68a5d")
     }
 }
 

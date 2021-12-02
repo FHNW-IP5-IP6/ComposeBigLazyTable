@@ -2,16 +2,19 @@ import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+dependencies {
+    implementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
+}
 plugins {
     kotlin("jvm")
     id("org.jetbrains.compose") version "1.0.0-alpha3"
     id("org.sonarqube") version "3.3"
 }
 
+// sonarqube configuration
 sonarqube {
     properties {
         property("sonar.projectKey", "demo")
-        property("sonar.login", "043a9791e1e6b593759abe6c1435ba1fd74f7955")
     }
 }
 
@@ -32,20 +35,11 @@ kotlin {
                 implementation(project(":common"))
                 implementation(project(":desktop"))
                 implementation("com.opencsv:opencsv:5.5.2")
-                // TODO: Variant 1 Jitpack
-                //  https://stackoverflow.com/questions/18748436/is-it-possible-to-declare-git-repository-as-dependency-in-android-gradle
-                //  Does not work yet - Could not resolve com.github.FHNW-IP5-IP6:ComposeForms:master-SNAPSHOT.
-                //  implementation("com.github.FHNW-IP5-IP6:ComposeForms:master-SNAPSHOT")
-
-                // TODO: Variant 2 add source dependencies from git
-                //  implementation("org.gradle.cpp-samples:utilities") {
-                //    version {
-                //        branch = "master"
-                //    }
-                //}
-
-                // TODO: Variant 3 git submodules
-                //implementation(project(":compose-forms"))
+                implementation("org.jetbrains.exposed:exposed-core:0.35.3")
+                implementation("org.jetbrains.exposed:exposed-dao:0.35.3")
+                implementation("org.jetbrains.exposed:exposed-jdbc:0.35.3")
+                implementation("org.xerial:sqlite-jdbc:3.30.1")
+                implementation("io.github.microutils:kotlin-logging:1.12.5")
             }
         }
     }

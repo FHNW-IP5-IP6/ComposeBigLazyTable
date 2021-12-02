@@ -22,8 +22,8 @@
 
 package model.convertibles
 
-import convertibles.CustomConvertible
-import convertibles.ReplacementPair
+import composeForms.convertibles.CustomConvertible
+import composeForms.convertibles.ReplacementPair
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 

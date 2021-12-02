@@ -57,10 +57,10 @@ import model.attributes.SelectionAttribute
 import model.meanings.Default
 import model.modelElements.Group
 import model.modelElements.HeaderGroup
-import ui.theme.ColorsUtil
-import ui.theme.DropdownColors
-import ui.theme.FormColors
-import ui.util.CustomSwitch
+import composeForms.ui.theme.ColorsUtil
+import composeForms.ui.theme.DropdownColors
+import composeForms.ui.theme.FormColors
+import composeForms.ui.CustomSwitch
 
 val normalChars = listOf('a','b','c','d','e','f','g','h','i','j','k','l','n','o','p','q','r','s','t','u','v','x','y','z')
 val bigChars = listOf('m','w')
@@ -92,7 +92,7 @@ fun InputElement(model: IModel<*>, attr: Attribute<*, *, *>, group: Group<*>, co
                 .map{ it.getLanguageStringFromLabel(it as Enum<*>, getCurrentLanguage())}.toString().removePrefix("[").removeSuffix("]"))
         }
 
-        var trailingIconWidth: Dp = 0.dp
+        var trailingIconWidth: Dp
 
         Column {
             Row(modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 6.dp),
@@ -320,7 +320,7 @@ private fun DualField(dualAttribute: DualAttribute<*, *, *>, model: IModel<*>, g
  * @param model: Model that is the attribute in
  * @param attr: Attribute the dropdown is created for
  * @param dropDownIsOpen: flag that indicates if the drop down is shown
- * @param keyEvent: function for custom key event on the input field
+ * @param keyListener: function for custom key event on the input field
  */
 @Composable
 private fun SelectionAttributeDropDownMenu(model: IModel<*>,
@@ -332,7 +332,7 @@ private fun SelectionAttributeDropDownMenu(model: IModel<*>,
         val selectedValues = attr.convertStringToType(attr.getValueAsText())
         BoxWithConstraints {
             DropDownMenu(
-                model, attr, dropDownIsOpen, possibleSelection, selectedValues!!,
+                model, attr, dropDownIsOpen, possibleSelection, selectedValues,
                 attr::addUserSelection, attr::removeUserSelection, maxWidth, keyListener
             )
         }

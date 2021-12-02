@@ -43,8 +43,8 @@ import model.modelElements.Field
 import model.modelElements.FieldSize
 import model.modelElements.Group
 import model.modelElements.HeaderGroup
-import ui.theme.ColorsUtil.Companion.get
-import ui.theme.FormColors
+import composeForms.ui.theme.ColorsUtil.Companion.get
+import composeForms.ui.theme.FormColors
 
 /**
  * Creating the UI for a [Group].

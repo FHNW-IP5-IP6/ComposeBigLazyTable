@@ -48,9 +48,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import model.IModel
 import server.QRCodeService
-import ui.theme.ColorsUtil.Companion.get
-import ui.theme.DropdownColors
-import ui.theme.FormColors
+import composeForms.ui.theme.ColorsUtil.Companion.get
+import composeForms.ui.theme.DropdownColors
+import composeForms.ui.theme.FormColors
 
 /**
  * Header provides the element for interacting with the model. Providing buttons to interact for example the save button.
