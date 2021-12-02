@@ -1,4 +1,4 @@
-package demo.bigLazyTable.model
+package demo.bigLazyTable.NOTUSED
 
 import model.attributes.Attribute
 import java.util.concurrent.ConcurrentHashMap
