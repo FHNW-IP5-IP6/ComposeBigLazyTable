@@ -1,8 +1,5 @@
 package demo.bigLazyTable.NOTUSED
 
-import model.attributes.Attribute
-import java.util.concurrent.ConcurrentHashMap
-
 /**
  * @author Marco Sprenger, Livio Näf
  */

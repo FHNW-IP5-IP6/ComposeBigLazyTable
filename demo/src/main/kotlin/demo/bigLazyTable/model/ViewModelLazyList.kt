@@ -11,19 +11,19 @@ private val Log = KotlinLogging.logger {}
 /**
  * @author Marco Sprenger, Livio Näf
  */
-class ViewModelLazyList(private val dbService: DBService) {
+object ViewModelLazyList {
 
-    private val totalCount = dbService.getTotalCount()
+    private val totalCount = DBService.getTotalCount()
     var firstIndex = 0
-    private val pageSize = 40
+    private const val pageSize = 40
     var currentPage = mutableStateOf(0)
     val maxPages = ceil(totalCount.toDouble() / pageSize).toInt()
 
-    private val cache: LruCache<Int, List<PlaylistFormModel>> = LruCache(4)
+    val cache: LruCache<Int, List<PlaylistFormModel>> = LruCache(4)
 
     fun init() {
-        val playlists1 = dbService.getPage(startIndex = 0, pageSize = pageSize)
-        val playlists2 = dbService.getPage(startIndex = pageSize, pageSize = pageSize)
+        val playlists1 = DBService.getPage(startIndex = 0, pageSize = pageSize)
+        val playlists2 = DBService.getPage(startIndex = pageSize, pageSize = pageSize)
         val playlistFormModels1 = playlists1.map { PlaylistFormModel(it) }
         val playlistFormModels2 = playlists2.map { PlaylistFormModel(it) }
         cache[0] = playlistFormModels1
@@ -59,7 +59,7 @@ class ViewModelLazyList(private val dbService: DBService) {
             // Calculate pageStartIndexToLoad
             val pageStartIndexToLoad = indexToLoad - (indexToLoad % pageSize)
             // Load page from service
-            val playlists = dbService.getPage(startIndex = pageStartIndexToLoad, pageSize = pageSize)
+            val playlists = DBService.getPage(startIndex = pageStartIndexToLoad, pageSize = pageSize)
             val playlistFormModels = playlists.map { PlaylistFormModel(it) }
             // Save new page to cache
             cache[pageToLoad] = playlistFormModels

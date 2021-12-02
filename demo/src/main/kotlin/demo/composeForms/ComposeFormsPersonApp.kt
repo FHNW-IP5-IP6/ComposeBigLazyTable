@@ -5,7 +5,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.IntSize
-import ui.Form
+import composeForms.ui.Form
 
 
 @ExperimentalMaterialApi

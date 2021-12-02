@@ -8,7 +8,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 /**
  * @author Marco Sprenger, Livio Näf
  */
-class DBService : IPagingService<Playlist> {
+object DBService : IPagingService<Playlist> {
 
     // TODO: Validate startIndex -> should not be bigger than what getTotalCount() returns
     override fun getPage(startIndex: Int, pageSize: Int, filter: String): List<Playlist> {

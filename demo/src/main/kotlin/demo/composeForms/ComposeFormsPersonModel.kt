@@ -40,20 +40,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import composeForms.convertibles.CustomConvertible
 import composeForms.convertibles.ReplacementPair
-import model.BaseModel
-import model.attributes.*
-import model.formatter.DateFormatter
-import model.meanings.Currency
-import model.meanings.CustomMeaning
-import model.modelElements.Field
-import model.modelElements.FieldSize
-import model.modelElements.Group
-import model.modelElements.HeaderGroup
-import model.validators.ValidatorType
-import model.validators.semanticValidators.FloatingPointValidator
-import model.validators.semanticValidators.NumberValidator
-import model.validators.semanticValidators.RegexValidator
-import model.validators.semanticValidators.SelectionValidator
+import composeForms.model.BaseModel
+import composeForms.model.attributes.*
+import composeForms.model.formatter.DateFormatter
+import composeForms.model.meanings.Currency
+import composeForms.model.meanings.CustomMeaning
+import composeForms.model.modelElements.Field
+import composeForms.model.modelElements.FieldSize
+import composeForms.model.modelElements.Group
+import composeForms.model.modelElements.HeaderGroup
+import composeForms.model.validators.ValidatorType
+import composeForms.model.validators.semanticValidators.FloatingPointValidator
+import composeForms.model.validators.semanticValidators.NumberValidator
+import composeForms.model.validators.semanticValidators.RegexValidator
+import composeForms.model.validators.semanticValidators.SelectionValidator
 import java.net.URL
 import java.time.LocalDate
 import java.time.Period
@@ -240,7 +240,7 @@ class ComposeFormsPersonModel : BaseModel<ComposeFormsPersonLabels>(title = Comp
     }
 
     //*****************************************************************************************************************
-    //create some individual ui-elements for the headergroup (optional)
+    //create some individual composeForms.ui-elements for the headergroup (optional)
 
     //mutable States to force recompose
     var personPicture : MutableState<ImageBitmap> = mutableStateOf(ImageBitmap( 256, 256, ImageBitmapConfig.Alpha8, colorSpace = ColorSpaces.LinearExtendedSrgb))

@@ -1,11 +1,11 @@
 package demo.bigLazyTable.model
 
-import model.BaseModel
-import model.attributes.*
-import model.modelElements.Field
-import model.modelElements.FieldSize
-import model.modelElements.Group
-import model.modelElements.HeaderGroup
+import composeForms.model.BaseModel
+import composeForms.model.attributes.*
+import composeForms.model.modelElements.Field
+import composeForms.model.modelElements.FieldSize
+import composeForms.model.modelElements.Group
+import composeForms.model.modelElements.HeaderGroup
 
 /**
  * @author Marco Sprenger, Livio Näf

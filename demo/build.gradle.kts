@@ -2,9 +2,6 @@ import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-dependencies {
-    implementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
-}
 plugins {
     kotlin("jvm")
     id("org.jetbrains.compose") version "1.0.0-alpha3"
@@ -40,6 +37,11 @@ kotlin {
                 implementation("org.jetbrains.exposed:exposed-jdbc:0.35.3")
                 implementation("org.xerial:sqlite-jdbc:3.30.1")
                 implementation("io.github.microutils:kotlin-logging:1.12.5")
+                implementation("org.jetbrains.compose.material:material-icons-extended-desktop:0.4.0")
+                implementation("com.hivemq:hivemq-community-edition-embedded:2021.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
+                implementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
+                implementation("io.mockk:mockk:1.11.0")
             }
         }
     }
@@ -58,5 +60,11 @@ compose.desktop {
             packageName = "demo"
             packageVersion = "1.0.0"
         }
+    }
+}
+
+tasks {
+    test {
+        useJUnitPlatform()
     }
 }
