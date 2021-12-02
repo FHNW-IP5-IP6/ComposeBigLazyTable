@@ -1,4 +1,12 @@
-= Asciidoctor Beispiel
+= Compose BigLazyTable (Compose BLT)
+Author M. Sprenger, L. Näf
+v0.1, 2021-09-29
+:toc: left
 
-Geht zurück auf einen Konferenz-Beitrag von Markus Schlichting.
+== Demo Applications
+* *ComposeForms* _(demo > src > main > kotlin > demo > composeForms)_ +
+Demo project for a sample of compose Forms
 
+
+* *BigLazyTable* _(demo > src > main > kotlin > demo > bigLazyTable)_ +
+Demo project for a sample of a bigLazyTable combined with a compose form
