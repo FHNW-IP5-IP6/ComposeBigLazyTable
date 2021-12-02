@@ -92,36 +92,44 @@ private fun PageInfoRow(model: ViewModelLazyList) = LazyRow(
     horizontalArrangement = Arrangement.Start
 ) {
     item {
-        Text(text = "Page: ${model.currentPage.value}/${model.maxPages}", color = Color.White, fontWeight = FontWeight.Bold)
+        Text(
+            text = "Page: ${model.currentPage.value}/${model.maxPages}",
+            color = Color.White,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 
 @Composable
 private fun PlaylistRow(model: ViewModelLazyList, playlistFormModel: PlaylistFormModel) {
     val isSelected = AppState.selectedPlaylist.value.id.getValue() == playlistFormModel.id.getValue()
-    val backgroundColor = if (isSelected) { Color.Yellow } else { Color.LightGray }
+    val backgroundColor = if (isSelected) {
+        Color.Yellow
+    } else {
+        Color.LightGray
+    }
 
     LazyRow(
-    modifier = Modifier
-        .background(backgroundColor)
-        .fillMaxWidth()
-        .padding(horizontal = 5.dp)
-        .selectable(
-            selected = isSelected,
-            onClick = {
-                model.selectPlaylist(playlistFormModel)
-            }
-        ),
-    horizontalArrangement = Arrangement.SpaceBetween
-) {
-    items(model.allAttributes(playlistFormModel)) { attribute ->
-        Text(
-            text = attribute.getValueAsText(),
-            color = Color.Black,
-            modifier = Modifier.background(backgroundColor)
-        )
+        modifier = Modifier
+            .background(backgroundColor)
+            .fillMaxWidth()
+            .padding(horizontal = 5.dp)
+            .selectable(
+                selected = isSelected,
+                onClick = {
+                    model.selectPlaylist(playlistFormModel)
+                }
+            ),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        items(model.allAttributes(playlistFormModel)) { attribute ->
+            Text(
+                text = attribute.getValueAsText(),
+                color = Color.Black,
+                modifier = Modifier.background(backgroundColor)
+            )
+        }
     }
-}
 }
 
 @Composable
