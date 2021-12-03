@@ -11,8 +11,17 @@ object AppState {
 
     val defaultPlaylistFormModel = mutableStateOf(PlaylistFormModel(Playlist()))
 
-    val lazyModelList: MutableList<PlaylistFormModel> = ArrayList(Collections.nCopies(DBService().getTotalCount(), defaultPlaylistFormModel.value))
+    val lazyModelList: MutableList<PlaylistFormModel> = ArrayList(Collections.nCopies(DBService.getTotalCount(), defaultPlaylistFormModel.value))
 
     val selectedPlaylist = mutableStateOf(PlaylistFormModel(Playlist()))
+
+    fun changeCurrentLanguage(language: String) {
+        defaultPlaylistFormModel.value.setCurrentLanguage(language)
+        ViewModelLazyList.cache.forEach{ _, value ->
+            value.forEach { formModel ->
+                formModel.setCurrentLanguage(language)
+            }
+        }
+    }
 
 }

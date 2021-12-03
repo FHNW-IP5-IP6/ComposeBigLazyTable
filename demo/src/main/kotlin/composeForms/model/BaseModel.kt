@@ -209,7 +209,7 @@ abstract class BaseModel<L>(private val title: L,
      */
     override fun setCurrentLanguage(lang: String){
         currentLanguage.value = lang
-        allGroups.forEach{it.getAttributes().forEach{attribute -> attribute.setCurrentLanguage(lang) }}
+        allGroups.forEach { it.getAttributes().forEach{ attribute -> attribute.setCurrentLanguage(lang) }}
         getCurrentFocusedAttribute()?.let { publishAll(it) }
     }
 

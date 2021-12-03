@@ -57,7 +57,6 @@ class Form {
     fun of(model: IModel<*>){
         val keyEventsFromUIElement = remember { mutableMapOf<Key, MutableMap<Int, ()->Unit>>() }
         val showValidations = remember { mutableStateOf(false) }
-
         //addDefaultKeyBehaviour(composeForms.model, keyEventsFromUIElement){ showValidations.value = it }
 
         Column(modifier = Modifier.fillMaxSize().background(get(FormColors.BODY_BACKGROUND))) {
