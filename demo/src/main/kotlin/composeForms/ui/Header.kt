@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerMoveFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.svgResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
@@ -77,7 +78,7 @@ fun Header(model : IModel<*>, changeShowError: (Boolean) -> Unit){
                 Row(modifier = Modifier.fillMaxHeight(), verticalAlignment = Alignment.CenterVertically){
 
                     //logo
-                    Image(painter = svgResource("ic_logo_composeforms.svg"),
+                    Image(painter = painterResource("ic_logo_composeforms.svg"),
                         contentDescription = "Logo", modifier = Modifier.requiredSize(width = 166.dp, height = 42.dp))
 
                     //title
