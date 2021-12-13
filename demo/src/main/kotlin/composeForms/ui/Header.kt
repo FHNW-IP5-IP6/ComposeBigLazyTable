@@ -382,8 +382,8 @@ private fun DropdownElement(model: IModel<*>, language: String, index: Int, sele
             .border(border = borderStroke, shape = RoundedCornerShape(4.dp))
             .pointerMoveFilter(onEnter = { selectedIndex.value = index; true }),
         onClick = {
+            AppState.defaultPlaylistFormModel.value.setCurrentLanguage(language)
             model.setCurrentLanguage(language)
-            //AppState.changeCurrentLanguage(language)
         },
         content = {
             Text(

@@ -264,4 +264,12 @@ class PlaylistFormModel(playlist: Playlist) : BaseModel<FormsBLTLabels>(title = 
         Field(track4DurationMs, FieldSize.SMALL)
     )
 
+    override fun updateChanges() {
+        if (!AppState.changedFormModels.contains(this)) {
+            AppState.changedFormModels.add(this)
+        }
+        println(AppState.changedFormModels.size)
+        super.updateChanges()
+    }
+
 }

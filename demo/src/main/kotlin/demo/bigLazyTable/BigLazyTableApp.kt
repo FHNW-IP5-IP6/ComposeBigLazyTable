@@ -29,7 +29,6 @@ fun main() = application {
         setupDatabase()
         // Initialize composeForms.model and load first batch of data to display the UI
         val model = remember { ViewModelLazyList }
-        model.init()
         // Initialize UI
         ComposeListsUI(model = model)
     }

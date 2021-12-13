@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -39,7 +38,7 @@ fun PlaylistList(model: ViewModelLazyList) {
 @Composable
 private fun LazyColumn(model: ViewModelLazyList) {
     val lazyListItems = AppState.lazyModelList
-    val listState = rememberLazyListState(initialFirstVisibleItemIndex = 0)
+    val listState = rememberLazyListState()
     val scrollbarStyle = ScrollbarStyle(
         minimalHeight = 16.dp,
         thickness = 12.dp,
@@ -52,7 +51,10 @@ private fun LazyColumn(model: ViewModelLazyList) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        if (listState.firstVisibleItemIndex != model.firstIndex) {
+        if (
+            listState.firstVisibleItemIndex > model.lastVisibleIndex + model.pageSize
+            || listState.firstVisibleItemIndex < model.lastVisibleIndex - model.pageSize
+        ) {
             model.get(listState.firstVisibleItemIndex)
         }
         LazyColumn(
@@ -100,9 +102,9 @@ private fun PageInfoRow(model: ViewModelLazyList) = LazyRow(
 private fun PlaylistRow(model: ViewModelLazyList, playlistFormModel: PlaylistFormModel) {
     val isSelected = AppState.selectedPlaylist.value.id.getValue() == playlistFormModel.id.getValue()
     val backgroundColor = if (isSelected) {
-        Color.Yellow
+        get(FormColors.BACKGROUND_COLOR_GROUPS)
     } else {
-        Color.LightGray
+        get(FormColors.BACKGROUND_COLOR_LIGHT)
     }
 
     with(model) {
