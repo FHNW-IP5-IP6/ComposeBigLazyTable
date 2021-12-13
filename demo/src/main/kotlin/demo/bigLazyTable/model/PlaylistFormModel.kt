@@ -268,7 +268,6 @@ class PlaylistFormModel(playlist: Playlist) : BaseModel<FormsBLTLabels>(title = 
         if (!AppState.changedFormModels.contains(this)) {
             AppState.changedFormModels.add(this)
         }
-        println(AppState.changedFormModels.size)
         super.updateChanges()
     }
 

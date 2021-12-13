@@ -36,17 +36,10 @@ object ViewModelLazyList {
 
     private fun addElementsToCache(page: Int, elements: List<PlaylistFormModel>) {
         val elems = elements.toMutableList()
-        if (cache[page] != null) {
-            for (i in 0 until pageSize) {
-                if (cache[page]!![i].changesExist()) {
-                    elems[i] = cache[page]!![i]
-                }
-            }
-        }
         if (AppState.changedFormModels.size > 0) {
             for (i in 0 until pageSize) {
-                if (AppState.changedFormModels.contains(elems[i])) {
-                    elems[i] = AppState.changedFormModels.find { playlistFormModel -> playlistFormModel == elems[i] }!!
+                if (AppState.changedFormModels.find { playlistFormModel -> playlistFormModel.id.getValue() == elems[i].id.getValue() } != null) {
+                    elems[i] = AppState.changedFormModels.find { playlistFormModel -> playlistFormModel.id.getValue() == elems[i].id.getValue() }!!
                     AppState.changedFormModels.remove(elems[i])
                 }
             }
