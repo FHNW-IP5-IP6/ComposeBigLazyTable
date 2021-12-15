@@ -27,9 +27,8 @@ fun main() = application {
         window.placement = WindowPlacement.Maximized
         // Initialize database connection
         setupDatabase()
-        // Initialize model and load first batch of data to display the UI
-        val model = remember { ViewModelLazyList(DBService()) }
-        model.init()
+        // Initialize composeForms.model and load first batch of data to display the UI
+        val model = remember { ViewModelLazyList }
         // Initialize UI
         ComposeListsUI(model = model)
     }

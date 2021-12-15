@@ -1,11 +1,11 @@
 package demo.bigLazyTable.model
 
-import model.BaseModel
-import model.attributes.*
-import model.modelElements.Field
-import model.modelElements.FieldSize
-import model.modelElements.Group
-import model.modelElements.HeaderGroup
+import composeForms.model.BaseModel
+import composeForms.model.attributes.*
+import composeForms.model.modelElements.Field
+import composeForms.model.modelElements.FieldSize
+import composeForms.model.modelElements.Group
+import composeForms.model.modelElements.HeaderGroup
 
 /**
  * @author Marco Sprenger, Livio Näf
@@ -196,7 +196,7 @@ class PlaylistFormModel(playlist: Playlist) : BaseModel<FormsBLTLabels>(title = 
         value = playlist.track4AlbumName
     )
 
-    val attributes = listOf<Attribute<*, *, *>>(id, name, numTracks, numFollowers, durationMs)
+    val lazyListAttributes = listOf<Attribute<*, *, *>>(id, name, numTracks, numFollowers, durationMs)
 
     private val headerGroup = HeaderGroup(
         model = this,
@@ -263,5 +263,12 @@ class PlaylistFormModel(playlist: Playlist) : BaseModel<FormsBLTLabels>(title = 
         Field(track4AlbumName, FieldSize.NORMAL),
         Field(track4DurationMs, FieldSize.SMALL)
     )
+
+    override fun updateChanges() {
+        if (!AppState.changedFormModels.contains(this)) {
+            AppState.changedFormModels.add(this)
+        }
+        super.updateChanges()
+    }
 
 }

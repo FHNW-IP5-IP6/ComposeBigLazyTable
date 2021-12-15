@@ -1,6 +1,6 @@
 package demo.bigLazyTable.model
 
-import model.ILabel
+import composeForms.model.ILabel
 
 /**
  * @author Marco Sprenger, Livio Näf
