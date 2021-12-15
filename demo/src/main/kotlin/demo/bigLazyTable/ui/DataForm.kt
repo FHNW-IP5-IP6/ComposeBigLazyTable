@@ -8,11 +8,11 @@ import demo.bigLazyTable.model.PlaylistFormModel
 import composeForms.ui.Form
 
 /**
+ * Creates a ComposeForm with the data from the selected Playlist.
+ *
  * @author Marco Sprenger, Livio Näf
  */
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun DataForm(model: PlaylistFormModel) {
-    Form().of(model)
-}
+fun DataForm(model: PlaylistFormModel) = Form().of(model)

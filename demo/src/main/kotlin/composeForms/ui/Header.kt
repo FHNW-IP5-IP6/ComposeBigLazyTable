@@ -42,7 +42,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.svgResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -382,7 +381,7 @@ private fun DropdownElement(model: IModel<*>, language: String, index: Int, sele
             .border(border = borderStroke, shape = RoundedCornerShape(4.dp))
             .pointerMoveFilter(onEnter = { selectedIndex.value = index; true }),
         onClick = {
-            AppState.defaultPlaylistFormModel.value.setCurrentLanguage(language)
+            AppState.defaultPlaylistFormModel.setCurrentLanguage(language)
             model.setCurrentLanguage(language)
         },
         content = {
