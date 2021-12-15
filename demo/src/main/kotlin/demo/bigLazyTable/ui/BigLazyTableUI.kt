@@ -19,11 +19,9 @@ import demo.bigLazyTable.model.ViewModelLazyList
 @ExperimentalMaterialApi
 @Composable
 @Preview
-fun ComposeListsUI(model: ViewModelLazyList) {
-    with(model) {
-        DesktopMaterialTheme {
-            MainContent(this)
-        }
+fun BigLazyTableUI(model: ViewModelLazyList) {
+    DesktopMaterialTheme {
+        MainContent(model = model)
     }
 }
 
@@ -33,10 +31,11 @@ fun ComposeListsUI(model: ViewModelLazyList) {
 private fun MainContent(model: ViewModelLazyList) {
     Row(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.weight(2f)) {
-            PlaylistList(model)
+            DataTable(model = model)
         }
         Box(modifier = Modifier.weight(3f)) {
-            DataForm(AppState.selectedPlaylist.value)
+            val playlistFormModel = AppState.selectedPlaylist
+            DataForm(model = playlistFormModel)
         }
     }
 }
