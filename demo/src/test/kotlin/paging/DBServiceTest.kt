@@ -29,7 +29,7 @@ internal class DBServiceTest {
 
     @BeforeEach
     fun setupDatabase() {
-        dbService = DBService()
+        dbService = DBService
         Database.connect("jdbc:sqlite:./src/test/resources/test_spotify_playlist_dataset.db", "org.sqlite.JDBC")
         TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
     }
