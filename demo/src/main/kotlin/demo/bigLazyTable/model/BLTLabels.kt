@@ -5,7 +5,7 @@ import composeForms.model.ILabel
 /**
  * @author Marco Sprenger, Livio Näf
  */
-enum class FormsBLTLabels(val deutsch: String, val english: String) : ILabel {
+enum class BLTLabels(val deutsch: String, val english: String) : ILabel {
     TITLE("Spotify Daten","Spotify data"),
     HEADER_GROUP("Playlist Übersicht", "Playlist Overview"),
     PLAYLIST_INFO_GROUP("Playlist Informationen", "Playlist Informations"),
