@@ -29,7 +29,7 @@ object AppState {
      * List of FormModels. Size is the totalCount of the provided data.
      * All elements in the LazyList cache are stored in this list. The rest is filled with the defaultFormModel to provide the default loading data.
      */
-    val lazyModelList: MutableList<PlaylistModel> = ArrayList(Collections.nCopies(DBService.getTotalCount(), defaultPlaylistModel))
+    val lazyModelList: MutableList<PlaylistModel?> = ArrayList(Collections.nCopies(DBService.getTotalCount(), null))
 //    val lazyModelList: MutableList<PlaylistModel> = ArrayList(Collections.nCopies(DBService.getTotalCount(), null))
 
     /**

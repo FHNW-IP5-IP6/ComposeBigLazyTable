@@ -134,8 +134,11 @@ fun LazyTable(viewModel: LazyTableViewModel) {
             verticalArrangement = Arrangement.spacedBy(4.dp),
             state = listState
         ) {
-            items(lazyListItems) { playlistFormModel ->
-                PlaylistRow(viewModel, playlistFormModel)
+            items(lazyListItems) { playlistModel ->
+                when (playlistModel) {
+                    null -> PlaylistRowPlaceholder()
+                    else -> PlaylistRow(viewModel, playlistModel)
+                }
             }
         }
 
@@ -172,5 +175,24 @@ private fun PlaylistRow(viewModel: LazyTableViewModel, playlistModel: PlaylistMo
                 backgroundColor = backgroundColor
             )
         }
+    }
+}
+
+@Composable
+fun PlaylistRowPlaceholder(
+    backgroundColor: Color = BackgroundColorLight
+) {
+    // TODO: Is LazyRow really needed or is Row just good enough?
+    Row(
+        modifier = Modifier
+            .background(backgroundColor)
+            .fillMaxWidth()
+            .padding(horizontal = 5.dp),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        TableCell(
+            text = "...",
+            backgroundColor = backgroundColor
+        )
     }
 }

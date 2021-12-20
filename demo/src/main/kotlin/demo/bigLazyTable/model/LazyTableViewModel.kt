@@ -36,7 +36,7 @@ object LazyTableViewModel {
         addToAppStateList(startIndex = startIndexFirstPage, 0)
         addToAppStateList(startIndex = startIndexSecondPage, 1)
 
-        selectPlaylist(AppState.lazyModelList.first())
+        selectPlaylist(AppState.lazyModelList.first()!!)
     }
 
     private fun loadPageAndMapToFormModels(startIndexOfPage: Int): List<PlaylistModel> {
