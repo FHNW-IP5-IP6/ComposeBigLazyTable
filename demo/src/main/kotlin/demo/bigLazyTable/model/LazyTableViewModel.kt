@@ -11,17 +11,17 @@ private val Log = KotlinLogging.logger {}
 /**
  * @author Marco Sprenger, Livio Näf
  */
-object ViewModelLazyList {
+object LazyTableViewModel {
 
     private val totalCount = DBService.getTotalCount()
-    const val pageSize = 40
+    private const val pageSize = 40
 
     var lastVisibleIndex = 0
     var currentPage = mutableStateOf(0)
     val maxPages = ceil(totalCount.toDouble() / pageSize).toInt() // Example: 10 / 3 = 4
 
     private const val cacheSize = 4
-    private val cache: LruCache<Int, List<PlaylistFormModel>> = LruCache(cacheSize)
+    private val cache: LruCache<Int, List<PlaylistModel>> = LruCache(cacheSize)
 
     init {
         val startIndexFirstPage = 0
@@ -39,12 +39,12 @@ object ViewModelLazyList {
         selectPlaylist(AppState.lazyModelList.first())
     }
 
-    private fun loadPageAndMapToFormModels(startIndexOfPage: Int): List<PlaylistFormModel> {
+    private fun loadPageAndMapToFormModels(startIndexOfPage: Int): List<PlaylistModel> {
         val page = DBService.getPage(startIndex = startIndexOfPage, pageSize = pageSize)
-        return page.map { PlaylistFormModel(it) }
+        return page.map { PlaylistModel(it) }
     }
 
-    private fun addPageToCache(pageNr: Int, pageOfFormModels: List<PlaylistFormModel>) {
+    private fun addPageToCache(pageNr: Int, pageOfFormModels: List<PlaylistModel>) {
         val elements = pageOfFormModels.toMutableList()
         if (AppState.changedFormModels.size > 0) {
             for (i in 0 until pageSize) {
@@ -136,14 +136,28 @@ object ViewModelLazyList {
     private fun removeOldPageFromList(startIndexOldPage: Int) {
         for (i in startIndexOldPage until startIndexOldPage + pageSize) {
             if (i in 0 until totalCount) {
-                AppState.lazyModelList.set(index = i, element = AppState.defaultPlaylistFormModel)
+                AppState.lazyModelList.set(index = i, element = AppState.defaultPlaylistModel)
             }
         }
     }
 
-    fun selectPlaylist(playlistFormModel: PlaylistFormModel) {
-        playlistFormModel.setCurrentLanguage(AppState.defaultPlaylistFormModel.getCurrentLanguage())
-        AppState.selectedPlaylist = playlistFormModel
+    fun selectPlaylist(playlistModel: PlaylistModel) {
+        playlistModel.setCurrentLanguage(AppState.defaultPlaylistModel.getCurrentLanguage())
+        AppState.selectedPlaylistModel = playlistModel
+    }
+
+    fun isTimeToLoadPage(firstVisibleItemIndex: Int): Boolean {
+        return isTimeToLoadNextPage(firstVisibleItemIndex) || isTimeToLoadPreviousPage(firstVisibleItemIndex)
+    }
+
+    private fun isTimeToLoadNextPage(firstVisibleItemIndex: Int): Boolean {
+        val endOfPage = lastVisibleIndex + pageSize
+        return firstVisibleItemIndex > endOfPage
+    }
+
+    private fun isTimeToLoadPreviousPage(firstVisibleItemIndex: Int): Boolean {
+        val startOfPage = lastVisibleIndex - pageSize
+        return firstVisibleItemIndex < startOfPage
     }
 
 }
