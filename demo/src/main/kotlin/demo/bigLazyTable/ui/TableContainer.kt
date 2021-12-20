@@ -45,7 +45,7 @@ fun PageInfoRow(viewModel: LazyTableViewModel) = LazyRow(
 ) {
     item {
         Text(
-            text = "Page: ${viewModel.currentPage.value}/${viewModel.maxPages}",
+            text = "Page: ${viewModel.currentPage}/${viewModel.maxPages}",
             color = Color.White,
             fontWeight = FontWeight.Bold
         )
@@ -78,16 +78,17 @@ fun RowScope.TableCell(
     weight: Float = 1f,
     color: Color = Color.Black,
     backgroundColor: Color,
-    fontWeight: FontWeight = FontWeight.Normal
+    fontWeight: FontWeight = FontWeight.Normal,
+    hasError: Boolean = false
 ) {
     Text(
         text = text,
-        color = color,
-        fontWeight = fontWeight,
+        color = if (hasError) Color.Red else color,
+        fontWeight = if (hasError) FontWeight.Bold else fontWeight,
         modifier = Modifier
             .background(backgroundColor)
             .weight(weight)
-            .padding(8.dp)
+            .padding(8.dp),
     )
 }
 
@@ -149,7 +150,8 @@ private fun PlaylistRow(viewModel: LazyTableViewModel, playlistModel: PlaylistMo
         for (attribute in playlistModel.lazyListAttributes) {
             TableCell(
                 text = attribute.getValueAsText(),
-                backgroundColor = backgroundColor
+                backgroundColor = backgroundColor,
+                hasError = !attribute.isValid()
             )
         }
     }

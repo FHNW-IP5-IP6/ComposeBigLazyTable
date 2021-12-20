@@ -1,6 +1,6 @@
 package demo.bigLazyTable.model
 
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import demo.bigLazyTable.data.database.DBService
 import mu.KotlinLogging
 import org.junit.platform.commons.util.LruCache
@@ -17,11 +17,13 @@ object LazyTableViewModel {
     private const val pageSize = 40
 
     var lastVisibleIndex = 0
-    var currentPage = mutableStateOf(0)
+    var currentPage by mutableStateOf(0)
     val maxPages = ceil(totalCount.toDouble() / pageSize).toInt() // Example: 10 / 3 = 4
 
     private const val cacheSize = 4
     private val cache: LruCache<Int, List<PlaylistModel>> = LruCache(cacheSize)
+
+    var hasError by mutableStateOf(false)
 
     init {
         val startIndexFirstPage = 0
@@ -63,7 +65,7 @@ object LazyTableViewModel {
      * If firstVisibleItemIndex < lastVisibleIndex --> scrolled up
      */
     fun loadAllNeededPagesFor(firstVisibleItemIndex: Int) {
-        currentPage.value = firstVisibleItemIndex / pageSize
+        currentPage = firstVisibleItemIndex / pageSize
         val scrolledDown = firstVisibleItemIndex > lastVisibleIndex
 
         // load cacheSize pages
