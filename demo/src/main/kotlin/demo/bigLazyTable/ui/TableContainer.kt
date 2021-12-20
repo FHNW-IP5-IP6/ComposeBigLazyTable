@@ -92,26 +92,6 @@ fun RowScope.TableCell(
 }
 
 @Composable
-fun LazyListScope.TableCell(
-    text: String,
-    weight: Float = 1f,
-    backgroundColor: Color,
-    color: Color = Color.Black,
-    fontWeight: FontWeight = FontWeight.Normal
-) {
-    Text(
-        text = text,
-        color = color,
-        fontWeight = fontWeight,
-        modifier = Modifier
-            .background(backgroundColor)
-//            .border(1.dp, Color.Black)
-//            .weight(weight)
-            .padding(8.dp)
-    )
-}
-
-@Composable
 fun LazyTable(viewModel: LazyTableViewModel) {
     val lazyListItems = AppState.lazyModelList
     val listState = rememberLazyListState()
@@ -155,7 +135,6 @@ private fun PlaylistRow(viewModel: LazyTableViewModel, playlistModel: PlaylistMo
     val isSelected = AppState.selectedPlaylistModel.id.getValue() == playlistModel.id.getValue()
     val backgroundColor = if (isSelected) BackgroundColorGroups else BackgroundColorLight
 
-    // TODO: Is LazyRow really needed or is Row just good enough?
     Row(
         modifier = Modifier
             .background(backgroundColor)
@@ -167,11 +146,9 @@ private fun PlaylistRow(viewModel: LazyTableViewModel, playlistModel: PlaylistMo
             ),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-//        items(playlistFormModel.lazyListAttributes) { attribute ->
         for (attribute in playlistModel.lazyListAttributes) {
             TableCell(
-                text = if (attribute.getValueAsText() != (-999_999).toString()) attribute.getValueAsText() else "...",
-//                text = if (attribute.getValue() != null) attribute.getValueAsText() else "...",
+                text = attribute.getValueAsText(),
                 backgroundColor = backgroundColor
             )
         }
@@ -182,7 +159,6 @@ private fun PlaylistRow(viewModel: LazyTableViewModel, playlistModel: PlaylistMo
 fun PlaylistRowPlaceholder(
     backgroundColor: Color = BackgroundColorLight
 ) {
-    // TODO: Is LazyRow really needed or is Row just good enough?
     Row(
         modifier = Modifier
             .background(backgroundColor)

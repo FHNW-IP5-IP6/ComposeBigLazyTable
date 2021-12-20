@@ -27,11 +27,11 @@ object LazyTableViewModel {
         val startIndexFirstPage = 0
         val startIndexSecondPage = pageSize
 
-        val firstPageFormModels = loadPageAndMapToFormModels(startIndexOfPage = startIndexFirstPage)
-        val secondPageFormModels = loadPageAndMapToFormModels(startIndexOfPage = startIndexSecondPage)
+        val firstPagePlaylistModels = loadPageAndMapToPlaylistModels(startIndexOfPage = startIndexFirstPage)
+        val secondPagePlaylistModels = loadPageAndMapToPlaylistModels(startIndexOfPage = startIndexSecondPage)
 
-        addPageToCache(pageNr = 0, pageOfFormModels = firstPageFormModels)
-        addPageToCache(pageNr = 1, pageOfFormModels = secondPageFormModels)
+        addPageToCache(pageNr = 0, pageOfPlaylistModels = firstPagePlaylistModels)
+        addPageToCache(pageNr = 1, pageOfPlaylistModels = secondPagePlaylistModels)
 
         addToAppStateList(startIndex = startIndexFirstPage, 0)
         addToAppStateList(startIndex = startIndexSecondPage, 1)
@@ -39,19 +39,19 @@ object LazyTableViewModel {
         selectPlaylist(AppState.lazyModelList.first()!!)
     }
 
-    private fun loadPageAndMapToFormModels(startIndexOfPage: Int): List<PlaylistModel> {
+    private fun loadPageAndMapToPlaylistModels(startIndexOfPage: Int): List<PlaylistModel> {
         val page = DBService.getPage(startIndex = startIndexOfPage, pageSize = pageSize)
         return page.map { PlaylistModel(it) }
     }
 
-    private fun addPageToCache(pageNr: Int, pageOfFormModels: List<PlaylistModel>) {
-        val elements = pageOfFormModels.toMutableList()
-        if (AppState.changedFormModels.size > 0) {
+    private fun addPageToCache(pageNr: Int, pageOfPlaylistModels: List<PlaylistModel>) {
+        val elements = pageOfPlaylistModels.toMutableList()
+        if (AppState.changedPlaylistModels.size > 0) {
             for (i in 0 until pageSize) {
-                if (AppState.changedFormModels.find { playlistFormModel -> playlistFormModel.id.getValue() == elements[i].id.getValue() } != null) {
+                if (AppState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() } != null) {
                     elements[i] =
-                        AppState.changedFormModels.find { playlistFormModel -> playlistFormModel.id.getValue() == elements[i].id.getValue() }!!
-                    AppState.changedFormModels.remove(elements[i])
+                        AppState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() }!!
+                    AppState.changedPlaylistModels.remove(elements[i])
                 }
             }
         }
@@ -86,9 +86,9 @@ object LazyTableViewModel {
         if (isPageNotInCache(pageNrToLoad)) {
             val pageStartIndexToLoad = calculatePageStartIndexToLoad(indexToLoad)
 
-            val playlistFormModels = loadPageAndMapToFormModels(startIndexOfPage = pageStartIndexToLoad)
+            val playlistModels = loadPageAndMapToPlaylistModels(startIndexOfPage = pageStartIndexToLoad)
 
-            addPageToCache(pageNr = pageNrToLoad, pageOfFormModels = playlistFormModels)
+            addPageToCache(pageNr = pageNrToLoad, pageOfPlaylistModels = playlistModels)
 
             updateAppStateList(
                 pageStartIndexToLoad = pageStartIndexToLoad,

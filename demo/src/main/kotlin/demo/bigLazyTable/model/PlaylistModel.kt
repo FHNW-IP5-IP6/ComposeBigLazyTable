@@ -265,8 +265,8 @@ class PlaylistModel(playlist: Playlist) : BaseModel<BLTLabels>(title = BLTLabels
     )
 
     override fun updateChanges() {
-        if (!AppState.changedFormModels.contains(this)) {
-            AppState.changedFormModels.add(this)
+        if (!AppState.changedPlaylistModels.contains(this)) {
+            AppState.changedPlaylistModels.add(this)
         }
         super.updateChanges()
     }

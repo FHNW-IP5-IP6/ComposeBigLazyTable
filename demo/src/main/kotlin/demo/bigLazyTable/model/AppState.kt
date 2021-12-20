@@ -12,7 +12,7 @@ import java.util.*
 object AppState {
 
     /**
-     * Default PlaylistFormModel to store global data for Form and LazyList
+     * Default PlaylistModel to store global data for Form and LazyList
      * Stores:
      * - current Language
      * - default data when LazyList is loading
@@ -21,19 +21,19 @@ object AppState {
 
     /**
      * Current selected Playlist in LazyList.
-     * This is the current FormModel behind the Forms
+     * This is the current Model behind the Forms
      */
     var selectedPlaylistModel by mutableStateOf(defaultPlaylistModel)
 
     /**
-     * List of FormModels. Size is the totalCount of the provided data.
-     * All elements in the LazyList cache are stored in this list. The rest is filled with the defaultFormModel to provide the default loading data.
+     * List of Models. Size is the totalCount of the provided data.
+     * All elements in the LazyList cache are stored in this list. The rest is filled with the defaultPlaylistModel to provide the default loading data.
      */
     val lazyModelList: MutableList<PlaylistModel?> = ArrayList(Collections.nCopies(DBService.getTotalCount(), null))
 //    val lazyModelList: MutableList<PlaylistModel> = ArrayList(Collections.nCopies(DBService.getTotalCount(), null))
 
     /**
-     * List of all FormModels with changes. Used to prevent loosing changed data if new data is loaded from the service.
+     * List of all Models with changes. Used to prevent loosing changed data if new data is loaded from the service.
      */
-    val changedFormModels: MutableList<PlaylistModel> = mutableListOf()
+    val changedPlaylistModels: MutableList<PlaylistModel> = mutableListOf()
 }
