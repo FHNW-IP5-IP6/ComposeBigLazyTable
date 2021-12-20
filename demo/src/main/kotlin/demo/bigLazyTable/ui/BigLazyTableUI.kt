@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import demo.bigLazyTable.model.AppState
 import demo.bigLazyTable.model.ViewModelLazyList
+import demo.bigLazyTable.ui.theme.BigLazyTableTheme
 
 /**
  * @author Marco Sprenger, Livio Näf
@@ -20,7 +21,7 @@ import demo.bigLazyTable.model.ViewModelLazyList
 @Composable
 @Preview
 fun BigLazyTableUI(model: ViewModelLazyList) {
-    DesktopMaterialTheme {
+    BigLazyTableTheme {
         MainContent(model = model)
     }
 }
