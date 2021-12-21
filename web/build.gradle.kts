@@ -22,6 +22,9 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
+                implementation(kotlin("stdlib-common"))
+//                implementation(project(":demo")) doesnt work yet
+                implementation(compose.web.widgets)
                 implementation(compose.web.core)
                 implementation(compose.runtime)
             }
