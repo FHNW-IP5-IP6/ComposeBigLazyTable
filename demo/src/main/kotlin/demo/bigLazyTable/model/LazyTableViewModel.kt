@@ -1,6 +1,6 @@
 package demo.bigLazyTable.model
 
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import demo.bigLazyTable.data.database.DBService
 import mu.KotlinLogging
 import org.junit.platform.commons.util.LruCache
@@ -11,47 +11,49 @@ private val Log = KotlinLogging.logger {}
 /**
  * @author Marco Sprenger, Livio Näf
  */
-object ViewModelLazyList {
+object LazyTableViewModel {
 
     private val totalCount = DBService.getTotalCount()
-    const val pageSize = 40
+    private const val pageSize = 40
 
     var lastVisibleIndex = 0
-    var currentPage = mutableStateOf(0)
+    var currentPage by mutableStateOf(0)
     val maxPages = ceil(totalCount.toDouble() / pageSize).toInt() // Example: 10 / 3 = 4
 
     private const val cacheSize = 4
-    private val cache: LruCache<Int, List<PlaylistFormModel>> = LruCache(cacheSize)
+    private val cache: LruCache<Int, List<PlaylistModel>> = LruCache(cacheSize)
+
+    var hasError by mutableStateOf(false)
 
     init {
         val startIndexFirstPage = 0
         val startIndexSecondPage = pageSize
 
-        val firstPageFormModels = loadPageAndMapToFormModels(startIndexOfPage = startIndexFirstPage)
-        val secondPageFormModels = loadPageAndMapToFormModels(startIndexOfPage = startIndexSecondPage)
+        val firstPagePlaylistModels = loadPageAndMapToPlaylistModels(startIndexOfPage = startIndexFirstPage)
+        val secondPagePlaylistModels = loadPageAndMapToPlaylistModels(startIndexOfPage = startIndexSecondPage)
 
-        addPageToCache(pageNr = 0, pageOfFormModels = firstPageFormModels)
-        addPageToCache(pageNr = 1, pageOfFormModels = secondPageFormModels)
+        addPageToCache(pageNr = 0, pageOfPlaylistModels = firstPagePlaylistModels)
+        addPageToCache(pageNr = 1, pageOfPlaylistModels = secondPagePlaylistModels)
 
         addToAppStateList(startIndex = startIndexFirstPage, 0)
         addToAppStateList(startIndex = startIndexSecondPage, 1)
 
-        selectPlaylist(AppState.lazyModelList.first())
+        selectPlaylist(AppState.lazyModelList.first()!!)
     }
 
-    private fun loadPageAndMapToFormModels(startIndexOfPage: Int): List<PlaylistFormModel> {
+    private fun loadPageAndMapToPlaylistModels(startIndexOfPage: Int): List<PlaylistModel> {
         val page = DBService.getPage(startIndex = startIndexOfPage, pageSize = pageSize)
-        return page.map { PlaylistFormModel(it) }
+        return page.map { PlaylistModel(it) }
     }
 
-    private fun addPageToCache(pageNr: Int, pageOfFormModels: List<PlaylistFormModel>) {
-        val elements = pageOfFormModels.toMutableList()
-        if (AppState.changedFormModels.size > 0) {
+    private fun addPageToCache(pageNr: Int, pageOfPlaylistModels: List<PlaylistModel>) {
+        val elements = pageOfPlaylistModels.toMutableList()
+        if (AppState.changedPlaylistModels.size > 0) {
             for (i in 0 until pageSize) {
-                if (AppState.changedFormModels.find { playlistFormModel -> playlistFormModel.id.getValue() == elements[i].id.getValue() } != null) {
+                if (AppState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() } != null) {
                     elements[i] =
-                        AppState.changedFormModels.find { playlistFormModel -> playlistFormModel.id.getValue() == elements[i].id.getValue() }!!
-                    AppState.changedFormModels.remove(elements[i])
+                        AppState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() }!!
+                    AppState.changedPlaylistModels.remove(elements[i])
                 }
             }
         }
@@ -63,7 +65,7 @@ object ViewModelLazyList {
      * If firstVisibleItemIndex < lastVisibleIndex --> scrolled up
      */
     fun loadAllNeededPagesFor(firstVisibleItemIndex: Int) {
-        currentPage.value = firstVisibleItemIndex / pageSize
+        currentPage = firstVisibleItemIndex / pageSize
         val scrolledDown = firstVisibleItemIndex > lastVisibleIndex
 
         // load cacheSize pages
@@ -86,9 +88,9 @@ object ViewModelLazyList {
         if (isPageNotInCache(pageNrToLoad)) {
             val pageStartIndexToLoad = calculatePageStartIndexToLoad(indexToLoad)
 
-            val playlistFormModels = loadPageAndMapToFormModels(startIndexOfPage = pageStartIndexToLoad)
+            val playlistModels = loadPageAndMapToPlaylistModels(startIndexOfPage = pageStartIndexToLoad)
 
-            addPageToCache(pageNr = pageNrToLoad, pageOfFormModels = playlistFormModels)
+            addPageToCache(pageNr = pageNrToLoad, pageOfPlaylistModels = playlistModels)
 
             updateAppStateList(
                 pageStartIndexToLoad = pageStartIndexToLoad,
@@ -136,14 +138,28 @@ object ViewModelLazyList {
     private fun removeOldPageFromList(startIndexOldPage: Int) {
         for (i in startIndexOldPage until startIndexOldPage + pageSize) {
             if (i in 0 until totalCount) {
-                AppState.lazyModelList.set(index = i, element = AppState.defaultPlaylistFormModel)
+                AppState.lazyModelList.set(index = i, element = AppState.defaultPlaylistModel)
             }
         }
     }
 
-    fun selectPlaylist(playlistFormModel: PlaylistFormModel) {
-        playlistFormModel.setCurrentLanguage(AppState.defaultPlaylistFormModel.getCurrentLanguage())
-        AppState.selectedPlaylist = playlistFormModel
+    fun selectPlaylist(playlistModel: PlaylistModel) {
+        playlistModel.setCurrentLanguage(AppState.defaultPlaylistModel.getCurrentLanguage())
+        AppState.selectedPlaylistModel = playlistModel
+    }
+
+    fun isTimeToLoadPage(firstVisibleItemIndex: Int): Boolean {
+        return isTimeToLoadNextPage(firstVisibleItemIndex) || isTimeToLoadPreviousPage(firstVisibleItemIndex)
+    }
+
+    private fun isTimeToLoadNextPage(firstVisibleItemIndex: Int): Boolean {
+        val endOfPage = lastVisibleIndex + pageSize
+        return firstVisibleItemIndex > endOfPage
+    }
+
+    private fun isTimeToLoadPreviousPage(firstVisibleItemIndex: Int): Boolean {
+        val startOfPage = lastVisibleIndex - pageSize
+        return firstVisibleItemIndex < startOfPage
     }
 
 }
