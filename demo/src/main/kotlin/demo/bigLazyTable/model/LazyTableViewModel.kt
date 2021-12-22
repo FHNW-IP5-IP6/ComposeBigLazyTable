@@ -2,8 +2,11 @@ package demo.bigLazyTable.model
 
 import androidx.compose.runtime.*
 import demo.bigLazyTable.data.database.DBService
+import kotlinx.coroutines.*
 import mu.KotlinLogging
+import org.jetbrains.exposed.sql.transactions.experimental.suspendedTransactionAsync
 import org.junit.platform.commons.util.LruCache
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.ceil
 
 private val Log = KotlinLogging.logger {}
@@ -23,26 +26,31 @@ object LazyTableViewModel {
     private const val cacheSize = 4
     private val cache: LruCache<Int, List<PlaylistModel>> = LruCache(cacheSize)
 
-    var hasError by mutableStateOf(false)
+    val scheduler: MutableList<Job> = mutableListOf()
+    val schedulerCache: LruCache<Int, Job> = LruCache(2)
+
+    var isScrolling by mutableStateOf(false)
 
     init {
         val startIndexFirstPage = 0
         val startIndexSecondPage = pageSize
 
-        val firstPagePlaylistModels = loadPageAndMapToPlaylistModels(startIndexOfPage = startIndexFirstPage)
-        val secondPagePlaylistModels = loadPageAndMapToPlaylistModels(startIndexOfPage = startIndexSecondPage)
+        CoroutineScope(Dispatchers.Main).launch {
+            val firstPagePlaylistModels = loadPageAndMapToPlaylistModels(startIndexOfPage = startIndexFirstPage)
+            val secondPagePlaylistModels = loadPageAndMapToPlaylistModels(startIndexOfPage = startIndexSecondPage)
 
-        addPageToCache(pageNr = 0, pageOfPlaylistModels = firstPagePlaylistModels)
-        addPageToCache(pageNr = 1, pageOfPlaylistModels = secondPagePlaylistModels)
+            addPageToCache(pageNr = 0, pageOfPlaylistModels = firstPagePlaylistModels)
+            addPageToCache(pageNr = 1, pageOfPlaylistModels = secondPagePlaylistModels)
 
-        addToAppStateList(startIndex = startIndexFirstPage, 0)
-        addToAppStateList(startIndex = startIndexSecondPage, 1)
+            addToAppStateList(startIndex = startIndexFirstPage, 0)
+            addToAppStateList(startIndex = startIndexSecondPage, 1)
 
-        selectPlaylist(AppState.lazyModelList.first()!!)
+            selectPlaylist(AppState.lazyModelList.first()!!)
+        }
     }
 
-    private fun loadPageAndMapToPlaylistModels(startIndexOfPage: Int): List<PlaylistModel> {
-        val page = DBService.getPage(startIndex = startIndexOfPage, pageSize = pageSize)
+    private suspend fun loadPageAndMapToPlaylistModels(startIndexOfPage: Int): List<PlaylistModel> {
+        val page = DBService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filter = "")
         return page.map { PlaylistModel(it) }
     }
 
@@ -64,14 +72,16 @@ object LazyTableViewModel {
      * If firstVisibleItemIndex > lastVisibleIndex --> scrolled down
      * If firstVisibleItemIndex < lastVisibleIndex --> scrolled up
      */
-    fun loadAllNeededPagesFor(firstVisibleItemIndex: Int) {
+    suspend fun loadAllNeededPagesFor(firstVisibleItemIndex: Int) {
         currentPage = firstVisibleItemIndex / pageSize
         val scrolledDown = firstVisibleItemIndex > lastVisibleIndex
 
         // load cacheSize pages
         for (i in -1 until cacheSize - 1) {
             val indexToLoad = calculateIndexToLoad(scrolledDown, firstVisibleItemIndex, i)
-            loadPage(firstVisibleItemIndex, indexToLoad, scrolledDown)
+            if (indexToLoad  <= totalCount - pageSize) {
+                loadPage(firstVisibleItemIndex, indexToLoad, scrolledDown)
+            }
         }
     }
 
@@ -79,15 +89,14 @@ object LazyTableViewModel {
         return if (scrolledDown) firstVisibleItemIndex + (i * pageSize) else firstVisibleItemIndex - (i * pageSize)
     }
 
-    private fun loadPage(firstVisibleItemIndex: Int, indexToLoad: Int, scrolledDown: Boolean) {
+    private suspend fun loadPage(firstVisibleItemIndex: Int, indexToLoad: Int, scrolledDown: Boolean) {
         // Set firstIndex to new value
         lastVisibleIndex = firstVisibleItemIndex
 
-        val pageNrToLoad = indexToLoad / pageSize // Example: 53 / 40 = 1
+        val pageNrToLoad = (indexToLoad / pageSize) -1 // Example: (1 Mio / 40) = 24.9k because service starts from 0 = total 25k
 
         if (isPageNotInCache(pageNrToLoad)) {
             val pageStartIndexToLoad = calculatePageStartIndexToLoad(indexToLoad)
-
             val playlistModels = loadPageAndMapToPlaylistModels(startIndexOfPage = pageStartIndexToLoad)
 
             addPageToCache(pageNr = pageNrToLoad, pageOfPlaylistModels = playlistModels)
@@ -138,7 +147,7 @@ object LazyTableViewModel {
     private fun removeOldPageFromList(startIndexOldPage: Int) {
         for (i in startIndexOldPage until startIndexOldPage + pageSize) {
             if (i in 0 until totalCount) {
-                AppState.lazyModelList.set(index = i, element = AppState.defaultPlaylistModel)
+                AppState.lazyModelList.set(index = i, element = null)
             }
         }
     }
@@ -153,12 +162,12 @@ object LazyTableViewModel {
     }
 
     private fun isTimeToLoadNextPage(firstVisibleItemIndex: Int): Boolean {
-        val endOfPage = lastVisibleIndex + pageSize
+        val endOfPage = lastVisibleIndex
         return firstVisibleItemIndex > endOfPage
     }
 
     private fun isTimeToLoadPreviousPage(firstVisibleItemIndex: Int): Boolean {
-        val startOfPage = lastVisibleIndex - pageSize
+        val startOfPage = lastVisibleIndex
         return firstVisibleItemIndex < startOfPage
     }
 

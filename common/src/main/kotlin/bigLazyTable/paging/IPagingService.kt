@@ -5,7 +5,7 @@ package bigLazyTable.paging
  */
 interface IPagingService<T> {
 
-    fun getPage(startIndex: Int, pageSize: Int, filter: String = ""): List<T>
+    suspend fun getPage(startIndex: Int, pageSize: Int, filter: String = ""): List<T>
 
     fun getFilteredCount(filter: String): Int
 

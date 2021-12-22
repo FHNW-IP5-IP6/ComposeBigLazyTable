@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import composeForms.ui.theme.ColorsUtil.Companion.get
@@ -20,6 +21,9 @@ import demo.bigLazyTable.model.PlaylistModel
 import demo.bigLazyTable.ui.theme.BackgroundColorGroups
 import demo.bigLazyTable.ui.theme.BackgroundColorHeader
 import demo.bigLazyTable.ui.theme.BackgroundColorLight
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * @author Marco Sprenger, Livio Näf
@@ -96,19 +100,26 @@ fun RowScope.TableCell(
 fun LazyTable(viewModel: LazyTableViewModel) {
     val lazyListItems = AppState.lazyModelList
     val listState = rememberLazyListState()
-    val scrollbarStyle = ScrollbarStyle(
-        minimalHeight = 16.dp,
-        thickness = 12.dp,
-        shape = RoundedCornerShape(4.dp),
-        hoverDurationMillis = 1000,
-        unhoverColor = Color.Red.copy(alpha = 0.3f),
-        hoverColor = Color.Red.copy(alpha = 0.8f)
-    )
 
     Box(modifier = Modifier.fillMaxSize()) {
         val firstVisibleItemIndex = listState.firstVisibleItemIndex
-        if (viewModel.isTimeToLoadPage(firstVisibleItemIndex)) {
-            viewModel.loadAllNeededPagesFor(firstVisibleItemIndex = firstVisibleItemIndex)
+
+        // FIXME@JetBrains: listState.isScrollInProgress is always false
+        if (!viewModel.isScrolling && viewModel.isTimeToLoadPage(firstVisibleItemIndex)) {
+
+//            viewModel.scheduler.forEach { job ->
+//                job.cancel()
+//                println("job $job canceled")
+//            }
+
+//            viewModel.scheduler.removeAll { true }
+
+            CoroutineScope(Dispatchers.IO).launch {
+                viewModel.loadAllNeededPagesFor(firstVisibleItemIndex = firstVisibleItemIndex)
+            }
+//            viewModel.scheduler.add(y).also {
+//                println("job added")
+//            }
         }
 
         LazyColumn(
@@ -125,8 +136,28 @@ fun LazyTable(viewModel: LazyTableViewModel) {
 
         VerticalScrollbar(
             adapter = rememberScrollbarAdapter(listState),
-            modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
-            style = scrollbarStyle
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .fillMaxHeight()
+                .pointerMoveFilter(
+                onEnter = {
+                    viewModel.isScrolling = true
+                    println("On Mouse(pointer) Enter")
+                    false
+                },
+                onExit = {
+                    viewModel.isScrolling = false
+                    println("on Mouse(pointer) Exit")
+                    false
+                }),
+            style = ScrollbarStyle(
+                minimalHeight = 16.dp,
+                thickness = 12.dp,
+                shape = RoundedCornerShape(4.dp),
+                hoverDurationMillis = 1000,
+                unhoverColor = Color.Red.copy(alpha = 0.3f),
+                hoverColor = Color.Red.copy(alpha = 0.8f)
+            )
         )
     }
 }
