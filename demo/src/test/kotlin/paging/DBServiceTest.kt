@@ -45,7 +45,7 @@ internal class DBServiceTest {
     }
 
     @Test
-    fun testGetPageReturnsPlaylists() {
+    suspend fun testGetPageReturnsPlaylists() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
         showStartLogMessage()
 
@@ -76,7 +76,7 @@ internal class DBServiceTest {
     }
 
     @Test
-    fun testGetPageStartsAtStartIndex() {
+    suspend fun testGetPageStartsAtStartIndex() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
         showStartLogMessage()
 
@@ -97,7 +97,7 @@ internal class DBServiceTest {
     }
 
     @Test
-    fun testGetPageReturnsPageSizeElements() {
+    suspend fun testGetPageReturnsPageSizeElements() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
         showStartLogMessage()
 
@@ -118,7 +118,7 @@ internal class DBServiceTest {
     }
 
     @Test
-    fun testGetPageReturnsOnlyFilteredItems() {
+    suspend fun testGetPageReturnsOnlyFilteredItems() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
         showStartLogMessage()
 
@@ -161,7 +161,7 @@ internal class DBServiceTest {
 
     // TODO: How can we know if a returned value is "correct"?
     @Test
-    fun testGetFilteredCountReturnsCorrectSize() {
+    suspend fun testGetFilteredCountReturnsCorrectSize() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
         showStartLogMessage()
 
