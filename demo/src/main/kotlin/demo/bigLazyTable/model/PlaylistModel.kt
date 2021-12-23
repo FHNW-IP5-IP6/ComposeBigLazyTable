@@ -196,7 +196,8 @@ class PlaylistModel(playlist: Playlist) : BaseModel<BLTLabels>(title = BLTLabels
         value = playlist.track4AlbumName
     )
 
-    val lazyListAttributes = listOf<Attribute<*, *, *>>(id, name, numTracks, numFollowers, durationMs)
+//    val lazyListAttributes = listOf<Attribute<*, *, *>>(id, name, numTracks, numFollowers, durationMs)
+    val lazyListAttributes = listOf<Attribute<*, *, *>>(id, name, numTracks, numFollowers, durationMs, numEdits, numAlbums, numArtists, numFollowers, numFollowers, numTracks)
 
     private val headerGroup = HeaderGroup(
         model = this,
