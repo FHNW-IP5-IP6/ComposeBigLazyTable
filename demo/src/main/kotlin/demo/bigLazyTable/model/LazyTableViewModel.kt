@@ -71,6 +71,7 @@ object LazyTableViewModel {
     /**
      * If firstVisibleItemIndex > lastVisibleIndex --> scrolled down
      * If firstVisibleItemIndex < lastVisibleIndex --> scrolled up
+     * launch here
      */
     suspend fun loadAllNeededPagesFor(firstVisibleItemIndex: Int) {
         currentPage = firstVisibleItemIndex / pageSize

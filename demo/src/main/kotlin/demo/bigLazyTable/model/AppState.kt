@@ -18,6 +18,7 @@ object AppState {
      * - default data when LazyList is loading
      */
     val defaultPlaylistModel by mutableStateOf(PlaylistModel(Playlist()))
+    val testDefaultPlaylistModel = PlaylistModel(Playlist())
 
     /**
      * Current selected Playlist in LazyList.

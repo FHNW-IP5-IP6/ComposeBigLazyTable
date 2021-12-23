@@ -1,10 +1,13 @@
 package demo.bigLazyTable.ui
 
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -13,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import composeForms.model.attributes.Attribute
 import composeForms.ui.theme.ColorsUtil.Companion.get
 import composeForms.ui.theme.FormColors
 import demo.bigLazyTable.model.AppState
@@ -78,6 +82,7 @@ fun HeaderRow() {
 
 @Composable
 fun RowScope.TableCell(
+//    attribute: Attribute<*,*,*>,
     text: String,
     weight: Float = 1f,
     color: Color = Color.Black,
@@ -91,7 +96,7 @@ fun RowScope.TableCell(
         fontWeight = if (hasError) FontWeight.Bold else fontWeight,
         modifier = Modifier
             .background(backgroundColor)
-            .weight(weight)
+//            .weight(weight)
             .padding(8.dp),
     )
 }
@@ -101,10 +106,13 @@ fun LazyTable(viewModel: LazyTableViewModel) {
     val lazyListItems = AppState.lazyModelList
     val listState = rememberLazyListState()
 
+    val scrollState = rememberScrollState()
+
     Box(modifier = Modifier.fillMaxSize()) {
         val firstVisibleItemIndex = listState.firstVisibleItemIndex
 
         // FIXME@JetBrains: listState.isScrollInProgress is always false
+        // TODO: Eigene Scrollbar funktion
         if (!viewModel.isScrolling && viewModel.isTimeToLoadPage(firstVisibleItemIndex)) {
 
 //            viewModel.scheduler.forEach { job ->
@@ -126,7 +134,8 @@ fun LazyTable(viewModel: LazyTableViewModel) {
             verticalArrangement = Arrangement.spacedBy(4.dp),
             state = listState
         ) {
-            items(lazyListItems) { playlistModel ->
+            // TODO: Experiment mit key
+            items(lazyListItems/*, key = id*/) { playlistModel ->
                 when (playlistModel) {
                     null -> PlaylistRowPlaceholder()
                     else -> PlaylistRow(viewModel, playlistModel)
@@ -150,6 +159,21 @@ fun LazyTable(viewModel: LazyTableViewModel) {
                     println("on Mouse(pointer) Exit")
                     false
                 }),
+            style = ScrollbarStyle(
+                minimalHeight = 16.dp,
+                thickness = 12.dp,
+                shape = RoundedCornerShape(4.dp),
+                hoverDurationMillis = 1000,
+                unhoverColor = Color.Red.copy(alpha = 0.3f),
+                hoverColor = Color.Red.copy(alpha = 0.8f)
+            )
+        )
+
+        HorizontalScrollbar(
+            adapter = rememberScrollbarAdapter(scrollState),
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter),
             style = ScrollbarStyle(
                 minimalHeight = 16.dp,
                 thickness = 12.dp,
@@ -189,9 +213,7 @@ private fun PlaylistRow(viewModel: LazyTableViewModel, playlistModel: PlaylistMo
 }
 
 @Composable
-fun PlaylistRowPlaceholder(
-    backgroundColor: Color = BackgroundColorLight
-) {
+fun PlaylistRowPlaceholder(backgroundColor: Color = BackgroundColorLight) {
     Row(
         modifier = Modifier
             .background(backgroundColor)
