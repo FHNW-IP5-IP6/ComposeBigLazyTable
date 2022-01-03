@@ -102,7 +102,7 @@ fun RowScope.AttributeTableCell(
 )
 
 @Composable
-fun RowScope.TableCell(
+fun TableCell(
     text: String,
     width: Dp = 150.dp, // TODO: Make it dynamically adjust when there is more or less text
     color: Color = Color.Black,
@@ -122,22 +122,14 @@ fun RowScope.TableCell(
 }
 
 @Composable
-fun LazyTable(viewModel: LazyTableViewModel, horizontalScrollState: ScrollState) {
+fun LazyTable(
+    viewModel: LazyTableViewModel,
+    horizontalScrollState: ScrollState
+) {
     val lazyListItems = AppState.lazyModelList
     val verticalLazyListState = rememberLazyListState()
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .scrollable(
-                state = verticalLazyListState,
-                orientation = Orientation.Vertical
-            )
-            .scrollable(
-                state = horizontalScrollState,
-                orientation = Orientation.Horizontal
-            )
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         val firstVisibleItemIndex = verticalLazyListState.firstVisibleItemIndex
 
         // FIXME@JetBrains: listState.isScrollInProgress is always false
@@ -220,7 +212,7 @@ private fun PlaylistRow(
 fun PlaylistRowPlaceholder(
     backgroundColor: Color = BackgroundColorLight,
     horizontalScrollState: ScrollState,
-    lazyListAttributes: List<Attribute<*,*,*>> = PlaylistModel(Playlist()).lazyListAttributes
+    lazyListAttributes: List<Attribute<*, *, *>> = AppState.defaultPlaylistModel.lazyListAttributes
 ) {
     Row(
         modifier = Modifier
