@@ -53,20 +53,18 @@ fun RowScope.TableContainer(weight: Float, viewModel: LazyTableViewModel) {
 }
 
 @Composable
-fun PageInfoRow(viewModel: LazyTableViewModel) = LazyRow(
+fun PageInfoRow(viewModel: LazyTableViewModel) = Row(
     modifier = Modifier
         .background(BackgroundColorHeader)
         .fillMaxWidth()
         .padding(horizontal = 5.dp),
     horizontalArrangement = Arrangement.Start
 ) {
-    item {
-        Text(
-            text = "Page: ${viewModel.currentPage}/${viewModel.maxPages}",
-            color = Color.White,
-            fontWeight = FontWeight.Bold
-        )
-    }
+    Text(
+        text = "Page: ${viewModel.currentPage}/${viewModel.maxPages}",
+        color = Color.White,
+        fontWeight = FontWeight.Bold
+    )
 }
 
 @Composable
