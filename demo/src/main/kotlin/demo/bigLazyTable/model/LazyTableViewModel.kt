@@ -73,15 +73,17 @@ object LazyTableViewModel {
      * If firstVisibleItemIndex < lastVisibleIndex --> scrolled up
      * launch here
      */
-    suspend fun loadAllNeededPagesFor(firstVisibleItemIndex: Int) {
+    fun loadAllNeededPagesForIndex(firstVisibleItemIndex: Int) {
         currentPage = firstVisibleItemIndex / pageSize
         val scrolledDown = firstVisibleItemIndex > lastVisibleIndex
 
-        // load cacheSize pages
-        for (i in -1 until cacheSize - 1) {
-            val indexToLoad = calculateIndexToLoad(scrolledDown, firstVisibleItemIndex, i)
-            if (indexToLoad  <= totalCount - pageSize) {
-                loadPage(firstVisibleItemIndex, indexToLoad, scrolledDown)
+        CoroutineScope(Dispatchers.IO).launch {
+            // load cacheSize pages
+            for (i in -1 until cacheSize - 1) {
+                val indexToLoad = calculateIndexToLoad(scrolledDown, firstVisibleItemIndex, i)
+                if (indexToLoad <= totalCount - pageSize) {
+                    loadPage(firstVisibleItemIndex, indexToLoad, scrolledDown)
+                }
             }
         }
     }
@@ -94,7 +96,8 @@ object LazyTableViewModel {
         // Set firstIndex to new value
         lastVisibleIndex = firstVisibleItemIndex
 
-        val pageNrToLoad = (indexToLoad / pageSize) -1 // Example: (1 Mio / 40) = 24.9k because service starts from 0 = total 25k
+        val pageNrToLoad =
+            (indexToLoad / pageSize) - 1 // Example: (1 Mio / 40) = 24.9k because service starts from 0 = total 25k
 
         if (isPageNotInCache(pageNrToLoad)) {
             val pageStartIndexToLoad = calculatePageStartIndexToLoad(indexToLoad)

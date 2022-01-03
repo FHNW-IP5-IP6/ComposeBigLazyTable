@@ -6,7 +6,6 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,46 +16,38 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import composeForms.model.attributes.Attribute
-import composeForms.ui.theme.ColorsUtil.Companion.get
-import composeForms.ui.theme.FormColors
 import demo.bigLazyTable.model.AppState
 import demo.bigLazyTable.model.LazyTableViewModel
+import demo.bigLazyTable.model.Playlist
 import demo.bigLazyTable.model.PlaylistModel
 import demo.bigLazyTable.ui.theme.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 /**
  * @author Marco Sprenger, Livio Näf
  */
 @Composable
 fun RowScope.TableContainer(weight: Float, viewModel: LazyTableViewModel) {
-    val scrollState = rememberScrollState()
+    val horizontalScrollState = rememberScrollState()
 
     Box(modifier = Modifier.weight(weight)) {
         Column(
             modifier = Modifier.padding(horizontal = 5.dp),
             verticalArrangement = Arrangement.Top
         ) {
-            PageInfoRow(viewModel)
-            HeaderRow(scrollState)
-            LazyTable(viewModel, scrollState)
+            PageInfoRow(viewModel = viewModel)
+            HeaderRow(horizontalScrollState = horizontalScrollState)
+            LazyTable(
+                viewModel = viewModel,
+                horizontalScrollState = horizontalScrollState
+            )
         }
 
         HorizontalScrollbar(
-            adapter = rememberScrollbarAdapter(scrollState),
+            adapter = rememberScrollbarAdapter(horizontalScrollState),
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter),
-            style = ScrollbarStyle(
-                minimalHeight = 16.dp,
-                thickness = 12.dp,
-                shape = RoundedCornerShape(4.dp),
-                hoverDurationMillis = 1000,
-                hoverColor = HoverColor,
-                unhoverColor = UnhoverColor
-            )
+            style = CustomScrollbarStyle
         )
     }
 }
@@ -64,7 +55,7 @@ fun RowScope.TableContainer(weight: Float, viewModel: LazyTableViewModel) {
 @Composable
 fun PageInfoRow(viewModel: LazyTableViewModel) = LazyRow(
     modifier = Modifier
-        .background(get(FormColors.BACKGROUND_COLOR_HEADER))
+        .background(BackgroundColorHeader)
         .fillMaxWidth()
         .padding(horizontal = 5.dp),
     horizontalArrangement = Arrangement.Start
@@ -79,14 +70,14 @@ fun PageInfoRow(viewModel: LazyTableViewModel) = LazyRow(
 }
 
 @Composable
-fun HeaderRow(scrollState: ScrollState) {
+fun HeaderRow(horizontalScrollState: ScrollState) {
     Row(
         modifier = Modifier
             .background(BackgroundColorHeader)
-//            .fillMaxWidth()
+            .fillMaxWidth()
             .padding(horizontal = 5.dp)
-            .horizontalScroll(scrollState),
-        horizontalArrangement = Arrangement.Center // Arrangement.SpaceBetween
+            .horizontalScroll(horizontalScrollState),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         for (attribute in AppState.defaultPlaylistModel.lazyListAttributes) {
             TableCell(
@@ -112,9 +103,7 @@ fun RowScope.AttributeTableCell(
 
 @Composable
 fun RowScope.TableCell(
-//    attribute: Attribute<*,*,*>,
     text: String,
-    weight: Float = 1f,
     width: Dp = 150.dp, // TODO: Make it dynamically adjust when there is more or less text
     color: Color = Color.Black,
     backgroundColor: Color,
@@ -127,67 +116,57 @@ fun RowScope.TableCell(
         fontWeight = if (hasError) FontWeight.Bold else fontWeight,
         modifier = Modifier
             .background(backgroundColor)
-//            .weight(weight)
             .width(width)
             .padding(8.dp),
     )
 }
 
 @Composable
-fun LazyTable(viewModel: LazyTableViewModel, scrollState: ScrollState) {
+fun LazyTable(viewModel: LazyTableViewModel, horizontalScrollState: ScrollState) {
     val lazyListItems = AppState.lazyModelList
-    val listState = rememberLazyListState()
+    val verticalLazyListState = rememberLazyListState()
 
 //    LazyColumn(modifier = Modifier
     Box(
         modifier = Modifier
 //            .fillMaxSize()
             .scrollable(
-                state = listState,
+                state = verticalLazyListState,
                 orientation = Orientation.Vertical
             )
             .scrollable(
-                state = scrollState,
+                state = horizontalScrollState,
                 orientation = Orientation.Horizontal
             )
     ) {
-        val firstVisibleItemIndex = listState.firstVisibleItemIndex
+        val firstVisibleItemIndex = verticalLazyListState.firstVisibleItemIndex
 
         // FIXME@JetBrains: listState.isScrollInProgress is always false
         // TODO: Eigene Scrollbar funktion
         if (!viewModel.isScrolling && viewModel.isTimeToLoadPage(firstVisibleItemIndex)) {
-
-//            viewModel.scheduler.forEach { job ->
-//                job.cancel()
-//                println("job $job canceled")
-//            }
-
-//            viewModel.scheduler.removeAll { true }
-
-            CoroutineScope(Dispatchers.IO).launch {
-                viewModel.loadAllNeededPagesFor(firstVisibleItemIndex = firstVisibleItemIndex)
-            }
-//            viewModel.scheduler.add(y).also {
-//                println("job added")
-//            }
+            viewModel.loadAllNeededPagesForIndex(firstVisibleItemIndex)
         }
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(4.dp),
-            state = listState
+            state = verticalLazyListState
         ) {
 
             // TODO: Experiment mit key
             items(lazyListItems/*, key = id*/) { playlistModel ->
                 when (playlistModel) {
-                    null -> PlaylistRowPlaceholder(scrollState = scrollState)
-                    else -> PlaylistRow(viewModel, playlistModel, scrollState)
+                    null -> PlaylistRowPlaceholder(horizontalScrollState = horizontalScrollState)
+                    else -> PlaylistRow(
+                        viewModel = viewModel,
+                        playlistModel = playlistModel,
+                        horizontalScrollState = horizontalScrollState
+                    )
                 }
             }
         }
 
         VerticalScrollbar(
-            adapter = rememberScrollbarAdapter(listState),
+            adapter = rememberScrollbarAdapter(verticalLazyListState),
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .fillMaxHeight()
@@ -202,34 +181,31 @@ fun LazyTable(viewModel: LazyTableViewModel, scrollState: ScrollState) {
                         println("on Mouse(pointer) Exit")
                         false
                     }),
-            style = ScrollbarStyle(
-                minimalHeight = 16.dp,
-                thickness = 12.dp,
-                shape = RoundedCornerShape(4.dp),
-                hoverDurationMillis = 1000,
-                hoverColor = HoverColor,
-                unhoverColor = UnhoverColor
-            )
+            style = CustomScrollbarStyle
         )
     }
 }
 
 @Composable
-private fun PlaylistRow(viewModel: LazyTableViewModel, playlistModel: PlaylistModel, scrollState: ScrollState) {
+private fun PlaylistRow(
+    viewModel: LazyTableViewModel,
+    playlistModel: PlaylistModel,
+    horizontalScrollState: ScrollState
+) {
     val isSelected = AppState.selectedPlaylistModel.id.getValue() == playlistModel.id.getValue()
     val backgroundColor = if (isSelected) BackgroundColorGroups else BackgroundColorLight
 
     Row(
         modifier = Modifier
             .background(backgroundColor)
-//            .fillMaxWidth()
+            .fillMaxWidth()
             .padding(horizontal = 5.dp)
             .selectable(
                 selected = isSelected,
                 onClick = { viewModel.selectPlaylist(playlistModel) }
             )
-            .horizontalScroll(scrollState),
-        horizontalArrangement = Arrangement.Center // Arrangement.SpaceBetween,
+            .horizontalScroll(horizontalScrollState),
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         for (attribute in playlistModel.lazyListAttributes) {
             TableCell(
@@ -242,18 +218,24 @@ private fun PlaylistRow(viewModel: LazyTableViewModel, playlistModel: PlaylistMo
 }
 
 @Composable
-fun PlaylistRowPlaceholder(backgroundColor: Color = BackgroundColorLight, scrollState: ScrollState) {
+fun PlaylistRowPlaceholder(
+    backgroundColor: Color = BackgroundColorLight,
+    horizontalScrollState: ScrollState,
+    lazyListAttributes: List<Attribute<*,*,*>> = PlaylistModel(Playlist()).lazyListAttributes
+) {
     Row(
         modifier = Modifier
             .background(backgroundColor)
             .fillMaxWidth()
             .padding(horizontal = 5.dp)
-            .horizontalScroll(scrollState),
+            .horizontalScroll(horizontalScrollState),
         horizontalArrangement = Arrangement.Center // Arrangement.SpaceBetween
     ) {
-        TableCell(
-            text = "...",
-            backgroundColor = backgroundColor
-        )
+        for (attribute in lazyListAttributes) {
+            TableCell(
+                text = "...",
+                backgroundColor = backgroundColor
+            )
+        }
     }
 }
