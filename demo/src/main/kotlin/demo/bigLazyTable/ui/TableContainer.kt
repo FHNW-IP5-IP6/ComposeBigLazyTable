@@ -126,10 +126,9 @@ fun LazyTable(viewModel: LazyTableViewModel, horizontalScrollState: ScrollState)
     val lazyListItems = AppState.lazyModelList
     val verticalLazyListState = rememberLazyListState()
 
-//    LazyColumn(modifier = Modifier
     Box(
         modifier = Modifier
-//            .fillMaxSize()
+            .fillMaxSize()
             .scrollable(
                 state = verticalLazyListState,
                 orientation = Orientation.Vertical
@@ -229,7 +228,7 @@ fun PlaylistRowPlaceholder(
             .fillMaxWidth()
             .padding(horizontal = 5.dp)
             .horizontalScroll(horizontalScrollState),
-        horizontalArrangement = Arrangement.Center // Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         for (attribute in lazyListAttributes) {
             TableCell(
