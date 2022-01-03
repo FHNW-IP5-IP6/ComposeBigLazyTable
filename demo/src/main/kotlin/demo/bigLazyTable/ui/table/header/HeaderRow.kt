@@ -1,4 +1,4 @@
-package demo.bigLazyTable.ui.table
+package demo.bigLazyTable.ui.table.header
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import demo.bigLazyTable.model.AppState
+import demo.bigLazyTable.ui.table.TableCell
 import demo.bigLazyTable.ui.theme.BackgroundColorHeader
 
 @Composable

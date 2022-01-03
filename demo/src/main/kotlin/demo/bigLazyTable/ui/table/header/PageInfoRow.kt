@@ -1,4 +1,4 @@
-package demo.bigLazyTable.ui.table
+package demo.bigLazyTable.ui.table.header
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
