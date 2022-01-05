@@ -18,7 +18,7 @@ object AppState {
      * - default data when LazyList is loading
      */
     val defaultPlaylistModel by mutableStateOf(PlaylistModel(Playlist()))
-    val testDefaultPlaylistModel = PlaylistModel(Playlist())
+    val testDefaultPlaylistModel = PlaylistModel(Playlist()) // TODO: Check this
 
     /**
      * Current selected Playlist in LazyList.
@@ -31,7 +31,6 @@ object AppState {
      * All elements in the LazyList cache are stored in this list. The rest is filled with the defaultPlaylistModel to provide the default loading data.
      */
     val lazyModelList: MutableList<PlaylistModel?> = ArrayList(Collections.nCopies(DBService.getTotalCount(), null))
-//    val lazyModelList: MutableList<PlaylistModel> = ArrayList(Collections.nCopies(DBService.getTotalCount(), null))
 
     /**
      * List of all Models with changes. Used to prevent loosing changed data if new data is loaded from the service.
