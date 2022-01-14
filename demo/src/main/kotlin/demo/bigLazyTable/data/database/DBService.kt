@@ -44,7 +44,7 @@ object DBService : IPagingService<Playlist> {
     }
 
     // Helper functions
-    private fun mapResultRowToPlaylist(resultRow: ResultRow) = resultRow.let {
+    private fun mapResultRowToPlaylist(resultRow: ResultRow): Playlist = resultRow.let {
         Playlist(
             it[DatabasePlaylists.id],
             it[DatabasePlaylists.name],

@@ -13,7 +13,7 @@ interface IPagingService<T> {
 
     fun get(id: Long): T
 
-    fun indexOf(id: Long, filter: String): Int
+    fun indexOf(id: Long, filter: String = ""): Int
 
     //fun update(dao: T): Boolean
 
