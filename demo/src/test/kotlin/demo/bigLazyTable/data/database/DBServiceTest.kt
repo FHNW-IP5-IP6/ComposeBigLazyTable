@@ -1,6 +1,5 @@
-package paging
+package demo.bigLazyTable.data.database
 
-import demo.bigLazyTable.data.database.DBService
 import demo.bigLazyTable.model.Playlist
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
@@ -228,7 +227,7 @@ internal class DBServiceTest {
 
     @Test
     fun testGetWithValidIdReturnsOneObject() {
-            printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
         runBlocking {
             // given
             page = dbService.getPage(startIndex, pageSize)
