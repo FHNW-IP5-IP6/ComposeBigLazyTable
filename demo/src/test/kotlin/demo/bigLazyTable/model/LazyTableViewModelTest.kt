@@ -1,5 +1,6 @@
 package demo.bigLazyTable.model
 
+import demo.bigLazyTable.data.database.FakePagingService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -8,8 +9,11 @@ import org.junit.jupiter.api.Assertions.*
 
 internal class LazyTableViewModelTest {
 
+    lateinit var viewModel: LazyTableViewModel
+
     @BeforeEach
     fun setUp() {
+        viewModel = LazyTableViewModel(FakePagingService)
     }
 
     @AfterEach
@@ -34,6 +38,7 @@ internal class LazyTableViewModelTest {
 
     @Test
     fun getMaxPages() {
+        assertEquals(1, viewModel.maxPages)
     }
 
     @Test
@@ -46,6 +51,7 @@ internal class LazyTableViewModelTest {
 
     @Test
     fun isScrolling() {
+        assertEquals(false, viewModel.isScrolling)
     }
 
     @Test
@@ -62,5 +68,6 @@ internal class LazyTableViewModelTest {
 
     @Test
     fun isTimeToLoadPage() {
+        assertEquals(false, viewModel.isTimeToLoadPage(0))
     }
 }

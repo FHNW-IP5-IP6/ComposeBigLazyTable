@@ -1,6 +1,7 @@
 package demo.bigLazyTable.model
 
 import androidx.compose.runtime.*
+import bigLazyTable.paging.IPagingService
 import demo.bigLazyTable.data.database.DBService
 import kotlinx.coroutines.*
 import mu.KotlinLogging
@@ -14,16 +15,17 @@ private val Log = KotlinLogging.logger {}
 /**
  * @author Marco Sprenger, Livio Näf
  */
-object LazyTableViewModel {
+class LazyTableViewModel(pagingService: IPagingService<*>) {
 
-    private val totalCount = DBService.getTotalCount()
-    private const val pageSize = 40
+    // TODO: Bad Design?! Service should be added as a parameter not directly called here - testing is impossible like this
+    private val totalCount = pagingService.getTotalCount()
+    private val pageSize = 40
 
     var lastVisibleIndex = 0
     var currentPage by mutableStateOf(0)
     val maxPages = ceil(totalCount.toDouble() / pageSize).toInt() // Example: 10 / 3 = 4
 
-    private const val cacheSize = 4
+    private val cacheSize = 4
     private val cache: LruCache<Int, List<PlaylistModel>> = LruCache(cacheSize)
 
     val scheduler: MutableList<Job> = mutableListOf()

@@ -5,6 +5,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.remember
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import demo.bigLazyTable.data.database.DBService
 import demo.bigLazyTable.data.database.Db
 import demo.bigLazyTable.model.LazyTableViewModel
 import demo.bigLazyTable.ui.BigLazyTableUI
@@ -24,7 +25,7 @@ fun main() = application {
 
         Db.initializeConnection()
 
-        val viewModel = remember { LazyTableViewModel } // side effect: init loads first data to display
+        val viewModel = remember { LazyTableViewModel(DBService) } // side effect: init loads first data to display
         BigLazyTableUI(viewModel = viewModel)
     }
 }
