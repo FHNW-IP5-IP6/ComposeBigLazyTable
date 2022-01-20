@@ -12,7 +12,7 @@ import java.util.*
  */
 object DBService : IPagingService<Playlist> {
 
-    private val maxItems by lazy { getTotalCount() }
+    private val lastIndex by lazy { getTotalCount() - 1 }
 
     override suspend fun getPage(
         startIndex: Int,
@@ -21,7 +21,8 @@ object DBService : IPagingService<Playlist> {
         caseSensitive: Boolean
     ): List<Playlist> {
         // TODO: check if lazy is working correctly without any downside
-        if (startIndex > maxItems) throw IllegalArgumentException("startIndex must be smaller than the totalCount")
+        if (startIndex > lastIndex) throw IllegalArgumentException("startIndex must be smaller than/equal to the lastIndex")
+        if (startIndex < 0) throw IllegalArgumentException("only positive values are allowed for startIndex")
 
         val start: Long = if (filter == "") startIndex.toLong() else 0
         return transaction {
@@ -32,7 +33,6 @@ object DBService : IPagingService<Playlist> {
         }
     }
 
-    // TODO: Find out how to check filter with caseSensitive
     // By default, the SQLite LIKE operator is case-insensitive for ASCII characters (which covers all english language
     // letters), and case-sensitive for unicode characters that are beyond the ASCII range (ä, ö, ü, ...)
     // PostgreSQL is a case-sensitive database by default
@@ -43,17 +43,13 @@ object DBService : IPagingService<Playlist> {
         columnWhichShouldMatch: Column<String>,
         filter: String
     ): Op<Boolean> {
-        // TODO: https://www.sqlitetutorial.net/sqlite-like/#:~:text=Note%20that%20SQLite%20LIKE%20operator,LIKE%20%22%C3%A4%22%20is%20false.
-        // TODO: How to PRAGMA case_sensitive_like = true;
         return if (caseSensitive) columnWhichShouldMatch like "%$filter%"
-        // TODO: match & like != caseSensitive
         else columnWhichShouldMatch.lowerCase() like "%${filter.lowercase(Locale.getDefault())}%"
     }
 
     // TODO: Filter works with ignoreCase=true, but what if the user wants to filter caseSensitive?
     override fun getFilteredCount(filter: String, caseSensitive: Boolean): Int = transaction {
-        // doesnt work
-//        exec("PRAGMA case_sensitive_like = true", explicitStatementType = StatementType.EXEC)
+        if (filter == "") throw IllegalArgumentException("Filter must be set - empty string is not allowed (leads to java.lang.OutOfMemoryError: Java heap space)")
         DatabasePlaylists
             .select { caseSensitiveSelect(caseSensitive, DatabasePlaylists.name, filter) }
             .count()
@@ -71,9 +67,12 @@ object DBService : IPagingService<Playlist> {
             .let { mapResultRowToPlaylist(it) }
     }
 
-    override fun indexOf(id: Long, filter: String): Int = transaction {
-        // TODO: How can we determine what the gui index is of a given index?
-        TODO("Implement indexOf function in DBService")
+    override fun indexOf(id: Long, filter: String): Int {
+        if (id < 0) throw IllegalArgumentException("only positive id as parameter is allowed")
+        transaction {
+            // TODO: How can we determine what the gui index is of a given index?
+        }
+        return -1
     }
 
     /**

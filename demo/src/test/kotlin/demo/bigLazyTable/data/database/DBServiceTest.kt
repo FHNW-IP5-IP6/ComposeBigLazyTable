@@ -1,16 +1,14 @@
 package demo.bigLazyTable.data.database
 
 import demo.bigLazyTable.model.Playlist
+import demo.bigLazyTable.utils.printTestMethodName
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.TransactionManager
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertDoesNotThrow
-import org.junit.jupiter.api.assertThrows
 import java.sql.Connection
 import java.util.NoSuchElementException
 
@@ -19,12 +17,14 @@ private val Log = KotlinLogging.logger {}
 internal class DBServiceTest {
 
     private lateinit var dbService: DBService
+
+    private val sizeTestDb = 1_001
+    private val lastTestDbIndice = sizeTestDb - 1
+
     private var startIndex = 0
-    private val maxSizeTestDb = 1_001
-    private val maxSizeTestDbIndice = maxSizeTestDb - 1
-    private var startIndexRandom =
-        (0 until maxSizeTestDbIndice).random() // TODO: if number bigger than maxSizeTestDb -> fails the tests
+    private var startIndexRandom = (0 until lastTestDbIndice).random()
     private var startIndexNegative = -3133
+
     private val pageSize = 20
 
     private lateinit var page: List<Playlist>
@@ -34,149 +34,236 @@ internal class DBServiceTest {
     @BeforeEach
     fun setupDatabase() {
         dbService = DBService
-        // TODO: Pass path as param not hardcoded
-        Database.connect("jdbc:sqlite:./src/test/resources/test_spotify_playlist_dataset.db?case_sensitive_like=true", "org.sqlite.JDBC")
+        val makeSqliteCaseSensitive = "?case_sensitive_like=true"
+        Database.connect(
+            "jdbc:sqlite:./src/test/resources/test_spotify_playlist_dataset.db$makeSqliteCaseSensitive",
+            "org.sqlite.JDBC"
+        )
         TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
     }
 
-    // TODO: Move into TestUtils?
-    private fun printTestMethodName(testMethodName: String) = println("------### $testMethodName ###------")
-
-    private fun showStartLogMessage() = Log.info {
+    private fun printFixedTestValues() = Log.info {
         "testing with start index " +
                 "page=$startIndex, " +
                 "randomPage=$startIndexRandom, " +
-                "negativePage=$startIndexNegative. " +
-                "Page size = $pageSize"
+                "negativePage=$startIndexNegative, " +
+                "Page size = $pageSize, " +
+                "Size Test DB = $sizeTestDb"
     }
 
     @Test
-    fun `getPage returns List of Playlist`() {
+    fun `getPage with startIndex 0 returns a list of Playlist`() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
-        runBlocking {
-            showStartLogMessage()
+        printFixedTestValues()
 
+        runBlocking {
             // when
             page = dbService.getPage(startIndex, pageSize)
-            randomPage = dbService.getPage(startIndexRandom, pageSize)
-            negativePage = dbService.getPage(startIndexNegative, pageSize)
 
             // then
-            assertDoesNotThrow { page as List<Playlist> }
-            assertDoesNotThrow { randomPage as List<Playlist> }
-            assertDoesNotThrow { negativePage as List<Playlist> }
-
-            assertTrue(page.first() is Playlist)
-            assertTrue(page.last() is Playlist)
-            assertTrue(randomPage.first() is Playlist)
-            assertTrue(randomPage.last() is Playlist)
-            assertTrue(negativePage.first() is Playlist)
-            assertTrue(negativePage.last() is Playlist)
+            assertTrue(page.isNotEmpty())
+            assertEquals(0, page.first().id)
+            assertEquals(pageSize - 1, page.last().id.toInt())
 
             // result logs
             Log.info { "page.size=${page.size}" }
-            Log.info { "randomPage.size=${randomPage.size}" }
-            Log.info { "negativePage.size=${negativePage.size}" }
             Log.info { "page.first=${page.first().id}, page.last=${page.last().id}" }
+        }
+    }
+
+    @Test
+    fun `getPage with random startIndex returns a list of Playlist`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        printFixedTestValues()
+
+        runBlocking {
+            // when
+            randomPage = dbService.getPage(startIndexRandom, pageSize)
+
+            // then
+            assertTrue(randomPage.isNotEmpty())
+            assertEquals(startIndexRandom, randomPage.first().id.toInt())
+            assertEquals(startIndexRandom + pageSize - 1, randomPage.last().id.toInt())
+
+            // result logs
+            Log.info { "randomPage.size=${randomPage.size}" }
             Log.info { "randomPage.first=${randomPage.first().id}, randomPage.last=${randomPage.last().id}" }
-            Log.info { "negativePage.first=${negativePage.first().id}, negativePage.last=${negativePage.last().id}" }
+        }
+    }
+
+    @Test
+    fun `getPage with invalid startIndex throws an IllegalArgumentException`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        printFixedTestValues()
+
+        runBlocking {
+            assertThrows<IllegalArgumentException> {
+                negativePage = dbService.getPage(startIndexNegative, pageSize)
+                Log.info { "Has not thrown Exception!" }
+            }
+            Log.info { "Has thrown Exception!" }
+        }
+    }
+
+    @Test
+    fun `getPage throws IllegalArgumentException on negative startIndex`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        printFixedTestValues()
+
+        runBlocking {
+            assertThrows<IllegalArgumentException> {
+                Log.info { "Try to call getPage with negative startIndex $startIndexNegative" }
+                dbService.getPage(startIndexNegative, pageSize)
+                Log.info { "Has not thrown Exception!" }
+            }
+            Log.info { "Has thrown Exception!" }
+        }
+    }
+
+    @Test
+    fun `getPage does not throw IllegalArgumentException on last index - pageSize`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        printFixedTestValues()
+
+        runBlocking {
+            Log.info { "Try to call getPage with last index - pageSize($pageSize) ${lastTestDbIndice - pageSize}" }
+            assertDoesNotThrow {
+                runBlocking {
+                    dbService.getPage(lastTestDbIndice - pageSize, pageSize)
+                }
+            }
+            Log.info { "Has not thrown Exception!" }
+        }
+    }
+
+    @Test
+    fun `getPage does not throw IllegalArgumentException on second last index & pageSize=1`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        printFixedTestValues()
+
+        val secondLastIndex = lastTestDbIndice - 1
+        Log.info { "Try to call getPage with second last index & pageSize=1 $secondLastIndex" }
+        assertDoesNotThrow {
+            runBlocking {
+                dbService.getPage(secondLastIndex, 1)
+            }
+        }
+        Log.info { "Has not thrown Exception!" }
+    }
+
+    @Test
+    fun `getPage does not throw IllegalArgumentException on last index & pageSize`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        printFixedTestValues()
+
+        Log.info { "Try to call getPage with last index $lastTestDbIndice" }
+        assertDoesNotThrow {
+            runBlocking {
+                dbService.getPage(lastTestDbIndice, pageSize)
+            }
+        }
+        Log.info { "Has not thrown Exception!" }
+    }
+
+    @Test
+    fun `getPage throws IllegalArgumentException with size of test db as startIndex`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        printFixedTestValues()
+
+        runBlocking {
+            assertThrows<IllegalArgumentException> {
+                // when
+                Log.info { "Try to call getPage with too big startIndex $sizeTestDb" }
+                dbService.getPage(sizeTestDb, pageSize)
+                Log.info { "Has not thrown Exception!" }
+            }
+            Log.info { "Has thrown Exception!" }
+        }
+    }
+
+    @Test
+    fun `getPage throws IllegalArgumentException with value bigger than size of test db as startIndex`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        printFixedTestValues()
+
+        runBlocking {
+            val moreThanMax = sizeTestDb + 100
+            assertThrows<IllegalArgumentException> {
+                // when
+                Log.info { "Try to call getPage with too big startIndex $moreThanMax" }
+                dbService.getPage(moreThanMax, pageSize)
+                Log.info { "Has not thrown Exception!" }
+            }
+            Log.info { "Has thrown Exception!" }
         }
     }
 
     @Test
     fun `getPage starts at start index`() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
-        runBlocking {
-            showStartLogMessage()
+        printFixedTestValues()
 
+        runBlocking {
             // when
             page = dbService.getPage(startIndex, pageSize)
             randomPage = dbService.getPage(startIndexRandom, pageSize)
-            negativePage = dbService.getPage(startIndexNegative, pageSize)
 
             // then
-            assertEquals(startIndex, (page.first() as Playlist).id.toInt())
-            assertEquals(startIndexRandom, (randomPage.first() as Playlist).id.toInt())
-            assertEquals(0, (negativePage.first() as Playlist).id.toInt())
+            assertEquals(startIndex, page.first().id.toInt())
+            assertEquals(startIndexRandom, randomPage.first().id.toInt())
 
             // result logs
-            Log.info { "page.first=${(page.first() as Playlist).id}" }
-            Log.info { "randomPage.first=${(randomPage.first() as Playlist).id}" }
-            Log.info { "negativePage.first=${(negativePage.first() as Playlist).id}" }
+            Log.info { "page.first=${page.first().id}" }
+            Log.info { "randomPage.first=${randomPage.first().id}" }
         }
     }
 
     @Test
     fun `getPage returns pageSize elements`() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
-        runBlocking {
-            showStartLogMessage()
+        printFixedTestValues()
 
+        runBlocking {
             // when
-            page = dbService.getPage(startIndex, pageSize, "")
-            randomPage = dbService.getPage(startIndexRandom, pageSize, "")
-            negativePage = dbService.getPage(startIndexNegative, pageSize, "")
+            page = dbService.getPage(startIndex, pageSize)
+            randomPage = dbService.getPage(startIndexRandom, pageSize)
 
             // then
             assertEquals(pageSize, page.size)
             assertEquals(pageSize, randomPage.size)
-            assertEquals(pageSize, negativePage.size)
 
             // result logs
             Log.info { "page.size=${page.size}" }
             Log.info { "randomPage.size=${randomPage.size}" }
-            Log.info { "negativePage.size=${negativePage.size}" }
         }
     }
 
     @Test
     fun `getPage returns only filtered items (no case sensitive)`() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
-        runBlocking {
-            showStartLogMessage()
+        printFixedTestValues()
 
+        runBlocking {
             // when
-            val filters = arrayOf(
-                "A",
-                "a",
-                "E",
-                "e",
-                "O",
-                "o",
-                "I Put A Spell On You"
-            ) // "" leads to java.lang.OutOfMemoryError: Java heap space
-            Log.info { "With filter1=${filters[0]}, filter2=${filters[1]}, filter3=${filters[2]}" }
+            val filters = arrayOf("A", "a", "E", "e", "O", "o", "I Put A Spell On You")
 
             // then
             for (i in filters.indices) {
+                Log.info { "With filter$i=${filters[i]}" }
+
                 val filteredCount = dbService.getFilteredCount(filters[i])
-
                 page = dbService.getPage(startIndex, filteredCount, filters[i])
-//                randomPage = dbService.getPage(startIndexRandom, filteredCount, filters[i])
-//                negativePage = dbService.getPage(startIndexNegative, filteredCount, filters[i])
-
                 assertEquals(filteredCount, page.size)
-//                assertEquals(filteredCount, randomPage.size)
-//                assertEquals(filteredCount, negativePage.size)
 
-                // TODO: If ignore case = false -> test fails!
                 if (filteredCount != 0) {
-                    assertTrue((page as List<Playlist>).first().name.contains(filters[i], ignoreCase = true))
-                    assertTrue((page as List<Playlist>).last().name.contains(filters[i], ignoreCase = true))
-//                    assertTrue((randomPage as List<Playlist>).first().name.contains(filters[i], ignoreCase = true))
-//                    assertTrue((randomPage as List<Playlist>).last().name.contains(filters[i], ignoreCase = true))
-//                    assertTrue((negativePage as List<Playlist>).first().name.contains(filters[i], ignoreCase = true))
-//                    assertTrue((negativePage as List<Playlist>).last().name.contains(filters[i], ignoreCase = true))
+                    assertTrue((page).first().name.contains(filters[i], ignoreCase = true))
+                    assertTrue((page).last().name.contains(filters[i], ignoreCase = true))
                 }
 
                 // result logs
                 Log.info { "filter$i=${filters[i]} filteredCount=$filteredCount" }
                 Log.info { "page.size=${page.size}" }
-//                Log.info { "randomPage.size=${randomPage.size}" }
-//                Log.info { "negativePage.size=${negativePage.size}" }
-                (page as List<Playlist>).apply { Log.info { "page: first.name=${first().name}, last.name=${last().name}" } }
-//                (randomPage as List<Playlist>).apply { Log.info { "randomPage: first.name=${first().name}, last.name=${last().name}" } }
-//                (negativePage as List<Playlist>).apply { Log.info { "negativePage: first.name=${first().name}, last.name=${last().name}" } }
+                Log.info { "page: first.name=${page.first().name}, last.name=${page.last().name}" }
             }
         }
     }
@@ -184,128 +271,119 @@ internal class DBServiceTest {
     @Test
     fun `getPage returns only filtered items (case sensitive)`() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
-        runBlocking {
-            showStartLogMessage()
+        printFixedTestValues()
 
+        runBlocking {
             // when
-            val filters = arrayOf(
-                "A",
-                "a",
-                "E",
-                "e",
-                "O",
-                "o",
-                "I Put A Spell On You"
-            ) // "" leads to java.lang.OutOfMemoryError: Java heap space
-            Log.info { "With filter1=${filters[0]}, filter2=${filters[1]}, filter3=${filters[2]}" }
+            val filters = arrayOf("A", "a", "E", "e", "O", "o", "I Put A Spell On You")
 
             // then
             for (i in filters.indices) {
+                Log.info { "With filter$i=${filters[i]}" }
+
                 val filteredCount = dbService.getFilteredCount(filters[i], caseSensitive = true)
-
                 page = dbService.getPage(startIndex, filteredCount, filters[i], caseSensitive = true)
-//                randomPage = dbService.getPage(startIndexRandom, filteredCount, filters[i], caseSensitive = true)
-//                negativePage = dbService.getPage(startIndexNegative, filteredCount, filters[i], caseSensitive = true)
-
                 assertEquals(filteredCount, page.size)
-//                assertEquals(filteredCount, randomPage.size)
-//                assertEquals(filteredCount, negativePage.size)
 
-                // TODO: If ignore case = false -> test fails!
                 if (filteredCount != 0) {
-//                    assertEquals(filters[i], (page as List<Playlist>).first().name)
-                    assertTrue((page as List<Playlist>).first().name.contains(filters[i], ignoreCase = false))
-                    assertTrue((page as List<Playlist>).last().name.contains(filters[i], ignoreCase = false))
-//                    assertTrue((randomPage as List<Playlist>).first().name.contains(filters[i], ignoreCase = false))
-//                    assertTrue((randomPage as List<Playlist>).last().name.contains(filters[i], ignoreCase = false))
-//                    assertTrue((negativePage as List<Playlist>).first().name.contains(filters[i], ignoreCase = false))
-//                    assertTrue((negativePage as List<Playlist>).last().name.contains(filters[i], ignoreCase = false))
+                    assertTrue((page).first().name.contains(filters[i], ignoreCase = false))
+                    assertTrue((page).last().name.contains(filters[i], ignoreCase = false))
                 }
 
                 // result logs
                 Log.info { "filter$i=${filters[i]} filteredCount=$filteredCount" }
                 Log.info { "page.size=${page.size}" }
-//                Log.info { "randomPage.size=${randomPage.size}" }
-//                Log.info { "negativePage.size=${negativePage.size}" }
-                (page as List<Playlist>).apply { Log.info { "page: first.name=${first().name}, last.name=${last().name}" } }
-//                (randomPage as List<Playlist>).apply { Log.info { "randomPage: first.name=${first().name}, last.name=${last().name}" } }
-//                (negativePage as List<Playlist>).apply { Log.info { "negativePage: first.name=${first().name}, last.name=${last().name}" } }
+                Log.info { "page: first.name=${page.first().name}, last.name=${page.last().name}" }
             }
         }
     }
 
-    // TODO: How can we know if a returned value is "correct"?
     @Test
     fun `getFilteredCount returns correct size`() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
-        runBlocking {
-            showStartLogMessage()
+        printFixedTestValues()
 
+        runBlocking {
             // when
-            val filters = arrayOf(
-                "A",
-                "a",
-                "E",
-                "e",
-                "O",
-                "o",
-                "I Put A Spell On You"
-            ) // "" leads to java.lang.OutOfMemoryError: Java heap space
-            Log.info { "With filter1=${filters[0]}, filter2=${filters[1]}, filter3=${filters[2]}" }
+            val filters = arrayOf("A", "a", "E", "e", "O", "o", "I Put A Spell On You")
 
             // then
             for (i in filters.indices) {
-                val filteredCount = dbService.getFilteredCount(filters[i])
+                Log.info { "With filter$i=${filters[i]}" }
 
+                val filteredCount = dbService.getFilteredCount(filters[i])
                 page = dbService.getPage(startIndex, filteredCount, filters[i])
-                randomPage = dbService.getPage(startIndexRandom, filteredCount, filters[i])
-                negativePage = dbService.getPage(startIndexNegative, filteredCount, filters[i])
 
                 assertEquals(filteredCount, page.size)
-                assertEquals(filteredCount, randomPage.size)
-                assertEquals(filteredCount, negativePage.size)
 
                 // result logs
                 Log.info { "filter$i=${filters[i]} filteredCount=$filteredCount" }
                 Log.info { "page.size=${page.size}" }
-                Log.info { "randomPage.size=${randomPage.size}" }
-                Log.info { "negativePage.size=${negativePage.size}" }
             }
         }
     }
 
     @Test
+    fun `getFilteredCount throws IllegalArgumentException on empty string`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        printFixedTestValues()
+
+        runBlocking {
+            // when
+            val filter = ""
+
+            // then
+            Log.info { "With filter=$filter(empty string)" }
+
+            assertThrows<IllegalArgumentException> {
+                // when
+                dbService.getFilteredCount(filter)
+                Log.info { "Has not thrown Exception!" }
+            }
+            Log.info { "Has thrown Exception!" }
+        }
+    }
+
+
+    @Test
     fun `getTotalCount returns correct size`() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        printFixedTestValues()
 
         // when
         val totalCount = dbService.getTotalCount()
 
         // then
-        assertEquals(maxSizeTestDb, totalCount)
-        Log.info { "maxSizeTestDb=$maxSizeTestDb == getTotalCount()=$totalCount" }
+        assertEquals(sizeTestDb, totalCount)
+        Log.info { "maxSizeTestDb=$sizeTestDb == getTotalCount()=$totalCount" }
     }
 
     @Test
-    fun testGetWithValidIdReturnsOneObject() {
+    fun `get with valid id returns that object`() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        printFixedTestValues()
+
         runBlocking {
             // given
             page = dbService.getPage(startIndex, pageSize)
+
             // when
             for (i in page.indices) {
+
                 // then
                 assertEquals(page[i], dbService.get(i.toLong()))
                 Log.info {
-                    "${page[i].toString().subSequence(0 until 15)}... == ${dbService.get(i.toLong()).toString().subSequence(0 until 15)}..."
+                    "${page[i].id} == ${dbService.get(i.toLong()).id}"
                 }
             }
         }
     }
 
     @Test
-    fun `get with invalid id returns error`() {
+    fun `get with invalid id returns NoSuchElementException`() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        printFixedTestValues()
+
         // given
         val invalidId = -1L
 
@@ -314,36 +392,40 @@ internal class DBServiceTest {
             // when
             Log.info { "DB Service to get $invalidId" }
             dbService.get(invalidId)
-            Log.info { "Has not thrown error!" }
+            Log.info { "Has not thrown Exception!" }
         }
-        Log.info { "Has thrown error!" }
+        Log.info { "Has thrown Exception!" }
     }
 
+    // TODO: Implement indexOf method first!
 //    @Test
-//    fun testIndexOfWithValidIdReturnsCorrectIndex() {
+//    fun `indexOf with valid id returns correct index`() {
 //        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+//
 //        // given
-//        val correctIndex = 2 // TODO:
+//        val correctIndex = -1
 //
 //        // when
 //        val randomItemIndex = dbService.indexOf(startIndexRandom.toLong())
 //
 //        // then
 //        assertEquals(correctIndex, randomItemIndex)
+//        Log.info { "index $correctIndex == randomItemIndexForTest $randomItemIndex" }
 //    }
 
     @Test
-    fun `indexOf with invalid id returns error`() {
+    fun `indexOf with invalid id returns Exception`() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         // when
         val invalidIndex = -6L
 
         // then
-        assertThrows<NotImplementedError> { // TODO: Change to NoSuchElementException or similar
+        assertThrows<IllegalArgumentException> {
             dbService.indexOf(invalidIndex)
-            Log.info { "Has not thrown error!" }
+            Log.info { "Has not thrown Exception!" }
         }
-        Log.info { "Has thrown error!" }
+        Log.info { "Has thrown Exception!" }
     }
 
 }
