@@ -2,10 +2,10 @@ package demo.bigLazyTable.model
 
 import androidx.compose.runtime.*
 import bigLazyTable.paging.IPagingService
+import demo.bigLazyTable.utils.MathUtils
 import kotlinx.coroutines.*
 import mu.KotlinLogging
 import org.junit.platform.commons.util.LruCache
-import kotlin.math.ceil
 
 private val Log = KotlinLogging.logger {}
 
@@ -18,19 +18,7 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
 
     var lastVisibleIndex = 0
     var currentPage by mutableStateOf(0)
-    val maxPages = roundDivisionToNextBiggerInt(number = totalCount, dividedBy = pageSize)
-
-    // TODO: Put in separate Utils?
-    /**
-     * Just a Wrapper function around the Kotlin [ceil] function with two Int Parameters
-     * @param number the number which should be divided
-     * @param dividedBy the number which divides [number]
-     * @return the next bigger int - Example: 10 / 3 = 4, where number=10 & dividedBy=3
-     */
-    private fun roundDivisionToNextBiggerInt(
-        number: Int,
-        dividedBy: Int
-    ): Int = ceil(number.toDouble() / dividedBy).toInt()
+    val maxPages = MathUtils.roundDivisionToNextBiggerInt(number = totalCount, dividedBy = pageSize)
 
     private val cacheSize = 4
     private val cache: LruCache<Int, List<PlaylistModel>> = LruCache(cacheSize)
@@ -63,6 +51,7 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
         return page.map { PlaylistModel(it as Playlist) }
     }
 
+    // TODO: Split up function -> too complicated
     private fun addPageToCache(pageNr: Int, pageOfPlaylistModels: List<PlaylistModel>) {
         val elements = pageOfPlaylistModels.toMutableList()
         if (AppState.changedPlaylistModels.size > 0) {
@@ -149,12 +138,10 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
         removeOldPageFromList(startIndexOldPage)
     }
 
+    // TODO: Better namings! What is going on here?
     private fun calculateStartIndexOfOldPage(index: Int, isEnd: Boolean): Int {
-        return if (isEnd) {
-            index - cacheSize * pageSize
-        } else {
-            index + cacheSize * pageSize
-        }
+        val previousOrNextPage = if (isEnd) index - cacheSize else index + cacheSize
+        return previousOrNextPage * pageSize
     }
 
     private fun removeOldPageFromList(startIndexOldPage: Int) {

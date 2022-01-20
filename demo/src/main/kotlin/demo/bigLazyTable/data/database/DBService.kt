@@ -47,7 +47,6 @@ object DBService : IPagingService<Playlist> {
         else columnWhichShouldMatch.lowerCase() like "%${filter.lowercase(Locale.getDefault())}%"
     }
 
-    // TODO: Filter works with ignoreCase=true, but what if the user wants to filter caseSensitive?
     override fun getFilteredCount(filter: String, caseSensitive: Boolean): Int = transaction {
         if (filter == "") throw IllegalArgumentException("Filter must be set - empty string is not allowed (leads to java.lang.OutOfMemoryError: Java heap space)")
         DatabasePlaylists
