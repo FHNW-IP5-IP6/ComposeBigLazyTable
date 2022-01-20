@@ -59,17 +59,18 @@ fun LazyTable(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .fillMaxHeight()
-                .pointerMoveFilter(
-                    onEnter = {
-                        viewModel.isScrolling = true
-                        println("On Mouse(pointer) Enter")
-                        false
-                    },
-                    onExit = {
-                        viewModel.isScrolling = false
-                        println("on Mouse(pointer) Exit")
-                        false
-                    }),
+//                .pointerMoveFilter(
+//                    onEnter = {
+//                        viewModel.isScrolling = true
+//                        println("On Mouse(pointer) Enter")
+//                        false
+//                    },
+//                    onExit = {
+//                        viewModel.isScrolling = false
+//                        println("on Mouse(pointer) Exit")
+//                        false
+//                    })
+            ,
             style = CustomScrollbarStyle
         )
     }

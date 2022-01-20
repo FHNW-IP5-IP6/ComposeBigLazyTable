@@ -6,18 +6,17 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
+import kotlin.math.ceil
+import kotlin.math.exp
 
 internal class LazyTableViewModelTest {
 
-    lateinit var viewModel: LazyTableViewModel
+    private lateinit var viewModel: LazyTableViewModel
+    private val numberOfPlaylists = 1_000_000
 
     @BeforeEach
     fun setUp() {
-        viewModel = LazyTableViewModel(FakePagingService)
-    }
-
-    @AfterEach
-    fun tearDown() {
+        viewModel = LazyTableViewModel(FakePagingService(numberOfPlaylists = numberOfPlaylists))
     }
 
     @Test
@@ -37,8 +36,11 @@ internal class LazyTableViewModelTest {
     }
 
     @Test
-    fun getMaxPages() {
-        assertEquals(1, viewModel.maxPages)
+    fun testGetMaxPages() {
+        val numberPlaylistsIsEven = numberOfPlaylists % 2 == 0
+        val numberDividedByPageSize = numberOfPlaylists / viewModel.pageSize
+        val expected = if (numberPlaylistsIsEven) numberDividedByPageSize else numberDividedByPageSize + 1
+        assertEquals(expected, viewModel.maxPages)
     }
 
     @Test

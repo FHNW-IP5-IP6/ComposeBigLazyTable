@@ -2,12 +2,9 @@ package demo.bigLazyTable.model
 
 import androidx.compose.runtime.*
 import bigLazyTable.paging.IPagingService
-import demo.bigLazyTable.data.database.DBService
 import kotlinx.coroutines.*
 import mu.KotlinLogging
-import org.jetbrains.exposed.sql.transactions.experimental.suspendedTransactionAsync
 import org.junit.platform.commons.util.LruCache
-import kotlin.coroutines.CoroutineContext
 import kotlin.math.ceil
 
 private val Log = KotlinLogging.logger {}
@@ -15,15 +12,25 @@ private val Log = KotlinLogging.logger {}
 /**
  * @author Marco Sprenger, Livio Näf
  */
-class LazyTableViewModel(pagingService: IPagingService<*>) {
+class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageSize: Int = 40) {
 
-    // TODO: Bad Design?! Service should be added as a parameter not directly called here - testing is impossible like this
-    private val totalCount = pagingService.getTotalCount()
-    private val pageSize = 40
+    private val totalCount by lazy { pagingService.getTotalCount() }
 
     var lastVisibleIndex = 0
     var currentPage by mutableStateOf(0)
-    val maxPages = ceil(totalCount.toDouble() / pageSize).toInt() // Example: 10 / 3 = 4
+    val maxPages = roundDivisionToNextBiggerInt(number = totalCount, dividedBy = pageSize)
+
+    // TODO: Put in separate Utils?
+    /**
+     * Just a Wrapper function around the Kotlin [ceil] function with two Int Parameters
+     * @param number the number which should be divided
+     * @param dividedBy the number which divides [number]
+     * @return the next bigger int - Example: 10 / 3 = 4, where number=10 & dividedBy=3
+     */
+    private fun roundDivisionToNextBiggerInt(
+        number: Int,
+        dividedBy: Int
+    ): Int = ceil(number.toDouble() / dividedBy).toInt()
 
     private val cacheSize = 4
     private val cache: LruCache<Int, List<PlaylistModel>> = LruCache(cacheSize)
@@ -52,8 +59,8 @@ class LazyTableViewModel(pagingService: IPagingService<*>) {
     }
 
     private suspend fun loadPageAndMapToPlaylistModels(startIndexOfPage: Int): List<PlaylistModel> {
-        val page = DBService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filter = "")
-        return page.map { PlaylistModel(it) }
+        val page = pagingService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filter = "")
+        return page.map { PlaylistModel(it as Playlist) }
     }
 
     private fun addPageToCache(pageNr: Int, pageOfPlaylistModels: List<PlaylistModel>) {

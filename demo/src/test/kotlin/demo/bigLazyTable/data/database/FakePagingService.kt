@@ -3,21 +3,26 @@ package demo.bigLazyTable.data.database
 import bigLazyTable.paging.IPagingService
 import demo.bigLazyTable.model.Playlist
 
-object FakePagingService: IPagingService<Playlist> {
+class FakePagingService(numberOfPlaylists: Int) : IPagingService<Playlist> {
 
     private val fakePage = mutableListOf<Playlist>()
 
     init {
-        for (i in 0 until 10) {
+        for (i in 0 until numberOfPlaylists) {
             fakePage.add(Playlist(id = i.toLong(), name = "name $i"))
         }
     }
 
-    override suspend fun getPage(startIndex: Int, pageSize: Int, filter: String): List<Playlist> {
+    override suspend fun getPage(
+        startIndex: Int,
+        pageSize: Int,
+        filter: String,
+        caseSensitive: Boolean
+    ): List<Playlist> {
         return fakePage
     }
 
-    override fun getFilteredCount(filter: String): Int {
+    override fun getFilteredCount(filter: String, caseSensitive: Boolean): Int {
         return fakePage.filter { it.name == filter }.size
     }
 

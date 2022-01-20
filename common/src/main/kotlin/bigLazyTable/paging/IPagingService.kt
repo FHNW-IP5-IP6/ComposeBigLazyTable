@@ -5,9 +5,10 @@ package bigLazyTable.paging
  */
 interface IPagingService<T> {
 
-    suspend fun getPage(startIndex: Int, pageSize: Int, filter: String = ""): List<T>
+    // TODO: does it make sense to add a Filter Object with filter: String & caseSensitive: Boolean as Parameters?
+    suspend fun getPage(startIndex: Int, pageSize: Int, filter: String = "", caseSensitive: Boolean = false): List<T>
 
-    fun getFilteredCount(filter: String): Int
+    fun getFilteredCount(filter: String, caseSensitive: Boolean = false): Int
 
     fun getTotalCount(): Int
 
