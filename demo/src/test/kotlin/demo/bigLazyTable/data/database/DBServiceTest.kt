@@ -125,15 +125,13 @@ internal class DBServiceTest {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
         printFixedTestValues()
 
-        runBlocking {
-            Log.info { "Try to call getPage with last index - pageSize($pageSize) ${lastTestDbIndice - pageSize}" }
-            assertDoesNotThrow {
-                runBlocking {
-                    dbService.getPage(lastTestDbIndice - pageSize, pageSize)
-                }
+        Log.info { "Try to call getPage with last index - pageSize($pageSize) ${lastTestDbIndice - pageSize}" }
+        assertDoesNotThrow {
+            runBlocking {
+                dbService.getPage(lastTestDbIndice - pageSize, pageSize)
             }
-            Log.info { "Has not thrown Exception!" }
         }
+        Log.info { "Has not thrown Exception!" }
     }
 
     @Test
