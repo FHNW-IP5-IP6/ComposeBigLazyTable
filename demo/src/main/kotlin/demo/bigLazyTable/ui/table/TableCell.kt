@@ -27,6 +27,7 @@ fun RowScope.AttributeTableCell(
 @Composable
 fun TableCell(
     text: String,
+    // TODO: I heard that you should never give a fixed width!
     width: Dp = 150.dp, // TODO: Make it dynamically adjust when there is more or less text
     color: Color = Color.Black,
     backgroundColor: Color,
