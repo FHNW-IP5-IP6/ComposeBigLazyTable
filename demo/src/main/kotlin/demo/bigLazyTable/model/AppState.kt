@@ -30,7 +30,11 @@ object AppState {
      * List of Models. Size is the totalCount of the provided data.
      * All elements in the LazyList cache are stored in this list. The rest is filled with the defaultPlaylistModel to provide the default loading data.
      */
-    val lazyModelList: MutableList<PlaylistModel?> = ArrayList(Collections.nCopies(DBService.getTotalCount(), null))
+    // TODO: Problem! Is it clean to access getTotalCount() on the object DBService?
+    //  What if a service is no object and thus cannot be called like that?
+    //  Now if we need to pass the pageSize here it makes things weird...
+    //  lazyModelList must exactly be the amount of items the service provides -> a fix value will maybe hide some more data if its bigger than that value
+    val lazyModelList: MutableList<PlaylistModel?> = ArrayList(Collections.nCopies(/*DBService.getTotalCount()*//*DBService(pageSize = 40).getTotalCount()*/1_000_000, null))
 
     /**
      * List of all Models with changes. Used to prevent loosing changed data if new data is loaded from the service.

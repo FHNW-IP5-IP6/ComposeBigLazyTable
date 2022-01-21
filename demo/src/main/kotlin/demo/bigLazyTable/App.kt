@@ -5,9 +5,11 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.remember
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import bigLazyTable.paging.IPagingService
 import demo.bigLazyTable.data.database.DBService
 import demo.bigLazyTable.data.database.SqliteDb
 import demo.bigLazyTable.model.LazyTableViewModel
+import demo.bigLazyTable.model.Playlist
 import demo.bigLazyTable.ui.BigLazyTableUI
 import demo.bigLazyTable.ui.theme.initializeWindowSize
 
@@ -28,7 +30,8 @@ fun main() = application {
             caseSensitiveFiltering = true
         ).initializeConnection()
 
-        val viewModel = remember { LazyTableViewModel(DBService) } // side effect: init loads first data to display
+        val service: IPagingService<Playlist> = DBService(pageSize = 40)
+        val viewModel = remember { LazyTableViewModel(service) } // side effect: init loads first data to display
         BigLazyTableUI(viewModel = viewModel)
     }
 }
