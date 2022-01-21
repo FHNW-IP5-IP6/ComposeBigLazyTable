@@ -68,11 +68,14 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
 
 
     fun loadAllNeededPagesForIndex(firstVisibleItemIndex: Int) {
+//        if (firstVisibleItemIndex < 0) throw IllegalArgumentException("firstVisibleItemIndex should be positive")
+//        if (firstVisibleItemIndex > totalCount - 1) throw IllegalArgumentException("firstVisibleItemIndex should be smaller than total count - 1")
+
         // Calculate current page visible in UI
         currentPage = calculatePageNumberForListIndex(listIndex = firstVisibleItemIndex)
 
-         // If firstVisibleItemIndex > oldFirstVisibleItemIndex --> scrolled down
-         // If firstVisibleItemIndex < oldFirstVisibleItemIndex --> scrolled up
+        // If firstVisibleItemIndex > oldFirstVisibleItemIndex --> scrolled down
+        // If firstVisibleItemIndex < oldFirstVisibleItemIndex --> scrolled up
         val scrolledDown = firstVisibleItemIndex > oldFirstVisibleItemIndex
 
         // Update first visible item index with the new value passed by the UI Table
@@ -146,6 +149,9 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
     }
 
     fun isTimeToLoadPage(firstVisibleItemIndex: Int): Boolean {
+        if (firstVisibleItemIndex < 0) throw IllegalArgumentException("firstVisibleItemIndex should be positive")
+        if (firstVisibleItemIndex > totalCount - 1) throw IllegalArgumentException("firstVisibleItemIndex should be smaller than total count - 1")
+
         val pageNumberForVisibleIndex = calculatePageNumberForListIndex(firstVisibleItemIndex)
         return !isPageInCache(pageNumberForVisibleIndex)
                 || !isPageInCache(pageNumberForVisibleIndex - 1)

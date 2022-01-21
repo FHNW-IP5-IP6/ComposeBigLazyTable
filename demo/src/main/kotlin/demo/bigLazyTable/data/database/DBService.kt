@@ -28,11 +28,12 @@ object DBService : IPagingService<Playlist> {
         return transaction {
             DatabasePlaylists
                 .select { caseSensitiveSelect(caseSensitive, DatabasePlaylists.name, filter) }
-                .limit(pageSize, start)
+                .limit(n = pageSize, offset = start)
                 .map { mapResultRowToPlaylist(it) }
         }
     }
 
+    // TODO: Move this knowledge into documentation
     // By default, the SQLite LIKE operator is case-insensitive for ASCII characters (which covers all english language
     // letters), and case-sensitive for unicode characters that are beyond the ASCII range (ä, ö, ü, ...)
     // PostgreSQL is a case-sensitive database by default
