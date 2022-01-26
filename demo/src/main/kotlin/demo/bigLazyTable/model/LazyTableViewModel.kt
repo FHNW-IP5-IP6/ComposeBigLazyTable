@@ -26,19 +26,14 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
     var isScrolling by mutableStateOf(false)
 
     init {
-        val startIndexFirstPage = 0
-        val startIndexSecondPage = pageSize
-
+        // Get first 4 pages on app initialization, to select one for the forms
         CoroutineScope(Dispatchers.Main).launch {
-            val firstPagePlaylistModels = loadPageAndMapToPlaylistModels(startIndexOfPage = startIndexFirstPage)
-            val secondPagePlaylistModels = loadPageAndMapToPlaylistModels(startIndexOfPage = startIndexSecondPage)
-
-            addPageToCache(pageNr = 0, pageOfPlaylistModels = firstPagePlaylistModels)
-            addPageToCache(pageNr = 1, pageOfPlaylistModels = secondPagePlaylistModels)
-
-            addToAppStateList(startIndex = startIndexFirstPage, 0)
-            addToAppStateList(startIndex = startIndexSecondPage, 1)
-
+            for (index in 0 until 4) {
+                val startIndex = index*pageSize
+                val playlistModels = loadPageAndMapToPlaylistModels(startIndexOfPage = startIndex)
+                addPageToCache(pageNr = index, pageOfPlaylistModels = playlistModels)
+                addToAppStateList(startIndex = startIndex, index)
+            }
             selectPlaylist(AppState.lazyModelList.first()!!)
         }
     }
@@ -64,8 +59,6 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
     }
 
     fun loadAllNeededPagesForIndex(firstVisibleItemIndex: Int) {
-//        if (firstVisibleItemIndex < 0) throw IllegalArgumentException("firstVisibleItemIndex should be positive")
-//        if (firstVisibleItemIndex > totalCount - 1) throw IllegalArgumentException("firstVisibleItemIndex should be smaller than total count - 1")
 
         // Calculate current page visible in UI
         currentPage = calculatePageNumberForListIndex(listIndex = firstVisibleItemIndex)
@@ -111,7 +104,6 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
     }
 
     private fun addToAppStateList(startIndex: Int, newPageNr: Int) {
-        println(newPageNr)
         // Add new page to list
         for (i in startIndex until startIndex + pageSize) {
             if (i in 0 until totalCount) {
@@ -144,15 +136,31 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
         AppState.selectedPlaylistModel = playlistModel
     }
 
+    // Checks with the passed firstVisibleItemIndex from the UI, if it's time to load new pages
     fun isTimeToLoadPage(firstVisibleItemIndex: Int): Boolean {
         if (firstVisibleItemIndex < 0) throw IllegalArgumentException("firstVisibleItemIndex should be positive")
-        if (firstVisibleItemIndex > totalCount - 1) throw IllegalArgumentException("firstVisibleItemIndex should be smaller than total count - 1")
+        if (firstVisibleItemIndex >= totalCount) throw IllegalArgumentException("firstVisibleItemIndex should be smaller than total count")
 
         val pageNumberForVisibleIndex = calculatePageNumberForListIndex(firstVisibleItemIndex)
-        return !isPageInCache(pageNumberForVisibleIndex)
-                || !isPageInCache(pageNumberForVisibleIndex - 1)
-                || !isPageInCache(pageNumberForVisibleIndex + 1)
-                || !isPageInCache(pageNumberForVisibleIndex + 2)
+
+        // Catch all edge cases, to load only data if necessarily
+        if (pageNumberForVisibleIndex == 0) {
+            return !isPageInCache(pageNumberForVisibleIndex)
+                    || !isPageInCache(1)
+                    || !isPageInCache(2)
+        } else if (pageNumberForVisibleIndex > maxPages) {
+            return !isPageInCache(pageNumberForVisibleIndex)
+                    || !isPageInCache(pageNumberForVisibleIndex - 1)
+                    || !isPageInCache(pageNumberForVisibleIndex + 1)
+        } else if (pageNumberForVisibleIndex > maxPages - 1) {
+            return !isPageInCache(pageNumberForVisibleIndex)
+                    || !isPageInCache(pageNumberForVisibleIndex - 1)
+        } else {
+            return !isPageInCache(pageNumberForVisibleIndex)
+                    || !isPageInCache(pageNumberForVisibleIndex - 1)
+                    || !isPageInCache(pageNumberForVisibleIndex + 1)
+                    || !isPageInCache(pageNumberForVisibleIndex + 2)
+        }
     }
 
     // Calculate the page number for a given list index
