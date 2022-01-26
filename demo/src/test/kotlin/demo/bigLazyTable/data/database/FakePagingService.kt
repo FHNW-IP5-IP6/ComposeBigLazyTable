@@ -2,18 +2,26 @@ package demo.bigLazyTable.data.database
 
 import bigLazyTable.paging.IPagingService
 import demo.bigLazyTable.model.Playlist
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import demo.bigLazyTable.utils.MathUtils
 
-class FakePagingService(numberOfPlaylists: Int) : IPagingService<Playlist> {
+class FakePagingService(val numberOfPlaylists: Int, val pageSize: Int) : IPagingService<Playlist> {
 
-    private val fakePage = mutableListOf<Playlist>()
+    private val allData = mutableMapOf<Int, List<Playlist>>()
+    private val numberOfPages = MathUtils.roundDivisionToNextBiggerInt(
+        number = numberOfPlaylists,
+        dividedBy = pageSize
+    )
 
     init {
-        for (i in 0 until numberOfPlaylists) {
-            fakePage.add(Playlist(id = i.toLong(), name = "name $i"))
+        for (pageNr in 0 until numberOfPages) {
+            val playlistsOfPage = mutableListOf<Playlist>()
+            for (pageItemNr in 1 until pageSize + 1) {
+                val playlistId = (pageNr * pageSize) + pageItemNr.toLong()
+                playlistsOfPage.add(Playlist(id = playlistId, name = "name $playlistId"))
+            }
+            allData[pageNr] = playlistsOfPage
         }
+//        println(allData)
     }
 
     override suspend fun getPage(
@@ -22,19 +30,26 @@ class FakePagingService(numberOfPlaylists: Int) : IPagingService<Playlist> {
         filter: String,
         caseSensitive: Boolean
     ): List<Playlist> {
-        return fakePage
+        val pageNrOfStartIndex = startIndex / pageSize
+        return allData[pageNrOfStartIndex]?.filter { it.name == filter } ?: emptyList()
     }
 
     override fun getFilteredCount(filter: String, caseSensitive: Boolean): Int {
-        return fakePage.filter { it.name == filter }.size
+        var count = 0
+        allData.values.forEach { playlists ->
+            count += playlists.filter { playlist -> playlist.name == filter }.size
+        }
+        return count
     }
 
-    override fun getTotalCount(): Int {
-        return fakePage.size
-    }
+    override fun getTotalCount() = numberOfPlaylists
 
     override fun get(id: Long): Playlist {
-        return fakePage[id.toInt()]
+        lateinit var playlist: Playlist
+        allData.values.forEach { playlists ->
+            playlist = playlists.find { it.id == id }!!
+        }
+        return playlist
     }
 
     override fun indexOf(id: Long, filter: String): Int {
