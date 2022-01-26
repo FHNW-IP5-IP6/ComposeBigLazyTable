@@ -16,15 +16,12 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
 
     private val totalCount by lazy { pagingService.getTotalCount() }
 
-    var oldFirstVisibleItemIndex = 0
+    private var oldFirstVisibleItemIndex = 0
     var currentPage by mutableStateOf(0)
     val maxPages = MathUtils.roundDivisionToNextBiggerInt(number = totalCount, dividedBy = pageSize)
 
     private val cacheSize = 4
     private val cache: LruCache<Int, List<PlaylistModel>> = LruCache(cacheSize)
-
-    val scheduler: MutableList<Job> = mutableListOf()
-    val schedulerCache: LruCache<Int, Job> = LruCache(2)
 
     var isScrolling by mutableStateOf(false)
 
@@ -65,7 +62,6 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
         }
         cache[pageNr] = elements
     }
-
 
     fun loadAllNeededPagesForIndex(firstVisibleItemIndex: Int) {
         // Calculate current page visible in UI
