@@ -59,7 +59,6 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
     }
 
     fun loadAllNeededPagesForIndex(firstVisibleItemIndex: Int) {
-
         // Calculate current page visible in UI
         currentPage = calculatePageNumberForListIndex(listIndex = firstVisibleItemIndex)
 
@@ -67,7 +66,7 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
         // If firstVisibleItemIndex < oldFirstVisibleItemIndex --> scrolled up
         val scrolledDown = firstVisibleItemIndex > oldFirstVisibleItemIndex
 
-        // Update first visible item index with the new value passed by the UI Table
+        // Update oldFirstVisibleItemIndex with the new value passed by the UI Table
         oldFirstVisibleItemIndex = firstVisibleItemIndex
 
         // Load cache size pages
