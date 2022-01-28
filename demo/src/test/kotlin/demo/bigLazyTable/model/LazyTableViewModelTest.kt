@@ -234,4 +234,22 @@ internal class LazyTableViewModelTest {
 //        assertEquals(playlistModel, AppState.selectedPlaylistModel)
 //    }
 
+    /*
+    properties:
+        oldFirstVisibleItemIndex
+        cache
+    methods:
+        suspend fun loadPageAndMapToPlaylistModels(startIndexOfPage: Int): List<PlaylistModel>
+        fun addPageToCache(pageNr: Int, pageOfPlaylistModels: List<PlaylistModel>)
+        fun loadPage(pageNrToLoad: Int, scrolledDown: Boolean)
+        fun updateAppStateList(pageStartIndexToLoad: Int, pageToLoad: Int, isEnd: Boolean)
+        fun addToAppStateList(startIndex: Int, newPageNr: Int)
+        fun removeFromAppStateList(index: Int, isEnd: Boolean
+        fun calculateStartIndexOfOldPage(index: Int, isEnd: Boolean): Int
+        fun removeOldPageFromList(startIndexOldPage: Int
+        fun calculatePageNumberForListIndex(listIndex: Int): Int
+        calculatePageStartIndexToLoad(pageNr: Int): Int
+        fun isPageInCache(pageNr: Int): Boolean
+     */
+
 }
