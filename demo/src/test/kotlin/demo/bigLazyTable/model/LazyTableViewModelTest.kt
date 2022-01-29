@@ -2,11 +2,12 @@ package demo.bigLazyTable.model
 
 import demo.bigLazyTable.data.database.FakePagingService
 import demo.bigLazyTable.utils.printTestMethodName
+import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import org.junit.Before
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.assertThrows
 
 private val Log = KotlinLogging.logger {}
@@ -14,18 +15,23 @@ private val Log = KotlinLogging.logger {}
 internal class LazyTableViewModelTest {
 
     private lateinit var viewModel: LazyTableViewModel
+    private lateinit var pagingService: FakePagingService
+    private lateinit var appState: AppState
+
     private val numberOfPlaylists = 1_000_000
     private val pageSize = 40
 
     @BeforeEach
     fun setUp() {
-        val pagingService = FakePagingService(
+        pagingService = FakePagingService(
             numberOfPlaylists = numberOfPlaylists,
             pageSize = pageSize
         )
+        appState = AppState(pagingService = pagingService)
         viewModel = LazyTableViewModel(
             pagingService = pagingService,
-            pageSize = pageSize
+            pageSize = pageSize,
+            appState = appState
         )
     }
 
@@ -151,7 +157,7 @@ internal class LazyTableViewModelTest {
         assertEquals(25_001, viewModel.currentPage)
     }
 
-//    // Exception in thread "AWT-EventQueue-0 @coroutine#4" java.lang.NoClassDefFoundError: Could not initialize class demo.bigLazyTable.model.AppState
+    // TODO: Exception in thread "AWT-EventQueue-0 @coroutine#4" java.lang.NoClassDefFoundError: Could not initialize class demo.bigLazyTable.model.AppState
 //    @Test
 //    fun `throws IllegalArgumentException after loadAllNeededPagesForIndex 1_000_000`() {
 //        printTestMethodName(object {}.javaClass.enclosingMethod.name)
@@ -176,65 +182,82 @@ internal class LazyTableViewModelTest {
         assertFalse(viewModel.isScrolling)
     }
 
-//    // TODO: Could not initialize class demo.bigLazyTable.model.AppState weil AppState DBService.getTotalCount() aufruft!
+    // TODO: Sometimes it works & sometimes it dont
 //    @Test
-//    fun `selectPlaylist changes language correctly`() {
+//    fun `selectPlaylist changes language correctly to deutsch`() {
 //        printTestMethodName(object {}.javaClass.enclosingMethod.name)
 //
 //        // given
-//        val playlistModel = PlaylistModel(Playlist(name = "test"))
+//        val playlistModel = PlaylistModel(Playlist(name = "test deutsch"), appState)
+//
+//        appState.selectedPlaylistModel.setCurrentLanguage("english")
+//
+//        // when
+//        playlistModel.setCurrentLanguage("deutsch")
+//        viewModel.selectPlaylist(playlistModel = playlistModel)
+//
+//        // then
+//        assertEquals(playlistModel, appState.selectedPlaylistModel)
+//        assertEquals("deutsch", appState.selectedPlaylistModel.getCurrentLanguage())
+//    }
+
+    // TODO: Sometimes it works & sometimes it dont
+//    @Test
+//    fun `selectPlaylist changes language correctly to english`() {
+//        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+//
+//        // given
+//        val playlistModel = PlaylistModel(Playlist(name = "test english"), appState)
+//
+//        appState.selectedPlaylistModel.setCurrentLanguage("deutsch")
 //
 //        // when
 //        playlistModel.setCurrentLanguage("english")
 //        viewModel.selectPlaylist(playlistModel = playlistModel)
 //
 //        // then
-//        assertEquals("english", AppState.selectedPlaylistModel.getCurrentLanguage())
-//    }
-//
-//    // TODO: Could not initialize class demo.bigLazyTable.model.AppState
-//    //   java.lang.NoClassDefFoundError: Could not initialize class demo.bigLazyTable.model.AppState
-//    //	 at demo.bigLazyTable.model.LazyTableViewModel.selectPlaylist(LazyTableViewModel.kt:143)
-//    //	 at demo.bigLazyTable.model.LazyTableViewModelTest.selectPlaylist sets the given playlistModel as selected(LazyTableViewModelTest.kt:199)
-//    @Test
-//    fun `selectPlaylist sets the given playlistModel as selected`() {
-//        // given
-//        val playlistModel = PlaylistModel(Playlist(name = "test"))
-//
-//        // when
-//        viewModel.selectPlaylist(playlistModel = playlistModel)
-//
-//        // then
-//        assertEquals(playlistModel, AppState.selectedPlaylistModel)
-//    }
-//
-//    // TODO: Unexpected exception thrown: java.lang.NoClassDefFoundError: Could not initialize class demo.bigLazyTable.model.AppState
-//    @Test
-//    fun `selectPlaylist does not throw an Exception`() {
-//        // given
-//        val playlistModel = PlaylistModel(Playlist(name = "test"))
-//
-//        // then
-//        assertDoesNotThrow {
-//            // when
-//            viewModel.selectPlaylist(playlistModel = playlistModel)
-//        }
-//    }
-//
-//    // TODO: Could not initialize class demo.bigLazyTable.model.AppState weil AppState DBService.getTotalCount() aufruft!
-//    @Test
-//    fun `what happens if we pass an empty playlistModel`() {
-//        // given
-//        val playlistModel = PlaylistModel(Playlist())
-//
-//        // when
-//        viewModel.selectPlaylist(playlistModel = playlistModel)
-//
-//        // then
-//        assertEquals(playlistModel, AppState.selectedPlaylistModel)
+//        assertEquals(playlistModel, appState.selectedPlaylistModel)
+//        assertEquals("english", appState.selectedPlaylistModel.getCurrentLanguage())
 //    }
 
+    @Test
+    fun `selectPlaylist sets the given playlistModel as selected`() {
+        // given
+        val playlistModel = PlaylistModel(Playlist(name = "test"), appState)
+
+        // when
+        viewModel.selectPlaylist(playlistModel = playlistModel)
+
+        // then
+        assertEquals(playlistModel, appState.selectedPlaylistModel)
+    }
+
+    @Test
+    fun `selectPlaylist does not throw an Exception`() {
+        // given
+        val playlistModel = PlaylistModel(Playlist(name = "test"), appState)
+
+        // then
+        assertDoesNotThrow {
+            // when
+            viewModel.selectPlaylist(playlistModel = playlistModel)
+        }
+    }
+
+    @Test
+    fun `what happens if we pass an empty playlistModel`() {
+        // given
+        val playlistModel = PlaylistModel(Playlist(), appState)
+
+        // when
+        viewModel.selectPlaylist(playlistModel = playlistModel)
+
+        // then
+        assertEquals(playlistModel, appState.selectedPlaylistModel)
+    }
+
     /*
+    TODO: https://medium.com/mindorks/how-to-unit-test-private-methods-in-java-and-kotlin-d3cae49dccd
     properties:
         oldFirstVisibleItemIndex
         cache
@@ -251,5 +274,57 @@ internal class LazyTableViewModelTest {
         calculatePageStartIndexToLoad(pageNr: Int): Int
         fun isPageInCache(pageNr: Int): Boolean
      */
+
+    // TODO: Why is it returning emptyList?
+//    @Test
+//    fun `loadPageAndMapToPlaylistModels works with 0 as startIndexOfPage`() {
+//        // when
+////        // TODO: java.lang.NoSuchMethodException: demo.bigLazyTable.model.LazyTableViewModel.loadPageAndMapToPlaylistModels(int)
+////        val loadPageAndMapToPlaylistModels =
+////            LazyTableViewModel::class.java.getDeclaredMethod("loadPageAndMapToPlaylistModels", Int::class.java).apply {
+////                isAccessible = true
+////            }
+////        val startIndexOfPage = 0
+////        val returnValue = loadPageAndMapToPlaylistModels.invoke(viewModel, startIndexOfPage)
+////        println("returnValue = ${returnValue.javaClass.name} $returnValue")
+////        assertTrue(returnValue is List<*>)
+//        runBlocking {
+//            // TODO: Why do both return an empty list???
+//            val playlistModels = viewModel.loadPageAndMapToPlaylistModels(startIndexOfPage = 5665)
+//            val x = pagingService.getPage(startIndex = 0, pageSize = pageSize)
+//            println(x)
+//            assertEquals(0, x.first())
+//        }
+//    }
+
+    @Test
+    fun `addPageToCache works with page 0`() {
+        val playlistModels = listOf(
+            PlaylistModel(playlist = Playlist(), appState = appState)
+        )
+        viewModel.addPageToCache(pageNr = 0, pageOfPlaylistModels = playlistModels)
+
+        assertTrue(viewModel.isPageInCache(0))
+    }
+
+    @Test
+    fun `addPageToCache works with page 1`() {
+        val playlistModels = listOf(
+            PlaylistModel(playlist = Playlist(), appState = appState)
+        )
+        viewModel.addPageToCache(pageNr = 1, pageOfPlaylistModels = playlistModels)
+
+        assertTrue(viewModel.isPageInCache(1))
+    }
+
+    @Test
+    fun `addPageToCache doesnt work with different pages in load & check if it is in cache`() {
+        val playlistModels = listOf(
+            PlaylistModel(playlist = Playlist(), appState = appState)
+        )
+        viewModel.addPageToCache(pageNr = 1, pageOfPlaylistModels = playlistModels)
+
+        assertFalse(viewModel.isPageInCache(45))
+    }
 
 }

@@ -22,9 +22,10 @@ import demo.bigLazyTable.ui.theme.CustomScrollbarStyle
 @Composable
 fun LazyTable(
     viewModel: LazyTableViewModel,
-    horizontalScrollState: ScrollState
+    horizontalScrollState: ScrollState,
+    appState: AppState
 ) {
-    val lazyListItems = AppState.lazyModelList
+    val lazyListItems = appState.lazyModelList
     val verticalLazyListState = rememberLazyListState()
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -44,11 +45,15 @@ fun LazyTable(
             // TODO: Experiment mit key
             items(lazyListItems/*, key = id*/) { playlistModel ->
                 when (playlistModel) {
-                    null -> PlaylistRowPlaceholder(horizontalScrollState = horizontalScrollState)
+                    null -> PlaylistRowPlaceholder(
+                        horizontalScrollState = horizontalScrollState,
+                        appState = appState
+                    )
                     else -> PlaylistRow(
                         viewModel = viewModel,
                         playlistModel = playlistModel,
-                        horizontalScrollState = horizontalScrollState
+                        horizontalScrollState = horizontalScrollState,
+                        appState = appState
                     )
                 }
             }

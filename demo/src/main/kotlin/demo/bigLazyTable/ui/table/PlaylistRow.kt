@@ -23,9 +23,10 @@ import demo.bigLazyTable.ui.theme.BackgroundColorLight
 fun PlaylistRow(
     viewModel: LazyTableViewModel,
     playlistModel: PlaylistModel,
-    horizontalScrollState: ScrollState
+    horizontalScrollState: ScrollState,
+    appState: AppState
 ) {
-    val isSelected = AppState.selectedPlaylistModel.id.getValue() == playlistModel.id.getValue()
+    val isSelected = appState.selectedPlaylistModel.id.getValue() == playlistModel.id.getValue()
     val backgroundColor = if (isSelected) BackgroundColorGroups else BackgroundColorLight
 
     Row(
@@ -54,8 +55,10 @@ fun PlaylistRow(
 fun PlaylistRowPlaceholder(
     backgroundColor: Color = BackgroundColorLight,
     horizontalScrollState: ScrollState,
-    lazyListAttributes: List<Attribute<*, *, *>> = AppState.defaultPlaylistModel.lazyListAttributes
+    appState: AppState
 ) {
+    val lazyListAttributes = appState.defaultPlaylistModel.lazyListAttributes
+
     Row(
         modifier = Modifier
             .background(backgroundColor)

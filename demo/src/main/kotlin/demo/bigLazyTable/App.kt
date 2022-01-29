@@ -7,6 +7,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import demo.bigLazyTable.data.database.DBService
 import demo.bigLazyTable.data.database.SqliteDb
+import demo.bigLazyTable.model.AppState
 import demo.bigLazyTable.model.LazyTableViewModel
 import demo.bigLazyTable.ui.BigLazyTableUI
 import demo.bigLazyTable.ui.theme.initializeWindowSize
@@ -28,7 +29,17 @@ fun main() = application {
             caseSensitiveFiltering = true
         ).initializeConnection()
 
-        val viewModel = remember { LazyTableViewModel(DBService) } // side effect: init loads first data to display
-        BigLazyTableUI(viewModel = viewModel)
+        val service = DBService
+        val appState = AppState(pagingService = service)
+        val viewModel = remember {
+            LazyTableViewModel(
+                pagingService = DBService,
+                appState = appState
+            ) // side effect: init loads first data to display
+        }
+        BigLazyTableUI(
+            viewModel = viewModel,
+            appState = appState
+        )
     }
 }

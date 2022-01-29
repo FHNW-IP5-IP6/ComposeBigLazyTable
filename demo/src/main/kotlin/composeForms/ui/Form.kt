@@ -38,6 +38,7 @@ import composeForms.model.IModel
 import composeForms.model.modelElements.HeaderGroup
 import composeForms.ui.theme.ColorsUtil.Companion.get
 import composeForms.ui.theme.FormColors
+import demo.bigLazyTable.model.AppState
 
 
 /**
@@ -54,13 +55,13 @@ class Form {
     @ExperimentalMaterialApi
     @ExperimentalFoundationApi
     @Composable
-    fun of(model: IModel<*>){
+    fun of(model: IModel<*>, appState: AppState){
         val keyEventsFromUIElement = remember { mutableMapOf<Key, MutableMap<Int, ()->Unit>>() }
         val showValidations = remember { mutableStateOf(false) }
         //addDefaultKeyBehaviour(composeForms.model, keyEventsFromUIElement){ showValidations.value = it }
 
         Column(modifier = Modifier.fillMaxSize().background(get(FormColors.BODY_BACKGROUND))) {
-            Header(model) { showValidations.value = it }
+            Header(model = model, appState = appState) { showValidations.value = it }
             StickyBody(model)
             Body(model, showValidations, keyEventsFromUIElement)
         }

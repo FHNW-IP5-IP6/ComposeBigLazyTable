@@ -12,7 +12,11 @@ private val Log = KotlinLogging.logger {}
 /**
  * @author Marco Sprenger, Livio Näf
  */
-class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageSize: Int = 40) {
+class LazyTableViewModel(
+    private val pagingService: IPagingService<*>,
+    val pageSize: Int = 40,
+    private val appState: AppState
+) {
 
     private val totalCount by lazy { pagingService.getTotalCount() }
 
@@ -39,24 +43,24 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
             addToAppStateList(startIndex = startIndexFirstPage, 0)
             addToAppStateList(startIndex = startIndexSecondPage, 1)
 
-            selectPlaylist(AppState.lazyModelList.first()!!)
+            selectPlaylist(appState.lazyModelList.first()!!)
         }
     }
 
-    private suspend fun loadPageAndMapToPlaylistModels(startIndexOfPage: Int): List<PlaylistModel> {
+    suspend fun loadPageAndMapToPlaylistModels(startIndexOfPage: Int): List<PlaylistModel> {
         val page = pagingService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filter = "")
-        return page.map { PlaylistModel(it as Playlist) }
+        return page.map { PlaylistModel(it as Playlist, appState) }
     }
 
     // TODO: Split up function -> too complicated
-    private fun addPageToCache(pageNr: Int, pageOfPlaylistModels: List<PlaylistModel>) {
+    fun addPageToCache(pageNr: Int, pageOfPlaylistModels: List<PlaylistModel>) {
         val elements = pageOfPlaylistModels.toMutableList()
-        if (AppState.changedPlaylistModels.size > 0) {
+        if (appState.changedPlaylistModels.size > 0) {
             for (i in 0 until pageSize) {
-                if (AppState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() } != null) {
+                if (appState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() } != null) {
                     elements[i] =
-                        AppState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() }!!
-                    AppState.changedPlaylistModels.remove(elements[i])
+                        appState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() }!!
+                    appState.changedPlaylistModels.remove(elements[i])
                 }
             }
         }
@@ -115,7 +119,7 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
         // Add new page to list
         for (i in startIndex until startIndex + pageSize) {
             if (i in 0 until totalCount) {
-                AppState.lazyModelList.set(index = i, element = cache[newPageNr]!![i % pageSize])
+                appState.lazyModelList.set(index = i, element = cache[newPageNr]!![i % pageSize])
             }
         }
     }
@@ -134,14 +138,14 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
     private fun removeOldPageFromList(startIndexOldPage: Int) {
         for (i in startIndexOldPage until startIndexOldPage + pageSize) {
             if (i in 0 until totalCount) {
-                AppState.lazyModelList.set(index = i, element = null)
+                appState.lazyModelList.set(index = i, element = null)
             }
         }
     }
 
     fun selectPlaylist(playlistModel: PlaylistModel) {
-        playlistModel.setCurrentLanguage(AppState.defaultPlaylistModel.getCurrentLanguage())
-        AppState.selectedPlaylistModel = playlistModel
+        playlistModel.setCurrentLanguage(appState.defaultPlaylistModel.getCurrentLanguage())
+        appState.selectedPlaylistModel = playlistModel
     }
 
     fun isTimeToLoadPage(firstVisibleItemIndex: Int): Boolean {
@@ -166,7 +170,7 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
     }
 
     // Check if a given page is in cache
-    private fun isPageInCache(pageNr: Int): Boolean {
+    fun isPageInCache(pageNr: Int): Boolean {
         return cache.containsKey(pageNr)
     }
 

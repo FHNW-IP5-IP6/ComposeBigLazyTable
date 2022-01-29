@@ -67,10 +67,13 @@ kotlin {
                 implementation("org.jetbrains.compose.ui:ui-test-junit4-desktop:1.0.1")
                 implementation(getSkiaDependency()) // WORKAROUND
 
-                // jUnit4
+                // JUnit4
                 implementation("junit:junit:4.13.2")
+
+                // JUnit5 dependency
                 implementation("org.junit.jupiter:junit-jupiter:5.8.2")
-                // needed so that jUnit4 tests can also run even though i
+
+                // needed so that JUnit4/3 tests can also run in the same project with JUnit5 Tests
                 implementation("org.junit.vintage:junit-vintage-engine:5.8.2")
             }
         }

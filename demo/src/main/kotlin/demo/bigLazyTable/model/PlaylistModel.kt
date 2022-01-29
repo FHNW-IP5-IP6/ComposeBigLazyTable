@@ -10,7 +10,7 @@ import composeForms.model.modelElements.HeaderGroup
 /**
  * @author Marco Sprenger, Livio Näf
  */
-class PlaylistModel(playlist: Playlist) : BaseModel<BLTLabels>(title = BLTLabels.TITLE) {
+class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTLabels>(title = BLTLabels.TITLE) {
 
     val id = LongAttribute(
         model = this,
@@ -266,8 +266,8 @@ class PlaylistModel(playlist: Playlist) : BaseModel<BLTLabels>(title = BLTLabels
     )
 
     override fun updateChanges() {
-        if (!AppState.changedPlaylistModels.contains(this)) {
-            AppState.changedPlaylistModels.add(this)
+        if (!appState.changedPlaylistModels.contains(this)) {
+            appState.changedPlaylistModels.add(this)
         }
         super.updateChanges()
     }

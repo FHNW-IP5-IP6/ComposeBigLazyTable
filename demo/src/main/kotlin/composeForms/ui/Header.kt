@@ -62,7 +62,7 @@ import demo.bigLazyTable.model.AppState
  * @author Louisa Reinger, Steve Vogel
  */
 @Composable
-fun Header(model : IModel<*>, changeShowError: (Boolean) -> Unit){
+fun Header(model : IModel<*>, appState: AppState, changeShowError: (Boolean) -> Unit){
     val ctrlString = if(System.getProperty("os.name") == "Mac OS X")  "CMD" else "CTRL"
 
     with(model){
@@ -91,7 +91,7 @@ fun Header(model : IModel<*>, changeShowError: (Boolean) -> Unit){
                     //auto save
                     AutoSaveSwitch(model)
                     //language
-                    LanguageDropDownButton(model)
+                    LanguageDropDownButton(model, appState)
 
                     //restart
                     HeaderButtonWithIcon(buttonIcon  = Icons.Filled.RestartAlt,
@@ -204,7 +204,7 @@ private fun HeaderButtonWithIcon(buttonIcon: ImageVector, tooltipText: String = 
  * @param model: composeForms.model used for the form
  */
 @Composable
-private fun LanguageDropDownButton(model: IModel<*>){
+private fun LanguageDropDownButton(model: IModel<*>, appState: AppState){
     with(model){
         Column {
             val langDropDownIsOpen = remember { mutableStateOf(false) }
@@ -226,7 +226,7 @@ private fun LanguageDropDownButton(model: IModel<*>){
                 modifier = Modifier.wrapContentSize(),
                 content = {
                     getPossibleLanguages().forEachIndexed { index, string ->
-                        DropdownElement(model, string, index, selectedIndex)
+                        DropdownElement(model, string, index, selectedIndex, appState)
                     }
                 }
             )
@@ -362,7 +362,7 @@ private fun AutoSaveSwitch(model: IModel<*>){
  * marking the current position of selection
  */
 @Composable
-private fun DropdownElement(model: IModel<*>, language: String, index: Int, selectedIndex: MutableState<Int>){
+private fun DropdownElement(model: IModel<*>, language: String, index: Int, selectedIndex: MutableState<Int>, appState: AppState){
     val elementIsSelected = model.isCurrentLanguage(language)
     val elementIsSelectedBackgroundColor =
         if (elementIsSelected) get(DropdownColors.BACKGROUND_ELEMENT_SEL) else get(DropdownColors.BACKGROUND_ELEMENT_NOT_SEL)
@@ -381,7 +381,7 @@ private fun DropdownElement(model: IModel<*>, language: String, index: Int, sele
             .border(border = borderStroke, shape = RoundedCornerShape(4.dp))
             .pointerMoveFilter(onEnter = { selectedIndex.value = index; true }),
         onClick = {
-            AppState.defaultPlaylistModel.setCurrentLanguage(language)
+            appState.defaultPlaylistModel.setCurrentLanguage(language)
             model.setCurrentLanguage(language)
         },
         content = {
