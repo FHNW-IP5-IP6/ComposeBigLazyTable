@@ -8,11 +8,14 @@ import mu.KotlinLogging
 import org.junit.platform.commons.util.LruCache
 
 private val Log = KotlinLogging.logger {}
+private const val LOGTAG = "LazyTableViewModel: "
 
 /**
  * @author Marco Sprenger, Livio Näf
  */
 class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageSize: Int = 40) {
+
+    private val pagingScope = PagingScope()
 
     private val totalCount by lazy { pagingService.getTotalCount() }
 
@@ -30,32 +33,12 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
         CoroutineScope(Dispatchers.Main).launch {
             for (index in 0 until 4) {
                 val startIndex = index*pageSize
-                val playlistModels = loadPageAndMapToPlaylistModels(startIndexOfPage = startIndex)
-                addPageToCache(pageNr = index, pageOfPlaylistModels = playlistModels)
+                val models = loadPageAndMapToModels(startIndexOfPage = startIndex)
+                addPageToCache(pageNr = index, pageOfModels = models)
                 addToAppStateList(startIndex = startIndex, index)
             }
             selectPlaylist(AppState.lazyModelList.first()!!)
         }
-    }
-
-    private suspend fun loadPageAndMapToPlaylistModels(startIndexOfPage: Int): List<PlaylistModel> {
-        val page = pagingService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filter = "")
-        return page.map { PlaylistModel(it as Playlist) }
-    }
-
-    // TODO: Split up function -> too complicated
-    private fun addPageToCache(pageNr: Int, pageOfPlaylistModels: List<PlaylistModel>) {
-        val elements = pageOfPlaylistModels.toMutableList()
-        if (AppState.changedPlaylistModels.size > 0) {
-            for (i in 0 until pageSize) {
-                if (AppState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() } != null) {
-                    elements[i] =
-                        AppState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() }!!
-                    AppState.changedPlaylistModels.remove(elements[i])
-                }
-            }
-        }
-        cache[pageNr] = elements
     }
 
     fun loadAllNeededPagesForIndex(firstVisibleItemIndex: Int) {
@@ -69,13 +52,13 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
         // Update oldFirstVisibleItemIndex with the new value passed by the UI Table
         oldFirstVisibleItemIndex = firstVisibleItemIndex
 
-        // Load cache size pages
-        for (i in -1 until cacheSize - 1) {
-            val pageToLoad = currentPage + i
-            if (pageToLoad in 0..maxPages) {
-                loadPage(pageNrToLoad = pageToLoad, scrolledDown = scrolledDown)
+            // Load cache size pages
+            for (i in -1 until cacheSize - 1) {
+                val pageToLoad = currentPage + i
+                if (pageToLoad in 0..maxPages) {
+                    loadPage(pageNrToLoad = pageToLoad, scrolledDown = scrolledDown)
+                }
             }
-        }
     }
 
     private fun loadPage(pageNrToLoad: Int, scrolledDown: Boolean) {
@@ -83,10 +66,11 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
             // Calculate start index for page to load
             val pageStartIndexToLoad = calculatePageStartIndexToLoad(pageNr = pageNrToLoad)
 
-            CoroutineScope(Dispatchers.IO).launch {
-                val playlistModels = loadPageAndMapToPlaylistModels(startIndexOfPage = pageStartIndexToLoad)
-
-                addPageToCache(pageNr = pageNrToLoad, pageOfPlaylistModels = playlistModels)
+            pagingScope.launch {
+                //val playlistModels = requestDataAsync(scope = pagingScope, startIndexOfPage = pageStartIndexToLoad)
+                val playlistModels = loadPageAndMapToModels(pageStartIndexToLoad)
+                //addPageToCache(pageNr = pageNrToLoad, pageOfModels = playlistModels.await())
+                addPageToCache(pageNr = pageNrToLoad, pageOfModels = playlistModels)
 
                 updateAppStateList(
                     pageStartIndexToLoad = pageStartIndexToLoad,
@@ -95,6 +79,37 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
                 )
             }
         }
+    }
+
+    private fun requestDataAsync(scope: CoroutineScope, startIndexOfPage: Int): Deferred<List<PlaylistModel>> =
+        scope.async {
+            var data: List<PlaylistModel>? = null
+
+            while (data == null && scope.isActive){
+                data = loadPageAndMapToModels(startIndexOfPage)
+            }
+
+            data!!
+        }
+
+    private suspend fun loadPageAndMapToModels(startIndexOfPage: Int): List<PlaylistModel> {
+        val page = pagingService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filter = "")
+        return page.map { PlaylistModel(it as Playlist) }
+    }
+
+    // TODO: Split up function -> too complicated
+    private fun addPageToCache(pageNr: Int, pageOfModels: List<PlaylistModel>) {
+        val elements = pageOfModels.toMutableList()
+        if (AppState.changedPlaylistModels.size > 0) {
+            for (i in 0 until pageSize) {
+                if (AppState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() } != null) {
+                    elements[i] =
+                        AppState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() }!!
+                    AppState.changedPlaylistModels.remove(elements[i])
+                }
+            }
+        }
+        cache[pageNr] = elements
     }
 
     private fun updateAppStateList(pageStartIndexToLoad: Int, pageToLoad: Int, isEnd: Boolean) {

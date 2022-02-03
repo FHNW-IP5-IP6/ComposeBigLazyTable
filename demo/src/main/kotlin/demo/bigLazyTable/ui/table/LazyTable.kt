@@ -35,8 +35,6 @@ fun LazyTable(
         // TODO: Should we move this isTimeToLoadPage check to our viewmodel and do it at the begin of the loadAllNeededPagesForIndex function?
         if (/*!viewModel.isScrolling &&*/ viewModel.isTimeToLoadPage(firstVisibleItemIndex)) {
             viewModel.loadAllNeededPagesForIndex(firstVisibleItemIndex)
-            // TODO If scheduler issue #32 fixed --> Remove this debbuging print statement
-            println("LazyTable.kt: isTimeToLoadPage returned true")
         }
 
         LazyColumn(
