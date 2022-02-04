@@ -13,7 +13,6 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.unit.dp
 import demo.bigLazyTable.model.AppState
 import demo.bigLazyTable.model.LazyTableViewModel
@@ -34,7 +33,7 @@ fun LazyTable(
         // TODO: Eigene Scrollbar funktion
         // TODO: Should we move this isTimeToLoadPage check to our viewmodel and do it at the begin of the loadAllNeededPagesForIndex function?
         if (/*!viewModel.isScrolling &&*/ viewModel.isTimeToLoadPage(firstVisibleItemIndex)) {
-            viewModel.loadAllNeededPagesForIndex(firstVisibleItemIndex)
+            viewModel.scheduler.add{viewModel.loadAllNeededPagesForIndex(firstVisibleItemIndex)}
         }
 
         LazyColumn(
@@ -60,15 +59,15 @@ fun LazyTable(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .fillMaxHeight()
-                .pointerMoveFilter(
-                    onEnter = {
-                        viewModel.isScrolling = true
-                        false
-                    },
-                    onExit = {
-                        viewModel.isScrolling = false
-                        false
-                    })
+//                .pointerMoveFilter(
+//                    onEnter = {
+//                        viewModel.isScrolling = true
+//                        false
+//                    },
+//                    onExit = {
+//                        viewModel.isScrolling = false
+//                        false
+//                    })
             ,
             style = CustomScrollbarStyle
         )

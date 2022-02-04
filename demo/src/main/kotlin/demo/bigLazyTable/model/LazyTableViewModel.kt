@@ -16,6 +16,7 @@ private const val LOGTAG = "LazyTableViewModel: "
 class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageSize: Int = 40) {
 
     private val pagingScope = PagingScope()
+    val scheduler = Scheduler
 
     private val totalCount by lazy { pagingService.getTotalCount() }
 
@@ -26,13 +27,13 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
     private val cacheSize = 4
     private val cache: LruCache<Int, List<PlaylistModel>> = LruCache(cacheSize)
 
-    var isScrolling by mutableStateOf(false)
+    //var isScrolling by mutableStateOf(false)
 
     init {
         // Get first 4 pages on app initialization, to select one for the forms
         CoroutineScope(Dispatchers.Main).launch {
             for (index in 0 until 4) {
-                val startIndex = index*pageSize
+                val startIndex = index * pageSize
                 val models = loadPageAndMapToModels(startIndexOfPage = startIndex)
                 addPageToCache(pageNr = index, pageOfModels = models)
                 addToAppStateList(startIndex = startIndex, index)
@@ -43,7 +44,7 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
 
     fun loadAllNeededPagesForIndex(firstVisibleItemIndex: Int) {
         // Calculate current page visible in UI
-        currentPage = calculatePageNumberForListIndex(listIndex = firstVisibleItemIndex)
+        val currPage = calculatePageNumberForListIndex(listIndex = firstVisibleItemIndex)
 
         // If firstVisibleItemIndex > oldFirstVisibleItemIndex --> scrolled down
         // If firstVisibleItemIndex < oldFirstVisibleItemIndex --> scrolled up
@@ -52,21 +53,25 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
         // Update oldFirstVisibleItemIndex with the new value passed by the UI Table
         oldFirstVisibleItemIndex = firstVisibleItemIndex
 
+        CoroutineScope(Dispatchers.IO).launch {
             // Load cache size pages
             for (i in -1 until cacheSize - 1) {
-                val pageToLoad = currentPage + i
+                val pageToLoad = currPage + i
                 if (pageToLoad in 0..maxPages) {
                     loadPage(pageNrToLoad = pageToLoad, scrolledDown = scrolledDown)
                 }
             }
+        }.invokeOnCompletion {
+            currentPage = currPage
+        }
+
     }
 
-    private fun loadPage(pageNrToLoad: Int, scrolledDown: Boolean) {
+    private suspend fun loadPage(pageNrToLoad: Int, scrolledDown: Boolean) {
         if (!isPageInCache(pageNrToLoad)) {
             // Calculate start index for page to load
             val pageStartIndexToLoad = calculatePageStartIndexToLoad(pageNr = pageNrToLoad)
 
-            pagingScope.launch {
                 //val playlistModels = requestDataAsync(scope = pagingScope, startIndexOfPage = pageStartIndexToLoad)
                 val playlistModels = loadPageAndMapToModels(pageStartIndexToLoad)
                 //addPageToCache(pageNr = pageNrToLoad, pageOfModels = playlistModels.await())
@@ -77,20 +82,8 @@ class LazyTableViewModel(private val pagingService: IPagingService<*>, val pageS
                     pageToLoad = pageNrToLoad,
                     isEnd = scrolledDown
                 )
-            }
         }
     }
-
-    private fun requestDataAsync(scope: CoroutineScope, startIndexOfPage: Int): Deferred<List<PlaylistModel>> =
-        scope.async {
-            var data: List<PlaylistModel>? = null
-
-            while (data == null && scope.isActive){
-                data = loadPageAndMapToModels(startIndexOfPage)
-            }
-
-            data!!
-        }
 
     private suspend fun loadPageAndMapToModels(startIndexOfPage: Int): List<PlaylistModel> {
         val page = pagingService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filter = "")
