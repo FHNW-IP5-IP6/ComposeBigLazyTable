@@ -14,7 +14,7 @@ object DBService : IPagingService<Playlist> {
 
     private val lastIndex by lazy { getTotalCount() - 1 }
 
-    override suspend fun getPage(
+    override fun getPage(
         startIndex: Int,
         pageSize: Int,
         filter: String,
