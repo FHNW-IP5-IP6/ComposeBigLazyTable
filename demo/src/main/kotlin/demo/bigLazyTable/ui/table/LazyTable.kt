@@ -2,10 +2,7 @@ package demo.bigLazyTable.ui.table
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -25,14 +22,16 @@ fun LazyTable(
 ) {
     val lazyListItems = AppState.lazyModelList
     val verticalLazyListState = rememberLazyListState()
+    // TODO: Used for recompose, other solution for unused variable?
+    val currentPage = viewModel.currentPage
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().padding(bottom = 16.dp)) {
         val firstVisibleItemIndex = verticalLazyListState.firstVisibleItemIndex
 
         // FIXME@JetBrains: listState.isScrollInProgress is always false
         // TODO: Eigene Scrollbar funktion
         // TODO: Should we move this isTimeToLoadPage check to our viewmodel and do it at the begin of the loadAllNeededPagesForIndex function?
-        if (/*!viewModel.isScrolling &&*/ viewModel.isTimeToLoadPage(firstVisibleItemIndex)) {
+        if (viewModel.isTimeToLoadPage(firstVisibleItemIndex)) {
             viewModel.scheduler.add{viewModel.loadAllNeededPagesForIndex(firstVisibleItemIndex)}
         }
 
@@ -59,15 +58,6 @@ fun LazyTable(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .fillMaxHeight()
-//                .pointerMoveFilter(
-//                    onEnter = {
-//                        viewModel.isScrolling = true
-//                        false
-//                    },
-//                    onExit = {
-//                        viewModel.isScrolling = false
-//                        false
-//                    })
             ,
             style = CustomScrollbarStyle
         )

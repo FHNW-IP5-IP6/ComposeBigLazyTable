@@ -2,9 +2,11 @@ package demo.bigLazyTable.model
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 object Scheduler {
     private var inProcess = false
     private var task: ((Any?) -> Unit)? = null
@@ -15,11 +17,10 @@ object Scheduler {
         inProcess = true
         val taskToDo = task
         CoroutineScope(Dispatchers.IO).launch {
-            println("Task in process: ${taskToDo.hashCode()}")
-            delay(2000)
+            //println("Task in process: ${taskToDo.hashCode()}")
             taskToDo!!.invoke(null)
         }.invokeOnCompletion {
-            println("Task finished: ${taskToDo.hashCode()}")
+            //println("Task finished: ${taskToDo.hashCode()}")
             inProcess = false
             if (task!! == taskToDo) task = null
             process()
@@ -27,7 +28,7 @@ object Scheduler {
     }
 
     fun add(task: (Any?) -> Unit) {
-        println("Task added to scheduler: ${task.hashCode()}")
+        //println("Task added to scheduler: ${task.hashCode()}")
         this.task = task
         process()
     }

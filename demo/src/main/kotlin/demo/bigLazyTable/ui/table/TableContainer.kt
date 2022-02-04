@@ -23,7 +23,7 @@ fun RowScope.TableContainer(weight: Float, viewModel: LazyTableViewModel) {
             modifier = Modifier.padding(horizontal = 5.dp),
             verticalArrangement = Arrangement.Top
         ) {
-            PageInfoRow(viewModel = viewModel)
+            //PageInfoRow(viewModel = viewModel, currentPage = currentPage)
             HeaderRow(horizontalScrollState = horizontalScrollState)
             LazyTable(
                 viewModel = viewModel,
@@ -35,7 +35,8 @@ fun RowScope.TableContainer(weight: Float, viewModel: LazyTableViewModel) {
             adapter = rememberScrollbarAdapter(horizontalScrollState),
             modifier = Modifier
                 .fillMaxWidth()
-                .align(Alignment.BottomCenter),
+                .align(Alignment.BottomCenter)
+                .padding(end= 25.dp),
             style = CustomScrollbarStyle
         )
     }
