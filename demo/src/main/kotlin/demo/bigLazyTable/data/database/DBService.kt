@@ -3,7 +3,6 @@ package demo.bigLazyTable.data.database
 import bigLazyTable.paging.IPagingService
 import demo.bigLazyTable.model.Playlist
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.statements.StatementType
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
@@ -18,18 +17,30 @@ object DBService : IPagingService<Playlist> {
         startIndex: Int,
         pageSize: Int,
         filter: String,
-        caseSensitive: Boolean
+        caseSensitive: Boolean,
+        sorted: String
     ): List<Playlist> {
         // TODO: check if lazy is working correctly without any downside
         if (startIndex > lastIndex) throw IllegalArgumentException("startIndex must be smaller than/equal to the lastIndex")
         if (startIndex < 0) throw IllegalArgumentException("only positive values are allowed for startIndex")
 
         val start: Long = if (filter == "") startIndex.toLong() else 0
-        return transaction {
-            DatabasePlaylists
-                .select { caseSensitiveSelect(caseSensitive, DatabasePlaylists.name, filter) }
-                .limit(n = pageSize, offset = start)
-                .map { mapResultRowToPlaylist(it) }
+        if (sorted != "ASC" && sorted != "DESC") {
+            return transaction {
+                DatabasePlaylists
+                    .select { caseSensitiveSelect(caseSensitive, DatabasePlaylists.name, filter) }
+                    .limit(n = pageSize, offset = start)
+                    .map { mapResultRowToPlaylist(it) }
+            }
+        } else {
+            val sortOrder = if (sorted == "ASC") SortOrder.ASC else SortOrder.DESC
+            return transaction {
+                DatabasePlaylists
+                    .select { caseSensitiveSelect(caseSensitive, DatabasePlaylists.name, filter) }
+                    .orderBy(DatabasePlaylists.name to sortOrder)
+                    .limit(n = pageSize, offset = start)
+                    .map { mapResultRowToPlaylist(it) }
+            }
         }
     }
 
@@ -46,6 +57,10 @@ object DBService : IPagingService<Playlist> {
     ): Op<Boolean> {
         return if (caseSensitive) columnWhichShouldMatch like "%$filter%"
         else columnWhichShouldMatch.lowerCase() like "%${filter.lowercase(Locale.getDefault())}%"
+    }
+
+    fun getSortedPage() {
+
     }
 
     override fun getFilteredCount(filter: String, caseSensitive: Boolean): Int = transaction {
