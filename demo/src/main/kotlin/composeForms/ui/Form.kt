@@ -55,7 +55,7 @@ class Form {
     @ExperimentalMaterialApi
     @ExperimentalFoundationApi
     @Composable
-    fun of(model: IModel<*>, appState: AppState){
+    fun of(model: IModel<*>, appState: AppState? = null){
         val keyEventsFromUIElement = remember { mutableMapOf<Key, MutableMap<Int, ()->Unit>>() }
         val showValidations = remember { mutableStateOf(false) }
         //addDefaultKeyBehaviour(composeForms.model, keyEventsFromUIElement){ showValidations.value = it }

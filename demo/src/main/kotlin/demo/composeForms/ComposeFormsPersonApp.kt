@@ -16,5 +16,5 @@ fun main() = Window(
 ) {
     val model = remember { ComposeFormsPersonModel() }
 
-//    Form().of(model, appState)
+    Form().of(model)
 }
