@@ -23,7 +23,7 @@ class FakePagingService(val numberOfPlaylists: Int, val pageSize: Int) : IPaging
         }
     }
 
-    override suspend fun getPage(
+    override fun getPage(
         startIndex: Int,
         pageSize: Int,
         filter: String,

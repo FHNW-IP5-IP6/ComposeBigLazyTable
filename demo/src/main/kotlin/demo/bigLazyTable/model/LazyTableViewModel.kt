@@ -39,7 +39,7 @@ class LazyTableViewModel(
                 addPageToCache(pageNr = index, pageOfModels = models)
                 addToAppStateList(startIndex = startIndex, index)
             }
-            selectPlaylist(AppState.lazyModelList.first()!!)
+            selectPlaylist(appState.lazyModelList.first()!!)
         }
     }
 
@@ -57,7 +57,7 @@ class LazyTableViewModel(
         // Load cache size pages
         for (i in -1 until cacheSize - 1) {
             val pageToLoad = currPage + i
-            if (pageToLoad in 0 until maxPages) {
+            if (pageToLoad in 0 until nbrOfTotalPages) {
                 loadPage(pageNrToLoad = pageToLoad, scrolledDown = scrolledDown)
             }
         }
@@ -82,20 +82,20 @@ class LazyTableViewModel(
         }
     }
 
-    private fun loadPageAndMapToModels(startIndexOfPage: Int): List<PlaylistModel> {
+    internal fun loadPageAndMapToModels(startIndexOfPage: Int): List<PlaylistModel> {
         val page = pagingService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filter = "")
-        return page.map { PlaylistModel(it as Playlist) }
+        return page.map { PlaylistModel(it as Playlist, appState) }
     }
 
     // TODO: Split up function -> too complicated
-    private fun addPageToCache(pageNr: Int, pageOfModels: List<PlaylistModel>) {
+    internal fun addPageToCache(pageNr: Int, pageOfModels: List<PlaylistModel>) {
         val elements = pageOfModels.toMutableList()
-        if (AppState.changedPlaylistModels.size > 0) {
+        if (appState.changedPlaylistModels.size > 0) {
             for (i in 0 until pageSize) {
-                if (AppState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() } != null) {
+                if (appState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() } != null) {
                     elements[i] =
-                        AppState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() }!!
-                    AppState.changedPlaylistModels.remove(elements[i])
+                        appState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() }!!
+                    appState.changedPlaylistModels.remove(elements[i])
                 }
             }
         }
@@ -107,7 +107,7 @@ class LazyTableViewModel(
         removeFromAppStateList(index = pageStartIndexToLoad, isEnd = isEnd)
     }
 
-    private fun addToAppStateList(startIndex: Int, newPageNr: Int) {
+    internal fun addToAppStateList(startIndex: Int, newPageNr: Int) {
         // Add new page to list
         for (i in startIndex until startIndex + pageSize) {
             if (i in 0 until totalCount) {
@@ -153,11 +153,11 @@ class LazyTableViewModel(
             return !isPageInCache(pageNumberForVisibleIndex)
                     || !isPageInCache(1)
                     || !isPageInCache(2)
-        } else if (pageNumberForVisibleIndex > maxPages) {
+        } else if (pageNumberForVisibleIndex > nbrOfTotalPages) {
             return !isPageInCache(pageNumberForVisibleIndex)
                     || !isPageInCache(pageNumberForVisibleIndex - 1)
                     || !isPageInCache(pageNumberForVisibleIndex + 1)
-        } else if (pageNumberForVisibleIndex > maxPages - 1) {
+        } else if (pageNumberForVisibleIndex > nbrOfTotalPages - 1) {
             return !isPageInCache(pageNumberForVisibleIndex)
                     || !isPageInCache(pageNumberForVisibleIndex - 1)
         } else {

@@ -16,7 +16,11 @@ import demo.bigLazyTable.ui.theme.*
  * @author Marco Sprenger, Livio Näf
  */
 @Composable
-fun RowScope.TableContainer(weight: Float, viewModel: LazyTableViewModel, appState: AppState) {
+fun RowScope.TableContainer(
+    weight: Float,
+    viewModel: LazyTableViewModel,
+    appState: AppState
+) {
     val horizontalScrollState = rememberScrollState()
 
     Box(modifier = Modifier.weight(weight)) {
@@ -25,7 +29,10 @@ fun RowScope.TableContainer(weight: Float, viewModel: LazyTableViewModel, appSta
             verticalArrangement = Arrangement.Top
         ) {
             //PageInfoRow(viewModel = viewModel, currentPage = currentPage)
-            HeaderRow(horizontalScrollState = horizontalScrollState)
+            HeaderRow(
+                horizontalScrollState = horizontalScrollState,
+                appState = appState
+            )
             LazyTable(
                 viewModel = viewModel,
                 horizontalScrollState = horizontalScrollState,

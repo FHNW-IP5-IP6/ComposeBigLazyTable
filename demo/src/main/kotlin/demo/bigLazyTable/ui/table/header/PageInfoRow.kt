@@ -23,7 +23,7 @@ fun PageInfoRow(viewModel: LazyTableViewModel, currentPage: Int) = Row(
     horizontalArrangement = Arrangement.Start
 ) {
     Text(
-        text = "Page: ${currentPage}/${viewModel.maxPages}",
+        text = "Page: ${currentPage}/${viewModel.nbrOfTotalPages}",
         color = Color.White,
         fontWeight = FontWeight.Bold
     )
