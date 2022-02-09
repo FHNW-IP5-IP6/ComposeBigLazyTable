@@ -7,6 +7,9 @@ import kotlinx.coroutines.*
 import mu.KotlinLogging
 import org.junit.platform.commons.util.LruCache
 
+private val Log = KotlinLogging.logger {}
+private const val LOGTAG = "LazyTableViewModel: "
+
 /**
  * @author Marco Sprenger, Livio Näf
  */
@@ -15,6 +18,8 @@ class LazyTableViewModel(
     val pageSize: Int = 40,
     private val appState: AppState
 ) {
+
+    val scheduler = Scheduler
 
     private val totalCount by lazy { pagingService.getTotalCount() }
 
@@ -25,67 +30,38 @@ class LazyTableViewModel(
     private val cacheSize = 4
     private val cache: LruCache<Int, List<PlaylistModel>> = LruCache(cacheSize)
 
-    var isScrolling by mutableStateOf(false)
-
     init {
-        val startIndexFirstPage = 0
-        val startIndexSecondPage = pageSize
-
+        // Get first 4 pages on app initialization, to select one for the forms
         CoroutineScope(Dispatchers.Main).launch {
-            val firstPagePlaylistModels = loadPageAndMapToPlaylistModels(startIndexOfPage = startIndexFirstPage)
-            val secondPagePlaylistModels = loadPageAndMapToPlaylistModels(startIndexOfPage = startIndexSecondPage)
-
-            addPageToCache(pageNr = 0, pageOfPlaylistModels = firstPagePlaylistModels)
-            addPageToCache(pageNr = 1, pageOfPlaylistModels = secondPagePlaylistModels)
-
-            addToAppStateList(startIndex = startIndexFirstPage, 0)
-            addToAppStateList(startIndex = startIndexSecondPage, 1)
-
-            selectPlaylist(appState.lazyModelList.first()!!)
-        }
-    }
-
-    internal suspend fun loadPageAndMapToPlaylistModels(startIndexOfPage: Int): List<PlaylistModel> {
-        val page = pagingService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filter = "")
-        return page.map { PlaylistModel(it as Playlist, appState) }
-    }
-
-    // TODO: Split up function -> too complicated
-    internal fun addPageToCache(pageNr: Int, pageOfPlaylistModels: List<PlaylistModel>) {
-        val elements = pageOfPlaylistModels.toMutableList()
-        if (appState.changedPlaylistModels.size > 0) {
-            for (i in 0 until pageSize) {
-                if (appState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() } != null) {
-                    elements[i] =
-                        appState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() }!!
-                    appState.changedPlaylistModels.remove(elements[i])
-                }
+            for (index in 0 until 4) {
+                val startIndex = index * pageSize
+                val models = loadPageAndMapToModels(startIndexOfPage = startIndex)
+                addPageToCache(pageNr = index, pageOfModels = models)
+                addToAppStateList(startIndex = startIndex, index)
             }
+            selectPlaylist(AppState.lazyModelList.first()!!)
         }
-        cache[pageNr] = elements
     }
 
     fun loadAllNeededPagesForIndex(firstVisibleItemIndex: Int) {
-        if (firstVisibleItemIndex < 0) throw IllegalArgumentException("firstVisibleItemIndex should be positive")
-//        if (firstVisibleItemIndex > totalCount - 1) throw IllegalArgumentException("firstVisibleItemIndex should be smaller than total count - 1")
-
         // Calculate current page visible in UI
-        currentPage = calculatePageNumberForListIndex(listIndex = firstVisibleItemIndex)
+        val currPage = calculatePageNumberForListIndex(listIndex = firstVisibleItemIndex)
 
         // If firstVisibleItemIndex > oldFirstVisibleItemIndex --> scrolled down
         // If firstVisibleItemIndex < oldFirstVisibleItemIndex --> scrolled up
         val scrolledDown = firstVisibleItemIndex > oldFirstVisibleItemIndex
 
-        // Update first visible item index with the new value passed by the UI Table
+        // Update oldFirstVisibleItemIndex with the new value passed by the UI Table
         oldFirstVisibleItemIndex = firstVisibleItemIndex
 
         // Load cache size pages
         for (i in -1 until cacheSize - 1) {
-            val pageToLoad = currentPage + i
-            if (pageToLoad in 0..nbrOfTotalPages) {
+            val pageToLoad = currPage + i
+            if (pageToLoad in 0 until maxPages) {
                 loadPage(pageNrToLoad = pageToLoad, scrolledDown = scrolledDown)
             }
         }
+        currentPage = currPage
     }
 
     internal fun loadPage(pageNrToLoad: Int, scrolledDown: Boolean) {
@@ -93,18 +69,37 @@ class LazyTableViewModel(
             // Calculate start index for page to load
             val pageStartIndexToLoad = calculatePageStartIndexToLoad(pageNr = pageNrToLoad)
 
-            CoroutineScope(Dispatchers.IO).launch {
-                val playlistModels = loadPageAndMapToPlaylistModels(startIndexOfPage = pageStartIndexToLoad)
+            //val playlistModels = requestDataAsync(scope = pagingScope, startIndexOfPage = pageStartIndexToLoad)
+            val playlistModels = loadPageAndMapToModels(pageStartIndexToLoad)
+            //addPageToCache(pageNr = pageNrToLoad, pageOfModels = playlistModels.await())
+            addPageToCache(pageNr = pageNrToLoad, pageOfModels = playlistModels)
 
-                addPageToCache(pageNr = pageNrToLoad, pageOfPlaylistModels = playlistModels)
+            updateAppStateList(
+                pageStartIndexToLoad = pageStartIndexToLoad,
+                pageToLoad = pageNrToLoad,
+                isEnd = scrolledDown
+            )
+        }
+    }
 
-                updateAppStateList(
-                    pageStartIndexToLoad = pageStartIndexToLoad,
-                    pageToLoad = pageNrToLoad,
-                    isEnd = scrolledDown
-                )
+    private fun loadPageAndMapToModels(startIndexOfPage: Int): List<PlaylistModel> {
+        val page = pagingService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filter = "")
+        return page.map { PlaylistModel(it as Playlist) }
+    }
+
+    // TODO: Split up function -> too complicated
+    private fun addPageToCache(pageNr: Int, pageOfModels: List<PlaylistModel>) {
+        val elements = pageOfModels.toMutableList()
+        if (AppState.changedPlaylistModels.size > 0) {
+            for (i in 0 until pageSize) {
+                if (AppState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() } != null) {
+                    elements[i] =
+                        AppState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() }!!
+                    AppState.changedPlaylistModels.remove(elements[i])
+                }
             }
         }
+        cache[pageNr] = elements
     }
 
     internal fun updateAppStateList(pageStartIndexToLoad: Int, pageToLoad: Int, isEnd: Boolean) {
@@ -112,8 +107,7 @@ class LazyTableViewModel(
         removeFromAppStateList(index = pageStartIndexToLoad, isEnd = isEnd)
     }
 
-    internal fun addToAppStateList(startIndex: Int, newPageNr: Int) {
-        println(newPageNr)
+    private fun addToAppStateList(startIndex: Int, newPageNr: Int) {
         // Add new page to list
         for (i in startIndex until startIndex + pageSize) {
             if (i in 0 until totalCount) {
@@ -147,15 +141,31 @@ class LazyTableViewModel(
         appState.selectedPlaylistModel = playlistModel
     }
 
+    // Checks with the passed firstVisibleItemIndex from the UI, if it's time to load new pages
     fun isTimeToLoadPage(firstVisibleItemIndex: Int): Boolean {
         if (firstVisibleItemIndex < 0) throw IllegalArgumentException("firstVisibleItemIndex should be positive")
-        if (firstVisibleItemIndex > totalCount - 1) throw IllegalArgumentException("firstVisibleItemIndex should be smaller than total count - 1")
+        if (firstVisibleItemIndex >= totalCount) throw IllegalArgumentException("firstVisibleItemIndex should be smaller than total count")
 
         val pageNumberForVisibleIndex = calculatePageNumberForListIndex(firstVisibleItemIndex)
-        return !isPageInCache(pageNumberForVisibleIndex)
-                || !isPageInCache(pageNumberForVisibleIndex - 1)
-                || !isPageInCache(pageNumberForVisibleIndex + 1)
-                || !isPageInCache(pageNumberForVisibleIndex + 2)
+
+        // Catch all edge cases, to load only data if necessarily
+        if (pageNumberForVisibleIndex == 0) {
+            return !isPageInCache(pageNumberForVisibleIndex)
+                    || !isPageInCache(1)
+                    || !isPageInCache(2)
+        } else if (pageNumberForVisibleIndex > maxPages) {
+            return !isPageInCache(pageNumberForVisibleIndex)
+                    || !isPageInCache(pageNumberForVisibleIndex - 1)
+                    || !isPageInCache(pageNumberForVisibleIndex + 1)
+        } else if (pageNumberForVisibleIndex > maxPages - 1) {
+            return !isPageInCache(pageNumberForVisibleIndex)
+                    || !isPageInCache(pageNumberForVisibleIndex - 1)
+        } else {
+            return !isPageInCache(pageNumberForVisibleIndex)
+                    || !isPageInCache(pageNumberForVisibleIndex - 1)
+                    || !isPageInCache(pageNumberForVisibleIndex + 1)
+                    || !isPageInCache(pageNumberForVisibleIndex + 2)
+        }
     }
 
     // Calculate the page number for a given list index

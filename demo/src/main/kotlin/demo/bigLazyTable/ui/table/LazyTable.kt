@@ -2,10 +2,7 @@ package demo.bigLazyTable.ui.table
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -13,7 +10,6 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.unit.dp
 import demo.bigLazyTable.model.AppState
 import demo.bigLazyTable.model.LazyTableViewModel
@@ -27,14 +23,17 @@ fun LazyTable(
 ) {
     val lazyListItems = appState.lazyModelList
     val verticalLazyListState = rememberLazyListState()
+    // TODO: Used for recompose, other solution for unused variable?
+    val currentPage = viewModel.currentPage
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().padding(bottom = 16.dp)) {
         val firstVisibleItemIndex = verticalLazyListState.firstVisibleItemIndex
 
         // FIXME@JetBrains: listState.isScrollInProgress is always false
         // TODO: Eigene Scrollbar funktion
-        if (!viewModel.isScrolling && viewModel.isTimeToLoadPage(firstVisibleItemIndex)) {
-            viewModel.loadAllNeededPagesForIndex(firstVisibleItemIndex)
+        // TODO: Should we move this isTimeToLoadPage check to our viewmodel and do it at the begin of the loadAllNeededPagesForIndex function?
+        if (viewModel.isTimeToLoadPage(firstVisibleItemIndex)) {
+            viewModel.scheduler.add{viewModel.loadAllNeededPagesForIndex(firstVisibleItemIndex)}
         }
 
         LazyColumn(
@@ -64,15 +63,6 @@ fun LazyTable(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .fillMaxHeight()
-                .pointerMoveFilter(
-                    onEnter = {
-                        viewModel.isScrolling = true
-                        false
-                    },
-                    onExit = {
-                        viewModel.isScrolling = false
-                        false
-                    })
             ,
             style = CustomScrollbarStyle
         )

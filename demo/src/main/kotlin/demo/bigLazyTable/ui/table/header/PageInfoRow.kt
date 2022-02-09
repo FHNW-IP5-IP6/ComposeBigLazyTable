@@ -15,7 +15,7 @@ import demo.bigLazyTable.model.LazyTableViewModel
 import demo.bigLazyTable.ui.theme.BackgroundColorHeader
 
 @Composable
-fun PageInfoRow(viewModel: LazyTableViewModel) = Row(
+fun PageInfoRow(viewModel: LazyTableViewModel, currentPage: Int) = Row(
     modifier = Modifier
         .background(BackgroundColorHeader)
         .fillMaxWidth()
@@ -23,7 +23,7 @@ fun PageInfoRow(viewModel: LazyTableViewModel) = Row(
     horizontalArrangement = Arrangement.Start
 ) {
     Text(
-        text = "Page: ${viewModel.currentPage}/${viewModel.nbrOfTotalPages}",
+        text = "Page: ${currentPage}/${viewModel.maxPages}",
         color = Color.White,
         fontWeight = FontWeight.Bold
     )
