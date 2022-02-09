@@ -4,9 +4,9 @@ import demo.bigLazyTable.data.database.FakePagingService
 import demo.bigLazyTable.utils.printTestMethodName
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import org.junit.Before
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
@@ -47,22 +47,23 @@ internal class LazyTableViewModelTest {
         Log.info { "testing with firstVisibleItemIndex $firstVisibleItemIndex" }
     }
 
-    // TODO: Why is it not returning false?
-//    @Test
-//    fun `isTimeToLoadPage returns false with 0 as firstVisibleItemIndex when already loaded first page`() {
-//        printTestMethodName(object {}.javaClass.enclosingMethod.name)
-//
-//        // given
-//        val firstVisibleItemIndex = 0
-//
-//        // when
-//        assertEquals(true, viewModel.isTimeToLoadPage(firstVisibleItemIndex = firstVisibleItemIndex))
-//        viewModel.loadAllNeededPagesForIndex(firstVisibleItemIndex = firstVisibleItemIndex)
-//
-//        // then
-//        assertEquals(false, viewModel.isTimeToLoadPage(firstVisibleItemIndex = firstVisibleItemIndex))
-//        Log.info { "testing with firstVisibleItemIndex $firstVisibleItemIndex" }
-//    }
+    // TODO:
+    @Disabled("Why is it not returning false?")
+    @Test
+    fun `isTimeToLoadPage returns false with 0 as firstVisibleItemIndex when already loaded first page`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
+        // given
+        val firstVisibleItemIndex = 0
+
+        // when
+        assertEquals(true, viewModel.isTimeToLoadPage(firstVisibleItemIndex = firstVisibleItemIndex))
+        viewModel.loadAllNeededPagesForIndex(firstVisibleItemIndex = firstVisibleItemIndex)
+
+        // then
+        assertEquals(false, viewModel.isTimeToLoadPage(firstVisibleItemIndex = firstVisibleItemIndex))
+        Log.info { "testing with firstVisibleItemIndex $firstVisibleItemIndex" }
+    }
 
     @Test
     fun `isTimeToLoadPage throws IllegalArgumentException with negative firstVisibleItemIndex`() {
@@ -71,45 +72,11 @@ internal class LazyTableViewModelTest {
         // given
         val firstVisibleItemIndex = -44232
 
-        Log.info { "testing with firstVisibleItemIndex $firstVisibleItemIndex" }
         // then
         assertThrows<IllegalArgumentException> {
             // when
             viewModel.isTimeToLoadPage(firstVisibleItemIndex = firstVisibleItemIndex)
         }
-        // TODO: Log statement is surrounded by
-        //  SLF4J: A number (23) of logging calls during the initialization phase have been intercepted and are
-        //SLF4J: now being replayed. These are subject to the filtering rules of the underlying logging system.
-        //SLF4J: See also http://www.slf4j.org/codes.html#replay
-        //2022-01-21 18:23:41,449 INFO  - testing with firstVisibleItemIndex -44232
-        //Exception in thread "AWT-EventQueue-0 @coroutine#1" java.lang.ExceptionInInitializerError
-        //	at demo.bigLazyTable.model.LazyTableViewModel.addPageToCache(LazyTableViewModel.kt:57)
-        //	at demo.bigLazyTable.model.LazyTableViewModel.access$addPageToCache(LazyTableViewModel.kt:15)
-        //	at demo.bigLazyTable.model.LazyTableViewModel$1.invokeSuspend(LazyTableViewModel.kt:39)
-        //	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
-        //	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:106)
-        //	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:316)
-        //	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:770)
-        //	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:721)
-        //	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:715)
-        //	at java.base/java.security.AccessController.doPrivileged(AccessController.java:391)
-        //	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:85)
-        //	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:740)
-        //	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
-        //	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
-        //	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
-        //	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
-        //	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
-        //	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
-        //Caused by: java.lang.IllegalStateException: Please call Database.connect() before using this code
-        //	at org.jetbrains.exposed.sql.transactions.NotInitializedManager.currentOrNull(TransactionApi.kt:38)
-        //	at org.jetbrains.exposed.sql.transactions.ThreadLocalTransactionManagerKt.keepAndRestoreTransactionRefAfterRun(ThreadLocalTransactionManager.kt:219)
-        //	at org.jetbrains.exposed.sql.transactions.ThreadLocalTransactionManagerKt.transaction(ThreadLocalTransactionManager.kt:134)
-        //	at org.jetbrains.exposed.sql.transactions.ThreadLocalTransactionManagerKt.transaction(ThreadLocalTransactionManager.kt:131)
-        //	at org.jetbrains.exposed.sql.transactions.ThreadLocalTransactionManagerKt.transaction$default(ThreadLocalTransactionManager.kt:130)
-        //	at demo.bigLazyTable.data.database.DBService.getTotalCount(DBService.kt:59)
-        //	at demo.bigLazyTable.model.AppState.<clinit>(AppState.kt:34)
-        //	... 18 more
     }
 
     @Test
@@ -157,14 +124,15 @@ internal class LazyTableViewModelTest {
         assertEquals(25_001, viewModel.currentPage)
     }
 
-    // TODO: Exception in thread "AWT-EventQueue-0 @coroutine#4" java.lang.NoClassDefFoundError: Could not initialize class demo.bigLazyTable.model.AppState
-//    @Test
-//    fun `throws IllegalArgumentException after loadAllNeededPagesForIndex 1_000_000`() {
-//        printTestMethodName(object {}.javaClass.enclosingMethod.name)
-//        assertThrows<IllegalArgumentException> {
-//            viewModel.loadAllNeededPagesForIndex(1_000_000)
-//        }
-//    }
+    // TODO:
+    @Disabled("Exception in thread 'AWT-EventQueue-0 @coroutine#' java.lang.NoClassDefFoundError: Could not initialize class demo.bigLazyTable.model.AppState")
+    @Test
+    fun `throws IllegalArgumentException after loadAllNeededPagesForIndex 1_000_000`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        assertThrows<IllegalArgumentException> {
+            viewModel.loadAllNeededPagesForIndex(1_000_000)
+        }
+    }
 
     @Test
     fun `nbrOfTotalPages is rounded to the next integer when numberOfPlaylists or pageSize are not even`() {
@@ -182,43 +150,45 @@ internal class LazyTableViewModelTest {
         assertFalse(viewModel.isScrolling)
     }
 
-    // TODO: Sometimes it works & sometimes it dont
-//    @Test
-//    fun `selectPlaylist changes language correctly to deutsch`() {
-//        printTestMethodName(object {}.javaClass.enclosingMethod.name)
-//
-//        // given
-//        val playlistModel = PlaylistModel(Playlist(name = "test deutsch"), appState)
-//
-//        appState.selectedPlaylistModel.setCurrentLanguage("english")
-//
-//        // when
-//        playlistModel.setCurrentLanguage("deutsch")
-//        viewModel.selectPlaylist(playlistModel = playlistModel)
-//
-//        // then
-//        assertEquals(playlistModel, appState.selectedPlaylistModel)
-//        assertEquals("deutsch", appState.selectedPlaylistModel.getCurrentLanguage())
-//    }
+    // TODO:
+    @Disabled("Sometimes it works & sometimes it dont")
+    @Test
+    fun `selectPlaylist changes language correctly to deutsch`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
 
-    // TODO: Sometimes it works & sometimes it dont
-//    @Test
-//    fun `selectPlaylist changes language correctly to english`() {
-//        printTestMethodName(object {}.javaClass.enclosingMethod.name)
-//
-//        // given
-//        val playlistModel = PlaylistModel(Playlist(name = "test english"), appState)
-//
-//        appState.selectedPlaylistModel.setCurrentLanguage("deutsch")
-//
-//        // when
-//        playlistModel.setCurrentLanguage("english")
-//        viewModel.selectPlaylist(playlistModel = playlistModel)
-//
-//        // then
-//        assertEquals(playlistModel, appState.selectedPlaylistModel)
-//        assertEquals("english", appState.selectedPlaylistModel.getCurrentLanguage())
-//    }
+        // given
+        val playlistModel = PlaylistModel(Playlist(name = "test deutsch"), appState)
+
+        appState.selectedPlaylistModel.setCurrentLanguage("english")
+
+        // when
+        playlistModel.setCurrentLanguage("deutsch")
+        viewModel.selectPlaylist(playlistModel = playlistModel)
+
+        // then
+        assertEquals(playlistModel, appState.selectedPlaylistModel)
+        assertEquals("deutsch", appState.selectedPlaylistModel.getCurrentLanguage())
+    }
+
+    // TODO:
+    @Disabled("Sometimes it works & sometimes it dont")
+    @Test
+    fun `selectPlaylist changes language correctly to english`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
+        // given
+        val playlistModel = PlaylistModel(Playlist(name = "test english"), appState)
+
+        appState.selectedPlaylistModel.setCurrentLanguage("deutsch")
+
+        // when
+        playlistModel.setCurrentLanguage("english")
+        viewModel.selectPlaylist(playlistModel = playlistModel)
+
+        // then
+        assertEquals(playlistModel, appState.selectedPlaylistModel)
+        assertEquals("english", appState.selectedPlaylistModel.getCurrentLanguage())
+    }
 
     @Test
     fun `selectPlaylist sets the given playlistModel as selected`() {
@@ -275,27 +245,28 @@ internal class LazyTableViewModelTest {
         fun isPageInCache(pageNr: Int): Boolean
      */
 
-    // TODO: Why is it returning emptyList?
-//    @Test
-//    fun `loadPageAndMapToPlaylistModels works with 0 as startIndexOfPage`() {
-//        // when
-////        // TODO: java.lang.NoSuchMethodException: demo.bigLazyTable.model.LazyTableViewModel.loadPageAndMapToPlaylistModels(int)
-////        val loadPageAndMapToPlaylistModels =
-////            LazyTableViewModel::class.java.getDeclaredMethod("loadPageAndMapToPlaylistModels", Int::class.java).apply {
-////                isAccessible = true
-////            }
-////        val startIndexOfPage = 0
-////        val returnValue = loadPageAndMapToPlaylistModels.invoke(viewModel, startIndexOfPage)
-////        println("returnValue = ${returnValue.javaClass.name} $returnValue")
-////        assertTrue(returnValue is List<*>)
-//        runBlocking {
-//            // TODO: Why do both return an empty list???
-//            val playlistModels = viewModel.loadPageAndMapToPlaylistModels(startIndexOfPage = 5665)
-//            val x = pagingService.getPage(startIndex = 0, pageSize = pageSize)
-//            println(x)
-//            assertEquals(0, x.first())
-//        }
-//    }
+    // TODO:
+    @Disabled("Why is it returning emptyList?")
+    @Test
+    fun `loadPageAndMapToPlaylistModels works with 0 as startIndexOfPage`() {
+        // when
+//        // TODO: java.lang.NoSuchMethodException: demo.bigLazyTable.model.LazyTableViewModel.loadPageAndMapToPlaylistModels(int)
+//        val loadPageAndMapToPlaylistModels =
+//            LazyTableViewModel::class.java.getDeclaredMethod("loadPageAndMapToPlaylistModels", Int::class.java).apply {
+//                isAccessible = true
+//            }
+//        val startIndexOfPage = 0
+//        val returnValue = loadPageAndMapToPlaylistModels.invoke(viewModel, startIndexOfPage)
+//        println("returnValue = ${returnValue.javaClass.name} $returnValue")
+//        assertTrue(returnValue is List<*>)
+        runBlocking {
+            // TODO: Why do both return an empty list???
+            val playlistModels = viewModel.loadPageAndMapToPlaylistModels(startIndexOfPage = 5665)
+            val x = pagingService.getPage(startIndex = 0, pageSize = pageSize)
+            println(x)
+            assertEquals(0, x.first())
+        }
+    }
 
     @Test
     fun `addPageToCache works with page 0`() {
