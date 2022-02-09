@@ -7,8 +7,6 @@ import kotlinx.coroutines.*
 import mu.KotlinLogging
 import org.junit.platform.commons.util.LruCache
 
-private val Log = KotlinLogging.logger {}
-
 /**
  * @author Marco Sprenger, Livio Näf
  */
@@ -47,13 +45,13 @@ class LazyTableViewModel(
         }
     }
 
-    suspend fun loadPageAndMapToPlaylistModels(startIndexOfPage: Int): List<PlaylistModel> {
+    internal suspend fun loadPageAndMapToPlaylistModels(startIndexOfPage: Int): List<PlaylistModel> {
         val page = pagingService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filter = "")
         return page.map { PlaylistModel(it as Playlist, appState) }
     }
 
     // TODO: Split up function -> too complicated
-    fun addPageToCache(pageNr: Int, pageOfPlaylistModels: List<PlaylistModel>) {
+    internal fun addPageToCache(pageNr: Int, pageOfPlaylistModels: List<PlaylistModel>) {
         val elements = pageOfPlaylistModels.toMutableList()
         if (appState.changedPlaylistModels.size > 0) {
             for (i in 0 until pageSize) {
@@ -90,7 +88,7 @@ class LazyTableViewModel(
         }
     }
 
-    private fun loadPage(pageNrToLoad: Int, scrolledDown: Boolean) {
+    internal fun loadPage(pageNrToLoad: Int, scrolledDown: Boolean) {
         if (!isPageInCache(pageNrToLoad)) {
             // Calculate start index for page to load
             val pageStartIndexToLoad = calculatePageStartIndexToLoad(pageNr = pageNrToLoad)
@@ -109,12 +107,12 @@ class LazyTableViewModel(
         }
     }
 
-    private fun updateAppStateList(pageStartIndexToLoad: Int, pageToLoad: Int, isEnd: Boolean) {
+    internal fun updateAppStateList(pageStartIndexToLoad: Int, pageToLoad: Int, isEnd: Boolean) {
         addToAppStateList(startIndex = pageStartIndexToLoad, newPageNr = pageToLoad)
         removeFromAppStateList(index = pageStartIndexToLoad, isEnd = isEnd)
     }
 
-    private fun addToAppStateList(startIndex: Int, newPageNr: Int) {
+    internal fun addToAppStateList(startIndex: Int, newPageNr: Int) {
         println(newPageNr)
         // Add new page to list
         for (i in startIndex until startIndex + pageSize) {
@@ -124,18 +122,19 @@ class LazyTableViewModel(
         }
     }
 
-    private fun removeFromAppStateList(index: Int, isEnd: Boolean) {
+    internal fun removeFromAppStateList(index: Int, isEnd: Boolean) {
         val startIndexOldPage = calculateStartIndexOfOldPage(index, isEnd)
         removeOldPageFromList(startIndexOldPage)
     }
 
     // TODO: Better namings! What is going on here?
-    private fun calculateStartIndexOfOldPage(index: Int, isEnd: Boolean): Int {
+    internal fun calculateStartIndexOfOldPage(index: Int, isEnd: Boolean): Int {
         val previousOrNextPage = if (isEnd) index - cacheSize else index + cacheSize
         return previousOrNextPage * pageSize
     }
 
-    private fun removeOldPageFromList(startIndexOldPage: Int) {
+    internal fun removeOldPageFromList(startIndexOldPage: Int) {
+        assert(startIndexOldPage >= 0)
         for (i in startIndexOldPage until startIndexOldPage + pageSize) {
             if (i in 0 until totalCount) {
                 appState.lazyModelList.set(index = i, element = null)
@@ -160,17 +159,17 @@ class LazyTableViewModel(
     }
 
     // Calculate the page number for a given list index
-    private fun calculatePageNumberForListIndex(listIndex: Int): Int {
+    internal fun calculatePageNumberForListIndex(listIndex: Int): Int {
         return listIndex / pageSize
     }
 
     // Calculate first index from page to load
-    private fun calculatePageStartIndexToLoad(pageNr: Int): Int {
+    internal fun calculatePageStartIndexToLoad(pageNr: Int): Int {
         return pageNr * pageSize
     }
 
     // Check if a given page is in cache
-    fun isPageInCache(pageNr: Int): Boolean {
+    internal fun isPageInCache(pageNr: Int): Boolean {
         return cache.containsKey(pageNr)
     }
 

@@ -226,25 +226,6 @@ internal class LazyTableViewModelTest {
         assertEquals(playlistModel, appState.selectedPlaylistModel)
     }
 
-    /*
-    TODO: https://medium.com/mindorks/how-to-unit-test-private-methods-in-java-and-kotlin-d3cae49dccd
-    properties:
-        oldFirstVisibleItemIndex
-        cache
-    methods:
-        suspend fun loadPageAndMapToPlaylistModels(startIndexOfPage: Int): List<PlaylistModel>
-        fun addPageToCache(pageNr: Int, pageOfPlaylistModels: List<PlaylistModel>)
-        fun loadPage(pageNrToLoad: Int, scrolledDown: Boolean)
-        fun updateAppStateList(pageStartIndexToLoad: Int, pageToLoad: Int, isEnd: Boolean)
-        fun addToAppStateList(startIndex: Int, newPageNr: Int)
-        fun removeFromAppStateList(index: Int, isEnd: Boolean
-        fun calculateStartIndexOfOldPage(index: Int, isEnd: Boolean): Int
-        fun removeOldPageFromList(startIndexOldPage: Int
-        fun calculatePageNumberForListIndex(listIndex: Int): Int
-        calculatePageStartIndexToLoad(pageNr: Int): Int
-        fun isPageInCache(pageNr: Int): Boolean
-     */
-
     // TODO:
     @Disabled("Why is it returning emptyList?")
     @Test
@@ -296,6 +277,206 @@ internal class LazyTableViewModelTest {
         viewModel.addPageToCache(pageNr = 1, pageOfPlaylistModels = playlistModels)
 
         assertFalse(viewModel.isPageInCache(45))
+    }
+
+    @Test
+    fun `loadPage works with pageNrToLoad 0 & scrolledDown = false`() {
+        assertDoesNotThrow {
+            viewModel.loadPage(pageNrToLoad = 0, scrolledDown = false)
+        }
+    }
+
+    @Test
+    fun `loadPage works with pageNrToLoad 0 & scrolledDown = true`() {
+        assertDoesNotThrow {
+            viewModel.loadPage(pageNrToLoad = 0, scrolledDown = true)
+        }
+    }
+
+    @Test
+    fun `loadPage works with pageNrToLoad 100 & scrolledDown = true`() {
+        assertDoesNotThrow {
+            viewModel.loadPage(pageNrToLoad = 100, scrolledDown = true)
+        }
+    }
+
+    // TODO:
+    @Disabled("Unexpected exception thrown: java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0")
+    @Test
+    fun `updateAppStateList works with pageStartIndexToLoad=0, pageToLoad=0, isEnd=false`() {
+        assertDoesNotThrow {
+            viewModel.updateAppStateList(
+                pageStartIndexToLoad = 0,
+                pageToLoad = 0,
+                isEnd = false
+            )
+        }
+    }
+
+    // TODO:
+    @Disabled("Unexpected exception thrown: java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0")
+    @Test
+    fun `updateAppStateList works with pageStartIndexToLoad=0, pageToLoad=0, isEnd=true`() {
+        assertDoesNotThrow {
+            viewModel.updateAppStateList(
+                pageStartIndexToLoad = 0,
+                pageToLoad = 0,
+                isEnd = true
+            )
+        }
+    }
+
+    // TODO:
+    @Disabled("Unexpected exception thrown: java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0")
+    @Test
+    fun `addToAppStateList works with startIndex=0 & newPageNr=1`() {
+        assertDoesNotThrow {
+            viewModel.addToAppStateList(
+                startIndex = 0,
+                newPageNr = 1
+            )
+        }
+    }
+
+    // TODO:
+    @Disabled("Unexpected exception thrown: java.lang.NullPointerException")
+    @Test
+    fun `addToAppStateList works with startIndex=4355 & newPageNr=45345`() {
+        assertDoesNotThrow {
+            viewModel.addToAppStateList(
+                startIndex = 4355,
+                newPageNr = 45345
+            )
+        }
+    }
+
+    @Test
+    fun `removeFromAppStateList works with index=0, isEnd=false`() {
+        assertDoesNotThrow {
+            viewModel.removeFromAppStateList(
+                index = 0,
+                isEnd = false
+            )
+        }
+    }
+
+    fun `removeFromAppStateList works with index=24960, isEnd=true`() {
+        assertDoesNotThrow {
+            viewModel.removeFromAppStateList(
+                index = 24960,
+                isEnd = true
+            )
+        }
+    }
+
+    // TODO: Why 160?
+    @Disabled("expected: <0> but was: <160>")
+    @Test
+    fun `calculateStartIndexOfOldPage works with index 0 & isEnd=false`() {
+        val oldStartIndex = viewModel.calculateStartIndexOfOldPage(
+            index = 0,
+            isEnd = false
+        )
+        assertEquals(0, oldStartIndex)
+    }
+
+    // TODO: Why 998240?
+    @Disabled("expected: <24960> but was: <998240>")
+    @Test
+    fun `calculateStartIndexOfOldPage works with index 25000 & isEnd=true`() {
+        val oldStartIndex = viewModel.calculateStartIndexOfOldPage(
+            index = 24960,
+            isEnd = true
+        )
+        assertEquals(24960, oldStartIndex)
+    }
+
+    @Test
+    fun `removeOldPageFromList works with startIndexOldPage=0`() {
+        assertDoesNotThrow {
+            viewModel.removeOldPageFromList(startIndexOldPage = 0)
+        }
+    }
+
+    @Test
+    fun `removeOldPageFromList doesnt work with startIndexOldPage=-1`() {
+        assertThrows<AssertionError> {
+            viewModel.removeOldPageFromList(startIndexOldPage = -1)
+        }
+    }
+
+    @Test
+    fun `calculatePageNumberForListIndex works with list index 0`() {
+        val pageNumber = viewModel.calculatePageNumberForListIndex(listIndex = 0)
+        assertEquals(0, pageNumber)
+    }
+
+    @Test
+    fun `calculatePageNumberForListIndex works with list index 40`() {
+        val pageNumber = viewModel.calculatePageNumberForListIndex(listIndex = 40)
+        assertEquals(1, pageNumber)
+    }
+
+    @Test
+    fun `calculatePageNumberForListIndex works with list index 25_000`() {
+        val pageNumber = viewModel.calculatePageNumberForListIndex(listIndex = 25_000)
+        assertEquals(625, pageNumber)
+    }
+
+    @Test
+    fun `calculatePageNumberForListIndex works with list index 999_960`() {
+        val pageNumber = viewModel.calculatePageNumberForListIndex(listIndex = 999_960)
+        assertEquals(24_999, pageNumber)
+    }
+
+    @Test
+    fun `calculatePageNumberForListIndex works with list index 999_961`() {
+        val pageNumber = viewModel.calculatePageNumberForListIndex(listIndex = 999_961)
+        assertEquals(24_999, pageNumber)
+    }
+
+    @Test
+    fun `calculatePageNumberForListIndex works with list index 1_000_000`() {
+        val pageNumber = viewModel.calculatePageNumberForListIndex(listIndex = 1_000_000)
+        assertEquals(25_000, pageNumber)
+    }
+
+    @Test
+    fun `calculatePageStartIndexToLoad works with pageNr 0`() {
+        val startIndexToLoad = viewModel.calculatePageStartIndexToLoad(pageNr = 0)
+        assertEquals(0, startIndexToLoad)
+    }
+
+    @Test
+    fun `calculatePageStartIndexToLoad works with pageNr 1`() {
+        val startIndexToLoad = viewModel.calculatePageStartIndexToLoad(pageNr = 1)
+        assertEquals(40, startIndexToLoad)
+    }
+
+    @Test
+    fun `calculatePageStartIndexToLoad works with pageNr 2`() {
+        val startIndexToLoad = viewModel.calculatePageStartIndexToLoad(pageNr = 2)
+        assertEquals(80, startIndexToLoad)
+    }
+
+    @Test
+    fun `calculatePageStartIndexToLoad works with pageNr 625`() {
+        val startIndexToLoad = viewModel.calculatePageStartIndexToLoad(pageNr = 625)
+        assertEquals(25_000, startIndexToLoad)
+    }
+
+    // TODO: Why is it not in cache?
+    @Disabled("expected: <true> but was: <false>")
+    @Test
+    fun `isPageInCache works with pageNr 1`() {
+        val isInCache = viewModel.isPageInCache(1)
+        assertEquals(true, isInCache)
+    }
+
+    @Test
+    fun `isPageInCache doesnt work with pageNr 5345`() {
+        val isInCache = viewModel.isPageInCache(5345)
+        assertEquals(false, isInCache)
     }
 
 }
