@@ -26,13 +26,6 @@ private val LightColorPalette = lightColors(
     secondary = BackgroundColorLight
 )
 
-fun FrameWindowScope.initializeWindowSize() {
-    window.apply {
-        minimumSize = Dimension(1000, 800)
-        placement = WindowPlacement.Maximized
-    }
-}
-
 val CustomScrollbarStyle = ScrollbarStyle(
     minimalHeight = 16.dp,
     thickness = 12.dp,

@@ -14,7 +14,7 @@ fun main() = Window(
     title = "Person Editor",
     size = IntSize(1600, 800)
 ) {
-    val model                    = remember { ComposeFormsPersonModel()   }
+    val model = remember { ComposeFormsPersonModel() }
 
     Form().of(model)
 }

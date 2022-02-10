@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Assertions.*
 
 internal class SqliteDbTest {
 
+    lateinit var sqlite: SqliteDb
+
     @BeforeEach
     fun setUp() {
     }

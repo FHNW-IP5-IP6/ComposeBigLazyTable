@@ -17,7 +17,7 @@ import demo.bigLazyTable.ui.table.TableCell
 import demo.bigLazyTable.ui.theme.BackgroundColorHeader
 
 @Composable
-fun HeaderRow(horizontalScrollState: ScrollState) {
+fun HeaderRow(horizontalScrollState: ScrollState, appState: AppState) {
     Row(
         modifier = Modifier
             .background(BackgroundColorHeader)
@@ -26,7 +26,7 @@ fun HeaderRow(horizontalScrollState: ScrollState) {
             .horizontalScroll(horizontalScrollState),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        for (attribute in AppState.defaultPlaylistModel.lazyListAttributes) {
+        for (attribute in appState.defaultPlaylistModel.lazyListAttributes) {
             TableCell(
                 text = attribute.getLabel(),
                 color = Color.White,

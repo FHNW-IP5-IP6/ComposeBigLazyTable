@@ -10,7 +10,7 @@ import composeForms.model.modelElements.HeaderGroup
 /**
  * @author Marco Sprenger, Livio Näf
  */
-class PlaylistModel(playlist: Playlist) : BaseModel<BLTLabels>(title = BLTLabels.TITLE) {
+class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTLabels>(title = BLTLabels.TITLE) {
 
     val id = LongAttribute(
         model = this,
@@ -196,8 +196,20 @@ class PlaylistModel(playlist: Playlist) : BaseModel<BLTLabels>(title = BLTLabels
         value = playlist.track4AlbumName
     )
 
-//    val lazyListAttributes = listOf<Attribute<*, *, *>>(id, name, numTracks, numFollowers, durationMs)
-    val lazyListAttributes = listOf<Attribute<*, *, *>>(id, name, numTracks, numFollowers, durationMs, numEdits, numAlbums, numArtists, numFollowers, numFollowers, numTracks)
+    //    val lazyListAttributes = listOf<Attribute<*, *, *>>(id, name, numTracks, numFollowers, durationMs)
+    val lazyListAttributes = listOf(
+        id,
+        name,
+        numTracks,
+        numFollowers,
+        durationMs,
+        numEdits,
+        numAlbums,
+        numArtists,
+        numFollowers,
+        numFollowers,
+        numTracks
+    )
 
     private val headerGroup = HeaderGroup(
         model = this,
@@ -266,8 +278,8 @@ class PlaylistModel(playlist: Playlist) : BaseModel<BLTLabels>(title = BLTLabels
     )
 
     override fun updateChanges() {
-        if (!AppState.changedPlaylistModels.contains(this)) {
-            AppState.changedPlaylistModels.add(this)
+        if (!appState.changedPlaylistModels.contains(this)) {
+            appState.changedPlaylistModels.add(this)
         }
         super.updateChanges()
     }
