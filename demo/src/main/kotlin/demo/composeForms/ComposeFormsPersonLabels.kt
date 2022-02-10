@@ -22,7 +22,7 @@
 
 package demo.composeForms
 
-import model.ILabel
+import composeForms.model.ILabel
 
 /**
  * @author Louisa Reinger

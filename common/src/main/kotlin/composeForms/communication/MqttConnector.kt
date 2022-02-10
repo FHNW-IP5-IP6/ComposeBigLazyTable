@@ -56,7 +56,7 @@ class MqttConnector (val mqttBroker: String,
         .buildAsync()
 
     /**
-     * Connect to the server
+     * Connect to the composeForms.server
      *
      * @param onConnectionFailed: function that is invoked when the connection could not be established
      * @param onConnected: function that is invoked when the connection has established
@@ -128,7 +128,7 @@ class MqttConnector (val mqttBroker: String,
     }
 
     /**
-     * Disconnect from the server
+     * Disconnect from the composeForms.server
      */
     fun disconnect() {
         client.disconnectWith()

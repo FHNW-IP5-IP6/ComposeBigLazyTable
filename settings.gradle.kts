@@ -13,3 +13,4 @@ rootProject.name = "ComposeBigLazyTable"
 include(":common")
 include(":desktop")
 include(":demo")
+include(":web")

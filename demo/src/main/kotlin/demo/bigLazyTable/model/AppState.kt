@@ -1,16 +1,39 @@
 package demo.bigLazyTable.model
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import demo.bigLazyTable.data.database.DBService
+import androidx.compose.runtime.setValue
+import bigLazyTable.paging.IPagingService
 import java.util.*
 
 /**
  * @author Marco Sprenger, Livio Näf
  */
-object AppState {
+class AppState(pagingService: IPagingService<*>) {
 
-    val lazyModelList: MutableList<PlaylistFormModel?> = ArrayList(Collections.nCopies(DBService().getTotalCount(), null))
+    /**
+     * Default PlaylistModel to store global data for Form and LazyList
+     * Stores:
+     * - current Language
+     * - default data when LazyList is loading
+     */
+    val defaultPlaylistModel by mutableStateOf(PlaylistModel(Playlist(), this))
+    val testDefaultPlaylistModel = PlaylistModel(Playlist(), this) // TODO: Check this
 
-    val selectedPlaylist = mutableStateOf(PlaylistFormModel(Playlist()))
+    /**
+     * Current selected Playlist in LazyList.
+     * This is the current Model behind the Forms
+     */
+    var selectedPlaylistModel by mutableStateOf(defaultPlaylistModel)
 
+    /**
+     * List of Models. Size is the totalCount of the provided data.
+     * All elements in the LazyList cache are stored in this list. The rest is filled with the defaultPlaylistModel to provide the default loading data.
+     */
+    val lazyModelList: MutableList<PlaylistModel?> = ArrayList(Collections.nCopies(pagingService.getTotalCount(), null))
+
+    /**
+     * List of all Models with changes. Used to prevent loosing changed data if new data is loaded from the service.
+     */
+    val changedPlaylistModels: MutableList<PlaylistModel> = mutableListOf()
 }
