@@ -2,7 +2,7 @@ name: Sonarqube
 on:
   push:
     branches:
-      - develop
+#      - develop
 
 jobs:
   build:

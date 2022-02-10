@@ -8,7 +8,6 @@ import mu.KotlinLogging
 import org.junit.platform.commons.util.LruCache
 
 private val Log = KotlinLogging.logger {}
-private const val LOGTAG = "LazyTableViewModel: "
 
 /**
  * @author Marco Sprenger, Livio Näf
