@@ -29,9 +29,6 @@ fun LazyTable(
     Box(modifier = Modifier.fillMaxSize().padding(bottom = 16.dp)) {
         val firstVisibleItemIndex = verticalLazyListState.firstVisibleItemIndex
 
-        // FIXME@JetBrains: listState.isScrollInProgress is always false
-        // TODO: Eigene Scrollbar funktion
-        // TODO: Should we move this isTimeToLoadPage check to our viewmodel and do it at the begin of the loadAllNeededPagesForIndex function?
         if (viewModel.isTimeToLoadPage(firstVisibleItemIndex)) {
             viewModel.scheduler.add{viewModel.loadAllNeededPagesForIndex(firstVisibleItemIndex)}
         }
@@ -40,9 +37,9 @@ fun LazyTable(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             state = verticalLazyListState
         ) {
-
-            // TODO: Experiment mit key
-            items(lazyListItems/*, key = id*/) { playlistModel ->
+            items(
+                items = lazyListItems
+            ) { playlistModel ->
                 when (playlistModel) {
                     null -> PlaylistRowPlaceholder(
                         horizontalScrollState = horizontalScrollState,

@@ -120,7 +120,7 @@ class LazyTableViewModel(
         removeOldPageFromList(startIndexOldPage)
     }
 
-    // TODO: Better namings! What is going on here?
+    // Calculates the start index of an "old" page, which has to be removed from the AppStateList
     internal fun calculateStartIndexOfOldPage(index: Int, isEnd: Boolean): Int {
         val previousOrNextPage = if (isEnd) index - cacheSize else index + cacheSize
         return previousOrNextPage * pageSize

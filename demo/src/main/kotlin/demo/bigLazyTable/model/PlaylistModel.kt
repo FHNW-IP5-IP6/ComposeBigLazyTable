@@ -6,11 +6,14 @@ import composeForms.model.modelElements.Field
 import composeForms.model.modelElements.FieldSize
 import composeForms.model.modelElements.Group
 import composeForms.model.modelElements.HeaderGroup
+import java.util.*
 
 /**
  * @author Marco Sprenger, Livio Näf
  */
 class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTLabels>(title = BLTLabels.TITLE) {
+
+    val uniqueID: String = UUID.randomUUID().toString()
 
     val id = LongAttribute(
         model = this,
