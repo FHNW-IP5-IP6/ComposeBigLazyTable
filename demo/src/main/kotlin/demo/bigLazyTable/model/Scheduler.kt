@@ -21,14 +21,16 @@ object Scheduler {
         if (inProcess) return
         if (task == null) return
         inProcess = true
+        taskToDo = task
         CoroutineScope(Dispatchers.IO).launch {
-            //Thread.sleep(50)
             delay(50)
-            taskToDo = task
-            taskToDo!!.invoke()
+
+            if (taskToDo == task) {
+                taskToDo?.invoke()
+            }
         }.invokeOnCompletion {
             inProcess = false
-            if (task!! == taskToDo) task = null
+            if (task == taskToDo) task = null
             process()
         }
     }

@@ -26,7 +26,7 @@ class LazyTableViewModel(
     private val totalCount by lazy { pagingService.getTotalCount() }
 
     private var oldFirstVisibleItemIndex = 0
-    var currentPage by mutableStateOf(0)
+    var recomposeStateChanger by mutableStateOf(false)
     val nbrOfTotalPages = MathUtils.roundDivisionToNextBiggerInt(number = totalCount, dividedBy = pageSize)
 
     private val cacheSize = 4
@@ -63,7 +63,7 @@ class LazyTableViewModel(
                 loadPage(pageNrToLoad = pageToLoad, scrolledDown = scrolledDown)
             }
         }
-        currentPage = currPage
+        forceRecompose()
     }
 
     internal fun loadPage(pageNrToLoad: Int, scrolledDown: Boolean) {
@@ -186,5 +186,9 @@ class LazyTableViewModel(
     internal fun calculatePageStartIndexToLoad(pageNr: Int): Int = pageNr * pageSize
 
     internal fun isPageNrInCache(pageNr: Int): Boolean = cache.containsKey(pageNr)
+
+    private fun forceRecompose() {
+        recomposeStateChanger = !recomposeStateChanger
+    }
 
 }

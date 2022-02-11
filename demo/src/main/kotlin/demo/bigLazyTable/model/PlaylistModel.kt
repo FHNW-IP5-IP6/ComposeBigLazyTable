@@ -13,8 +13,6 @@ import java.util.*
  */
 class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTLabels>(title = BLTLabels.TITLE) {
 
-    val uniqueID: String = UUID.randomUUID().toString()
-
     val id = LongAttribute(
         model = this,
         label = BLTLabels.ID,
