@@ -25,7 +25,13 @@ class LazyTableViewModel(
 
     private var oldFirstVisibleItemIndex = 0
     var currentPage by mutableStateOf(0)
-    val nbrOfTotalPages = MathUtils.roundDivisionToNextBiggerInt(number = totalCount, dividedBy = pageSize)
+    val nbrOfTotalPages by lazy {
+        println("Inside lazy nbrOfTotalPages")
+        MathUtils.roundDivisionToNextBiggerInt(
+            number = totalCount,
+            dividedBy = pageSize
+        )
+    }
 
     private val cacheSize = 4
     private val cache: LruCache<Int, List<PlaylistModel>> = LruCache(cacheSize)
@@ -139,6 +145,13 @@ class LazyTableViewModel(
     fun selectPlaylist(playlistModel: PlaylistModel) {
         playlistModel.setCurrentLanguage(appState.defaultPlaylistModel.getCurrentLanguage())
         appState.selectedPlaylistModel = playlistModel
+    }
+
+    private fun setCurrentLanguage(playlistModel: PlaylistModel) {
+        println("ViewModel setCurrentLanguage")
+        println("defaultPlaylistModel = ${appState.defaultPlaylistModel}")
+        val currentLanguage = appState.defaultPlaylistModel.getCurrentLanguage()
+        playlistModel.setCurrentLanguage(currentLanguage)
     }
 
     // Checks with the passed firstVisibleItemIndex from the UI, if it's time to load new pages

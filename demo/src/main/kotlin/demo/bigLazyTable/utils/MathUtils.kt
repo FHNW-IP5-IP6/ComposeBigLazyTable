@@ -28,6 +28,9 @@ object MathUtils {
     fun roundDivisionToNextBiggerInt(
         number: Int,
         dividedBy: Int
-    ): Int = ceil(number.toDouble() / dividedBy).toInt()
+    ): Int {
+        println("Inside roundDivisionToNextBiggerInt")
+        return ceil(number.toDouble() / dividedBy).toInt()
+    }
 
 }

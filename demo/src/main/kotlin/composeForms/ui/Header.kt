@@ -48,9 +48,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import composeForms.model.IModel
 import composeForms.server.QRCodeService
-import composeForms.ui.theme.ColorsUtil.Companion.get
-import composeForms.ui.theme.DropdownColors
-import composeForms.ui.theme.FormColors
+import composeForms.ui.theme.*
+import composeForms.ui.theme.ColorsUtil.get
+//import composeForms.ui.theme.ColorsUtil.Companion.get
 import demo.bigLazyTable.model.AppState
 
 /**
@@ -67,7 +67,7 @@ fun Header(model : IModel<*>, appState: AppState?, changeShowError: (Boolean) ->
 
     with(model){
         TopAppBar(
-            backgroundColor = get(FormColors.BACKGROUND_COLOR_HEADER),
+            backgroundColor = BackgroundColorHeader,
             elevation = 100.dp
         ){
 
@@ -81,7 +81,7 @@ fun Header(model : IModel<*>, appState: AppState?, changeShowError: (Boolean) ->
                         contentDescription = "Logo", modifier = Modifier.requiredSize(width = 166.dp, height = 42.dp))
 
                     //title
-                    Text(getTitle(), color = get(FormColors.FONT_ON_BACKGOUND),
+                    Text(getTitle(), color = FontOnBackground,
                         fontSize = 22.sp, modifier = Modifier.padding(start = 20.dp, top = 2.dp))
                 }
 
@@ -148,18 +148,18 @@ private fun HeaderButtonWithIcon(buttonIcon: ImageVector, tooltipText: String = 
     BoxWithTooltip(
         tooltip = {
             Surface(modifier = Modifier.shadow(4.dp), shape = RoundedCornerShape(4.dp)) {
-                Column(modifier = Modifier.wrapContentWidth().background(get(FormColors.BACKGROUND_COLOR_LIGHT)),
+                Column(modifier = Modifier.wrapContentWidth().background(BackgroundColorLight),
                     horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = tooltipText,
                         modifier = Modifier.padding(4.dp),
-                        color = get(FormColors.NORMALTEXT)
+                        color = NormalTextColor
                     )
                     if(tooltipShortcutText != ""){
                         Text(
                             text = tooltipShortcutText,
                             modifier = Modifier.padding(4.dp),
-                            color = get(FormColors.LABEL)
+                            color = LabelColor
                         )
                     }
                 }
@@ -173,7 +173,7 @@ private fun HeaderButtonWithIcon(buttonIcon: ImageVector, tooltipText: String = 
             Icon(
                 imageVector = buttonIcon,
                 contentDescription = tooltipText,
-                tint = if (enabled) get(FormColors.FONT_ON_BACKGOUND) else get(FormColors.DISABLED_ON_BACKGROUND)
+                tint = if (enabled) FontOnBackground else DisabledOnBackground
             )
             if (showError && errorIcon != null) {
                 Row(modifier = Modifier.offset(10.dp, (-8).dp)){
@@ -181,7 +181,7 @@ private fun HeaderButtonWithIcon(buttonIcon: ImageVector, tooltipText: String = 
                         modifier = Modifier.size(16.dp),
                         imageVector = Icons.Filled.Circle,
                         contentDescription = "Invalid Values",
-                        tint = get(FormColors.ERRORCONTRAST)
+                        tint = ErrorContrastColor
                     )
                 }
                 //Icon
@@ -190,7 +190,7 @@ private fun HeaderButtonWithIcon(buttonIcon: ImageVector, tooltipText: String = 
                         modifier = Modifier.size(16.dp),
                         imageVector = errorIcon,
                         contentDescription = "Invalid Values",
-                        tint = get(FormColors.ERROR)
+                        tint = ErrorColor
                     )
                 }
             }
@@ -215,10 +215,10 @@ private fun LanguageDropDownButton(model: IModel<*>, appState: AppState?){
                 modifier = Modifier.width(110.dp),
                 onClick = { langDropDownIsOpen.value = !langDropDownIsOpen.value },
                 shape = RoundedCornerShape(12),
-                colors = ButtonDefaults.buttonColors(backgroundColor = get(DropdownColors.BUTTON_BACKGROUND)),
-                border = BorderStroke(1.dp, get(FormColors.FONT_ON_BACKGOUND)),
+                colors = ButtonDefaults.buttonColors(backgroundColor = ButtonBackground),
+                border = BorderStroke(1.dp, FontOnBackground),
             ) {
-                Text(getCurrentLanguage(), color = get(FormColors.FONT_ON_BACKGOUND))
+                Text(getCurrentLanguage(), color = FontOnBackground)
             }
             CustomDropdownMenu(
                 expanded = langDropDownIsOpen.value,
@@ -296,17 +296,17 @@ private fun WizardModeButtons(model: IModel<*>, ctrlString: String, changeShowEr
 @Composable
 private fun AutoSaveSwitch(model: IModel<*>){
     with(model){
-        val switchColors =  SwitchDefaults.colors( checkedThumbColor = get(FormColors.FONT_ON_BACKGOUND), uncheckedThumbColor = get(FormColors.FONT_ON_BACKGOUND))
+        val switchColors =  SwitchDefaults.colors( checkedThumbColor = FontOnBackground, uncheckedThumbColor = FontOnBackground)
 
         val offFontWeight = if (!isAutoSave()) FontWeight.Bold else FontWeight.Normal
-        val offColor = if (!isAutoSave()) get(FormColors.FONT_ON_BACKGOUND) else get(FormColors.DISABLED_ON_BACKGROUND)
+        val offColor = if (!isAutoSave()) FontOnBackground else DisabledOnBackground
         val onFontWeight = if (isAutoSave()) FontWeight.Bold else FontWeight.Normal
-        val onColor = if (isAutoSave()) get(FormColors.FONT_ON_BACKGOUND) else get(FormColors.DISABLED_ON_BACKGROUND)
+        val onColor = if (isAutoSave()) FontOnBackground else DisabledOnBackground
 
         BoxWithTooltip(
             tooltip = {
                 Surface(modifier = Modifier.shadow(4.dp), shape = RoundedCornerShape(4.dp)) {
-                    Text(text = getTooltipAutoSave(), modifier = Modifier.background(get(FormColors.BACKGROUND_COLOR_LIGHT)).padding(4.dp)) }
+                    Text(text = getTooltipAutoSave(), modifier = Modifier.background(BackgroundColorLight).padding(4.dp)) }
             }, delay = 600
         ) {
             Row(
@@ -316,7 +316,7 @@ private fun AutoSaveSwitch(model: IModel<*>){
             ) {
                 Text(
                     text = "Auto Save",
-                    color = get(FormColors.FONT_ON_BACKGOUND),
+                    color = FontOnBackground,
                     modifier = Modifier.padding(6.dp)
                 )
                 Row(
@@ -365,12 +365,12 @@ private fun AutoSaveSwitch(model: IModel<*>){
 private fun DropdownElement(model: IModel<*>, language: String, index: Int, selectedIndex: MutableState<Int>, appState: AppState?){
     val elementIsSelected = model.isCurrentLanguage(language)
     val elementIsSelectedBackgroundColor =
-        if (elementIsSelected) get(DropdownColors.BACKGROUND_ELEMENT_SEL) else get(DropdownColors.BACKGROUND_ELEMENT_NOT_SEL)
+        if (elementIsSelected) BackgroundElementSel else BackgroundElementNotSel
     val elementIsSelectedTextColor =
-        if (elementIsSelected) get(DropdownColors.TEXT_ELEMENT_SEL) else get(DropdownColors.TEXT_ELEMENT_NOT_SEL)
+        if (elementIsSelected) TextElementSel else TextElementNotSel
 
     val borderStroke = if(index == selectedIndex.value){
-        BorderStroke(width = 2.dp, color = get(FormColors.BACKGROUND_COLOR_GROUPS))
+        BorderStroke(width = 2.dp, color = BackgroundColorGroups)
     }else{
         BorderStroke(0.dp, Color.Transparent)
     }
@@ -402,9 +402,9 @@ private fun DropdownElement(model: IModel<*>, language: String, index: Int, sele
 private fun AutoSaveStateIcon(model: IModel<*>){
     if (model.isAutoSave()) {
         if (model.allFocusedAttributesOfCurrentViewAreValid()) {
-            Icon(Icons.Filled.Done, "Done-Icon", tint = get(FormColors.FONT_ON_BACKGOUND))
+            Icon(Icons.Filled.Done, "Done-Icon", tint = FontOnBackground)
         } else {
-            Icon(Icons.Filled.Error, "Error", tint = get(FormColors.FONT_ON_BACKGOUND))
+            Icon(Icons.Filled.Error, "Error", tint = FontOnBackground)
         }
     }
 }

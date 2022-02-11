@@ -41,7 +41,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import composeForms.model.IModel
-import composeForms.ui.theme.ColorsUtil.Companion.get
+import composeForms.ui.theme.BackgroundColorHeader
+import composeForms.ui.theme.BodyBackground
+import composeForms.ui.theme.ColorsUtil.get
+import composeForms.ui.theme.FontOnBackground
+//import composeForms.ui.theme.ColorsUtil.Companion.get
 import composeForms.ui.theme.FormColors
 
 /**
@@ -57,15 +61,16 @@ fun ExceptionWindow(model: IModel<*>){
             val showDetails = remember { mutableStateOf(false) }
             if (!showingException.value) {
                 Window(size = IntSize(1000, 300), title = getTitle()) {
+
                     Column {
                         //Title
                         Box(
                             modifier = Modifier.fillMaxWidth().height(38.dp)
                                 .border(0.dp, Color.Transparent, RoundedCornerShape(10.dp))
-                                .background(get(FormColors.BACKGROUND_COLOR_HEADER)),
+                                .background(BackgroundColorHeader),
                             contentAlignment = Alignment.Center
                         ){
-                            Text("Error occurred", color = get(FormColors.BODY_BACKGROUND))
+                            Text("Error occurred", color = BodyBackground)
                         }
 
                         //Content
@@ -75,9 +80,9 @@ fun ExceptionWindow(model: IModel<*>){
                             Text("Please contact your administrator. Following error occurred:", fontWeight = FontWeight.Bold)
                             Text(model.getException()?.message ?: "No message was set")
                             Button(
-                                colors = ButtonDefaults.buttonColors(backgroundColor = get(FormColors.BACKGROUND_COLOR_HEADER)),
+                                colors = ButtonDefaults.buttonColors(backgroundColor = BackgroundColorHeader),
                                 onClick = { showDetails.value = !showDetails.value } ) {
-                                Text(buttonText, color = get(FormColors.FONT_ON_BACKGOUND))
+                                Text(buttonText, color = FontOnBackground)
                             }
                             DetailList(model, showDetails.value)
                         }
