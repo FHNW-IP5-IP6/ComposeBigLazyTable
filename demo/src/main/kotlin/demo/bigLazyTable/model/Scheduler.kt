@@ -33,6 +33,7 @@ object Scheduler {
         }
     }
 
+    // TODO: Should this be synchronized?
     fun set(task: () -> Unit) {
         this.task = task
         process()
