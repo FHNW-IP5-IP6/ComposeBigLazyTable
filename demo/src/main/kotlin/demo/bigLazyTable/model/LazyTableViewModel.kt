@@ -10,6 +10,7 @@ import org.junit.platform.commons.util.LruCache
 private val Log = KotlinLogging.logger {}
 
 /**
+ * TODO: Short description what this class is used for
  * @author Marco Sprenger, Livio Näf
  */
 class LazyTableViewModel(
@@ -17,6 +18,8 @@ class LazyTableViewModel(
     val pageSize: Int = 40,
     private val appState: AppState
 ) {
+    val firstPageNr = 0 // TODO: Nr or Nbr?
+    val firstPageIndex = 0
 
     val scheduler = Scheduler
 
@@ -32,11 +35,11 @@ class LazyTableViewModel(
     init {
         // Get first 4 pages on app initialization, to select one for the forms
         CoroutineScope(Dispatchers.Main).launch {
-            for (index in 0 until 4) {
-                val startIndex = index * pageSize
-                val models = loadPageAndMapToModels(startIndexOfPage = startIndex)
-                addPageToCache(pageNr = index, pageOfModels = models)
-                addToAppStateList(startIndex = startIndex, index)
+            for (pageNr in 0 until cacheSize) {
+                val startIndexOfPage = pageNr * pageSize
+                val models = loadPageAndMapToModels(startIndexOfPage = startIndexOfPage)
+                addPageToCache(pageNr = pageNr, pageOfModels = models)
+                addToAppStateList(startIndex = startIndexOfPage, newPageNr = pageNr)
             }
             selectPlaylist(appState.lazyModelList.first()!!)
         }
@@ -64,7 +67,7 @@ class LazyTableViewModel(
     }
 
     internal fun loadPage(pageNrToLoad: Int, scrolledDown: Boolean) {
-        if (!isPageInCache(pageNrToLoad)) {
+        if (!isPageNrInCache(pageNrToLoad)) {
             // Calculate start index for page to load
             val pageStartIndexToLoad = calculatePageStartIndexToLoad(pageNr = pageNrToLoad)
 
@@ -101,6 +104,9 @@ class LazyTableViewModel(
         cache[pageNr] = elements
     }
 
+    // TODO: Add below function
+    internal fun mergeModels() {}
+
     internal fun updateAppStateList(pageStartIndexToLoad: Int, pageToLoad: Int, isEnd: Boolean) {
         addToAppStateList(startIndex = pageStartIndexToLoad, newPageNr = pageToLoad)
         removeFromAppStateList(index = pageStartIndexToLoad, isEnd = isEnd)
@@ -121,6 +127,7 @@ class LazyTableViewModel(
     }
 
     // Calculates the start index of an "old" page, which has to be removed from the AppStateList
+    // TODO: isEnd? index? previousOrNextPage? index +- cacheSize?
     internal fun calculateStartIndexOfOldPage(index: Int, isEnd: Boolean): Int {
         val previousOrNextPage = if (isEnd) index - cacheSize else index + cacheSize
         return previousOrNextPage * pageSize
@@ -135,9 +142,16 @@ class LazyTableViewModel(
         }
     }
 
+    // TODO: selectPlaylistWithLanguageSet, selectModel, setLanguageAndSelectModel
     fun selectPlaylist(playlistModel: PlaylistModel) {
-        playlistModel.setCurrentLanguage(appState.defaultPlaylistModel.getCurrentLanguage())
+        println("selectPlaylist ${playlistModel.id}")
+        setCurrentLanguage(playlistModel = playlistModel)
         appState.selectedPlaylistModel = playlistModel
+    }
+
+    private fun setCurrentLanguage(playlistModel: PlaylistModel) {
+        val currentLanguage = playlistModel.getCurrentLanguage()
+        playlistModel.setCurrentLanguage(currentLanguage)
     }
 
     // Checks with the passed firstVisibleItemIndex from the UI, if it's time to load new pages
@@ -149,37 +163,28 @@ class LazyTableViewModel(
 
         // Catch all edge cases, to load only data if necessarily
         if (pageNumberForVisibleIndex == 0) {
-            return !isPageInCache(pageNumberForVisibleIndex)
-                    || !isPageInCache(1)
-                    || !isPageInCache(2)
+            return !isPageNrInCache(pageNumberForVisibleIndex)
+                    || !isPageNrInCache(1)
+                    || !isPageNrInCache(2)
         } else if (pageNumberForVisibleIndex > nbrOfTotalPages) {
-            return !isPageInCache(pageNumberForVisibleIndex)
-                    || !isPageInCache(pageNumberForVisibleIndex - 1)
-                    || !isPageInCache(pageNumberForVisibleIndex + 1)
+            return !isPageNrInCache(pageNumberForVisibleIndex)
+                    || !isPageNrInCache(pageNumberForVisibleIndex - 1)
+                    || !isPageNrInCache(pageNumberForVisibleIndex + 1)
         } else if (pageNumberForVisibleIndex > nbrOfTotalPages - 1) {
-            return !isPageInCache(pageNumberForVisibleIndex)
-                    || !isPageInCache(pageNumberForVisibleIndex - 1)
+            return !isPageNrInCache(pageNumberForVisibleIndex)
+                    || !isPageNrInCache(pageNumberForVisibleIndex - 1)
         } else {
-            return !isPageInCache(pageNumberForVisibleIndex)
-                    || !isPageInCache(pageNumberForVisibleIndex - 1)
-                    || !isPageInCache(pageNumberForVisibleIndex + 1)
-                    || !isPageInCache(pageNumberForVisibleIndex + 2)
+            return !isPageNrInCache(pageNumberForVisibleIndex)
+                    || !isPageNrInCache(pageNumberForVisibleIndex - 1)
+                    || !isPageNrInCache(pageNumberForVisibleIndex + 1)
+                    || !isPageNrInCache(pageNumberForVisibleIndex + 2)
         }
     }
 
-    // Calculate the page number for a given list index
-    internal fun calculatePageNumberForListIndex(listIndex: Int): Int {
-        return listIndex / pageSize
-    }
+    internal fun calculatePageNumberForListIndex(listIndex: Int): Int = listIndex / pageSize
 
-    // Calculate first index from page to load
-    internal fun calculatePageStartIndexToLoad(pageNr: Int): Int {
-        return pageNr * pageSize
-    }
+    internal fun calculatePageStartIndexToLoad(pageNr: Int): Int = pageNr * pageSize
 
-    // Check if a given page is in cache
-    internal fun isPageInCache(pageNr: Int): Boolean {
-        return cache.containsKey(pageNr)
-    }
+    internal fun isPageNrInCache(pageNr: Int): Boolean = cache.containsKey(pageNr)
 
 }
