@@ -22,6 +22,7 @@ object Scheduler {
         if (task == null) return
         inProcess = true
         CoroutineScope(Dispatchers.IO).launch {
+            //Thread.sleep(50)
             delay(50)
             taskToDo = task
             taskToDo!!.invoke()
@@ -32,7 +33,7 @@ object Scheduler {
         }
     }
 
-    fun add(task: () -> Unit) {
+    fun set(task: () -> Unit) {
         this.task = task
         process()
     }

@@ -30,7 +30,7 @@ fun LazyTable(
         val firstVisibleItemIndex = verticalLazyListState.firstVisibleItemIndex
 
         if (viewModel.isTimeToLoadPage(firstVisibleItemIndex)) {
-            viewModel.scheduler.add{viewModel.loadAllNeededPagesForIndex(firstVisibleItemIndex)}
+            viewModel.scheduler.set{viewModel.loadAllNeededPagesForIndex(firstVisibleItemIndex)}
         }
 
         LazyColumn(
