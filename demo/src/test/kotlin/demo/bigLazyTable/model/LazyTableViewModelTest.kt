@@ -253,7 +253,7 @@ internal class LazyTableViewModelTest {
         )
         viewModel.addPageToCache(pageNr = 0, pageOfModels = playlistModels)
 
-        assertTrue(viewModel.isPageInCache(0))
+        assertTrue(viewModel.isPageNrInCache(0))
     }
 
     @Test
@@ -263,7 +263,7 @@ internal class LazyTableViewModelTest {
         )
         viewModel.addPageToCache(pageNr = 1, pageOfModels = playlistModels)
 
-        assertTrue(viewModel.isPageInCache(1))
+        assertTrue(viewModel.isPageNrInCache(1))
     }
 
     @Test
@@ -273,7 +273,7 @@ internal class LazyTableViewModelTest {
         )
         viewModel.addPageToCache(pageNr = 1, pageOfModels = playlistModels)
 
-        assertFalse(viewModel.isPageInCache(45))
+        assertFalse(viewModel.isPageNrInCache(45))
     }
 
     @Test
@@ -469,13 +469,13 @@ internal class LazyTableViewModelTest {
     @Disabled("expected: <true> but was: <false>")
     @Test
     fun `isPageInCache works with pageNr 1`() {
-        val isInCache = viewModel.isPageInCache(1)
+        val isInCache = viewModel.isPageNrInCache(1)
         assertEquals(true, isInCache)
     }
 
     @Test
     fun `isPageInCache doesnt work with pageNr 5345`() {
-        val isInCache = viewModel.isPageInCache(5345)
+        val isInCache = viewModel.isPageNrInCache(5345)
         assertEquals(false, isInCache)
     }
 
