@@ -142,10 +142,6 @@ abstract class Attribute <A,T,L> (
     //******************************************************************************************************************
     //User Input
 
-    // TODO:
-    fun setValue() {
-        TODO()
-    }
 
     /**
      * If the attribute is not readonly, valueAsText is set to the new input value.

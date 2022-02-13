@@ -12,26 +12,17 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.WindowPlacement
 import java.awt.Dimension
 
-// TODO: Needs to be spezified
 private val DarkColorPalette = darkColors(
     primary = BackgroundColorGroups,
     primaryVariant = BackgroundColorGroups,
     secondary = BackgroundColorGroups
 )
 
-// TODO: Needs to be spezified
 private val LightColorPalette = lightColors(
     primary = BackgroundColorLight,
     primaryVariant = BackgroundColorLight,
     secondary = BackgroundColorLight
 )
-
-fun FrameWindowScope.initializeWindowSize() {
-    window.apply {
-        minimumSize = Dimension(1000, 800)
-        placement = WindowPlacement.Maximized
-    }
-}
 
 val CustomScrollbarStyle = ScrollbarStyle(
     minimalHeight = 16.dp,
@@ -42,7 +33,6 @@ val CustomScrollbarStyle = ScrollbarStyle(
     unhoverColor = UnhoverColor
 )
 
-// TODO: When Dark/Light Theme should be supported
 @Composable
 fun BigLazyTableTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
