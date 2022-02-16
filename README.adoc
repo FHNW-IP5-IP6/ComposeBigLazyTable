@@ -1,3 +1,5 @@
+https://github.com/FHNW-IP5-IP6/ComposeBigLazyTable/actions/workflows/sonarqube.yml[image:https://github.com/FHNW-IP5-IP6/ComposeBigLazyTable/actions/workflows/sonarqube.yml/badge.svg[.github/workflows/sonarqube.yml]]
+
 = Compose BigLazyTable (Compose BLT)
 Author M. Sprenger, L. Näf
 v0.1, 2021-09-29
