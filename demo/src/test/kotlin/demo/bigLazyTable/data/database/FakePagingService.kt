@@ -27,8 +27,8 @@ class FakePagingService(val numberOfPlaylists: Int, val pageSize: Int) : IPaging
         startIndex: Int,
         pageSize: Int,
         filter: String,
-        caseSensitive: Boolean,
-        sorted: String
+        caseSensitive: Boolean
+//        sorted: String
     ): List<Playlist> {
         val pageNrOfStartIndex = startIndex / pageSize
         return allData[pageNrOfStartIndex]?.filter { it.name == filter } ?: emptyList()
