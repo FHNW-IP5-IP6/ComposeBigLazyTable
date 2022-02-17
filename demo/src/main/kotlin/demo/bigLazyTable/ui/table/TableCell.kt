@@ -1,9 +1,7 @@
 package demo.bigLazyTable.ui.table
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,8 +25,7 @@ fun RowScope.AttributeTableCell(
 @Composable
 fun TableCell(
     text: String,
-    // TODO: I heard that you should never give a fixed width!
-    width: Dp = 150.dp, // TODO: Make it dynamically adjust when there is more or less text
+    width: Dp = 180.dp, // TODO: How to dynamically adjust?
     color: Color = Color.Black,
     backgroundColor: Color,
     fontWeight: FontWeight = FontWeight.Normal,
@@ -41,6 +38,6 @@ fun TableCell(
         modifier = Modifier
             .background(backgroundColor)
             .width(width)
-            .padding(8.dp),
+            .padding(8.dp)
     )
 }

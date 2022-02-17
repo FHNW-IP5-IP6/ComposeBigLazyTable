@@ -11,7 +11,18 @@ import java.util.*
  */
 object DBService : IPagingService<Playlist> {
 
-    private val lastIndex by lazy { getTotalCount() - 1 }
+    private val lastIndex by lazy {
+        val totalCount = getTotalCount() - 1
+        println("DBService: lastIndex called with totalCount = $totalCount")
+        totalCount
+    }
+
+//    private val filteredCount by lazy {
+//        val filtered = getFilteredCount("elorette")
+//        println("DBService: filteredCount called with filteredCount = $filtered")
+//        filtered
+//    }
+//    var count = 0
 
     override fun getPage(
         startIndex: Int,
@@ -24,11 +35,23 @@ object DBService : IPagingService<Playlist> {
         if (startIndex > lastIndex) throw IllegalArgumentException("startIndex must be smaller than/equal to the lastIndex and not $startIndex")
         if (startIndex < 0) throw IllegalArgumentException("only positive values are allowed for startIndex")
 
-        val start: Long = if (filter == "") startIndex.toLong() else 0
+//        println("filteredCount is $filteredCount")
+//        println("start: count is $count")
+        val start: Long = /*if (filter == "") */startIndex.toLong()
+        println("Offset: Start = $start")
+//        } else if (filteredCount >= pageSize) {
+//            count += pageSize
+//            println("filteredCount >= pageSize: count is $count")
+//            count.toLong()
+//        } else {
+//            count += filteredCount
+//            println("filteredCount < pageSize: count is $count")
+//            count.toLong()
+//        }
         if (sorted != "ASC" && sorted != "DESC") {
             return transaction {
                 DatabasePlaylists
-                    .select { caseSensitiveSelect(caseSensitive, DatabasePlaylists.name, filter) }
+                    .select { caseSensitiveFilter(caseSensitive, DatabasePlaylists.name, filter) }
                     .limit(n = pageSize, offset = start)
                     .map { mapResultRowToPlaylist(it) }
             }
@@ -36,7 +59,7 @@ object DBService : IPagingService<Playlist> {
             val sortOrder = if (sorted == "ASC") SortOrder.ASC else SortOrder.DESC
             return transaction {
                 DatabasePlaylists
-                    .select { caseSensitiveSelect(caseSensitive, DatabasePlaylists.name, filter) }
+                    .select { caseSensitiveFilter(caseSensitive, DatabasePlaylists.name, filter) }
                     .orderBy(DatabasePlaylists.name to sortOrder)
                     .limit(n = pageSize, offset = start)
                     .map { mapResultRowToPlaylist(it) }
@@ -45,12 +68,12 @@ object DBService : IPagingService<Playlist> {
     }
 
     // TODO: Move this knowledge into documentation
-    // By default, the SQLite LIKE operator is case-insensitive for ASCII characters (which covers all english language
-    // letters), and case-sensitive for unicode characters that are beyond the ASCII range (ä, ö, ü, ...)
-    // PostgreSQL is a case-sensitive database by default
-    // Text comparison in MySQL is case insensitive by default, while in H2 it is case sensitive
-    // From MariaDB docs, it depends on OS. For Windows, it's not case-sensitive.
-    private fun SqlExpressionBuilder.caseSensitiveSelect(
+// By default, the SQLite LIKE operator is case-insensitive for ASCII characters (which covers all english language
+// letters), and case-sensitive for unicode characters that are beyond the ASCII range (ä, ö, ü, ...)
+// PostgreSQL is a case-sensitive database by default
+// Text comparison in MySQL is case insensitive by default, while in H2 it is case sensitive
+// From MariaDB docs, it depends on OS. For Windows, it's not case-sensitive.
+    private fun SqlExpressionBuilder.caseSensitiveFilter(
         caseSensitive: Boolean,
         columnWhichShouldMatch: Column<String>,
         filter: String
@@ -66,7 +89,7 @@ object DBService : IPagingService<Playlist> {
     override fun getFilteredCount(filter: String, caseSensitive: Boolean): Int = transaction {
         if (filter == "") throw IllegalArgumentException("Filter must be set - empty string is not allowed (leads to java.lang.OutOfMemoryError: Java heap space)")
         DatabasePlaylists
-            .select { caseSensitiveSelect(caseSensitive, DatabasePlaylists.name, filter) }
+            .select { caseSensitiveFilter(caseSensitive, DatabasePlaylists.name, filter) }
             .count()
             .toInt()
     }

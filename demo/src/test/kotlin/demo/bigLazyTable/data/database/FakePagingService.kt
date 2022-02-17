@@ -2,14 +2,14 @@ package demo.bigLazyTable.data.database
 
 import bigLazyTable.paging.IPagingService
 import demo.bigLazyTable.model.Playlist
-import demo.bigLazyTable.utils.MathUtils
+import demo.bigLazyTable.utils.PageUtils
 
 class FakePagingService(val numberOfPlaylists: Int, val pageSize: Int) : IPagingService<Playlist> {
 
     private val allData = mutableMapOf<Int, List<Playlist>>()
-    private val numberOfPages = MathUtils.roundDivisionToNextBiggerInt(
-        number = numberOfPlaylists,
-        dividedBy = pageSize
+    private val numberOfPages = PageUtils.getTotalPages(
+        totalCount = numberOfPlaylists,
+        pageSize = pageSize
     )
 
     init {
@@ -27,7 +27,8 @@ class FakePagingService(val numberOfPlaylists: Int, val pageSize: Int) : IPaging
         startIndex: Int,
         pageSize: Int,
         filter: String,
-        caseSensitive: Boolean
+        caseSensitive: Boolean,
+        sorted: String
     ): List<Playlist> {
         val pageNrOfStartIndex = startIndex / pageSize
         return allData[pageNrOfStartIndex]?.filter { it.name == filter } ?: emptyList()

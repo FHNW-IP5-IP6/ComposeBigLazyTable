@@ -2,10 +2,12 @@ package demo.bigLazyTable.model
 
 import androidx.compose.runtime.*
 import bigLazyTable.paging.IPagingService
-import demo.bigLazyTable.utils.MathUtils
+import demo.bigLazyTable.utils.PageUtils
 import kotlinx.coroutines.*
 import mu.KotlinLogging
 import org.junit.platform.commons.util.LruCache
+import java.util.*
+import kotlin.collections.ArrayList
 
 private val Log = KotlinLogging.logger {}
 
@@ -18,36 +20,69 @@ class LazyTableViewModel(
     val pageSize: Int = 40,
     private val appState: AppState
 ) {
-    val firstPageNr = 0 // TODO: Nr or Nbr?
-    val firstPageIndex = 0
+    private val firstPageNr = 0 // TODO: Use Nr everywhere!
+    private val firstPageIndex = 0
+
+    var isFiltering by mutableStateOf(false)
+        private set
+
+    var nameFilter by mutableStateOf("")
+        private set
+
+    fun onNameFilterChanged(newFilter: String) {
+        nameFilter = newFilter
+
+        isFiltering = newFilter != ""
+
+        if (isFiltering) {
+            val filteredCount = pagingService.getFilteredCount(newFilter)
+//            appState.displayedItemsCount = filteredCount
+            appState.filteredList = ArrayList(ArrayList(Collections.nCopies(filteredCount, null)))
+        }
+    }
 
     val scheduler = Scheduler
 
     private val totalCount by lazy { pagingService.getTotalCount() }
+    val totalPages = PageUtils.getTotalPages(totalCount = totalCount, pageSize = pageSize)
+//    private var filteredCount = { filter: String -> pagingService.getFilteredCount(filter = filter) }
+//    var totalDisplayedItems = if (nameFilter == "") totalCount else filteredCount(nameFilter)
 
-    private var oldFirstVisibleItemIndex = 0
-    var recomposeStateChanger by mutableStateOf(false)
-    val nbrOfTotalPages = MathUtils.roundDivisionToNextBiggerInt(number = totalCount, dividedBy = pageSize)
+    private var oldFirstVisibleItemIndex = firstPageIndex
 
     private val cacheSize = 4
     private val cache: LruCache<Int, List<PlaylistModel>> = LruCache(cacheSize)
 
+    var recomposeStateChanger by mutableStateOf(false)
+
     init {
-        // Get first 4 pages on app initialization, to select one for the forms
+        // Get first cacheSize=4 pages on app initialization, to select one for the forms
         CoroutineScope(Dispatchers.Main).launch {
-            for (pageNr in 0 until cacheSize) {
-                val startIndexOfPage = pageNr * pageSize
-                val models = loadPageAndMapToModels(startIndexOfPage = startIndexOfPage)
-                addPageToCache(pageNr = pageNr, pageOfModels = models)
-                addToAppStateList(startIndex = startIndexOfPage, newPageNr = pageNr)
-            }
-            selectPlaylist(appState.lazyModelList.first()!!)
+//            appState.displayedItemsCount = totalCount
+            loadFirstPagesToFillCacheAndAddToAppStateList()
+            selectFirstPlaylist()
         }
+    }
+
+    private fun loadFirstPagesToFillCacheAndAddToAppStateList() {
+        for (pageNr in firstPageNr until cacheSize) {
+            val startIndexOfPage = pageNr * pageSize
+            val models = loadPageOfPlaylistModels(startIndexOfPage = startIndexOfPage)
+            addPageToCache(pageNr = pageNr, pageOfModels = models)
+            addToAppStateList(startIndex = startIndexOfPage, newPageNr = pageNr)
+        }
+    }
+
+    private fun selectFirstPlaylist() {
+        val fullList = if (isFiltering) appState.filteredList else appState.lazyModelList
+        println("loadFirstPagesAndFillCacheAndSelectFirstPlaylist: appState.list size = ${fullList.size}")
+        // TODO: NullPointerException
+        selectPlaylist(fullList.first()!!)
     }
 
     fun loadAllNeededPagesForIndex(firstVisibleItemIndex: Int) {
         // Calculate current page visible in UI
-        val currPage = calculatePageNumberForListIndex(listIndex = firstVisibleItemIndex)
+        val currPage = getPageNr(firstVisibleItemIndex = firstVisibleItemIndex)
 
         // If firstVisibleItemIndex > oldFirstVisibleItemIndex --> scrolled down
         // If firstVisibleItemIndex < oldFirstVisibleItemIndex --> scrolled up
@@ -59,7 +94,7 @@ class LazyTableViewModel(
         // Load cache size pages
         for (i in -1 until cacheSize - 1) {
             val pageToLoad = currPage + i
-            if (pageToLoad in 0 until nbrOfTotalPages) {
+            if (pageToLoad in firstPageNr until totalPages) {
                 loadPage(pageNrToLoad = pageToLoad, scrolledDown = scrolledDown)
             }
         }
@@ -67,12 +102,12 @@ class LazyTableViewModel(
     }
 
     internal fun loadPage(pageNrToLoad: Int, scrolledDown: Boolean) {
-        if (!isPageNrInCache(pageNrToLoad)) {
+        if (!isPageInCache(pageNrToLoad)) {
             // Calculate start index for page to load
-            val pageStartIndexToLoad = calculatePageStartIndexToLoad(pageNr = pageNrToLoad)
+            val pageStartIndexToLoad = getStartIndexOfPage(pageNr = pageNrToLoad)
 
             //val playlistModels = requestDataAsync(scope = pagingScope, startIndexOfPage = pageStartIndexToLoad)
-            val playlistModels = loadPageAndMapToModels(pageStartIndexToLoad)
+            val playlistModels = loadPageOfPlaylistModels(pageStartIndexToLoad)
             //addPageToCache(pageNr = pageNrToLoad, pageOfModels = playlistModels.await())
             addPageToCache(pageNr = pageNrToLoad, pageOfModels = playlistModels)
 
@@ -84,16 +119,21 @@ class LazyTableViewModel(
         }
     }
 
-    internal fun loadPageAndMapToModels(startIndexOfPage: Int): List<PlaylistModel> {
-        val page = pagingService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filter = "")
-        return page.map { PlaylistModel(it as Playlist, appState) }
+    internal fun loadPageOfPlaylistModels(startIndexOfPage: Int): List<PlaylistModel> {
+        println("loadPageAndMapToModels index=$startIndexOfPage filter=$nameFilter")
+        val page = pagingService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filter = nameFilter)
+        return page.toPlaylistModels()
+    }
+
+    private fun List<Any?>.toPlaylistModels(): List<PlaylistModel> {
+        return map { PlaylistModel(it as Playlist, appState) }
     }
 
     // TODO: Split up function -> too complicated
     internal fun addPageToCache(pageNr: Int, pageOfModels: List<PlaylistModel>) {
         val elements = pageOfModels.toMutableList()
         if (appState.changedPlaylistModels.size > 0) {
-            for (i in 0 until pageSize) {
+            for (i in firstPageIndex until pageSize) {
                 if (appState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() } != null) {
                     elements[i] =
                         appState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() }!!
@@ -113,10 +153,19 @@ class LazyTableViewModel(
     }
 
     internal fun addToAppStateList(startIndex: Int, newPageNr: Int) {
-        // Add new page to list
-        for (i in startIndex until startIndex + pageSize) {
-            if (i in 0 until totalCount) {
-                appState.lazyModelList.set(index = i, element = cache[newPageNr]!![i % pageSize])
+        if (isFiltering) {
+            for (i in startIndex until startIndex + pageSize) {
+                if (i in firstPageIndex until totalCount) {
+                    appState.filteredList.set(index = i, element = cache[newPageNr]!![i % pageSize])
+                }
+            }
+        }
+        else {
+            // Add new page to list
+            for (i in startIndex until startIndex + pageSize) {
+                if (i in firstPageIndex until totalCount) {
+                    appState.lazyModelList.set(index = i, element = cache[newPageNr]!![i % pageSize])
+                }
             }
         }
     }
@@ -134,12 +183,23 @@ class LazyTableViewModel(
     }
 
     internal fun removeOldPageFromList(startIndexOldPage: Int) {
-        assert(startIndexOldPage >= 0)
-        for (i in startIndexOldPage until startIndexOldPage + pageSize) {
-            if (i in 0 until totalCount) {
-                appState.lazyModelList.set(index = i, element = null)
+        assert(startIndexOldPage >= firstPageIndex)
+
+        if (isFiltering) {
+            for (i in startIndexOldPage until startIndexOldPage + pageSize) {
+                if (i in firstPageIndex until totalCount) {
+                    appState.filteredList.set(index = i, element = null)
+                }
             }
         }
+        else {
+            for (i in startIndexOldPage until startIndexOldPage + pageSize) {
+                if (i in firstPageIndex until totalCount) {
+                    appState.lazyModelList.set(index = i, element = null)
+                }
+            }
+        }
+
     }
 
     // TODO: selectPlaylistWithLanguageSet, selectModel, setLanguageAndSelectModel
@@ -156,36 +216,36 @@ class LazyTableViewModel(
 
     // Checks with the passed firstVisibleItemIndex from the UI, if it's time to load new pages
     fun isTimeToLoadPage(firstVisibleItemIndex: Int): Boolean {
-        if (firstVisibleItemIndex < 0) throw IllegalArgumentException("firstVisibleItemIndex should be positive")
+        if (firstVisibleItemIndex < firstPageIndex) throw IllegalArgumentException("firstVisibleItemIndex should be positive")
         if (firstVisibleItemIndex >= totalCount) throw IllegalArgumentException("firstVisibleItemIndex should be smaller than total count")
 
-        val pageNumberForVisibleIndex = calculatePageNumberForListIndex(firstVisibleItemIndex)
+        val pageNumberForVisibleIndex = getPageNr(firstVisibleItemIndex)
 
         // Catch all edge cases, to load only data if necessarily
-        if (pageNumberForVisibleIndex == 0) {
-            return !isPageNrInCache(pageNumberForVisibleIndex)
-                    || !isPageNrInCache(1)
-                    || !isPageNrInCache(2)
-        } else if (pageNumberForVisibleIndex > nbrOfTotalPages) {
-            return !isPageNrInCache(pageNumberForVisibleIndex)
-                    || !isPageNrInCache(pageNumberForVisibleIndex - 1)
-                    || !isPageNrInCache(pageNumberForVisibleIndex + 1)
-        } else if (pageNumberForVisibleIndex > nbrOfTotalPages - 1) {
-            return !isPageNrInCache(pageNumberForVisibleIndex)
-                    || !isPageNrInCache(pageNumberForVisibleIndex - 1)
+        if (pageNumberForVisibleIndex == firstPageIndex) {
+            return !isPageInCache(pageNumberForVisibleIndex)
+                    || !isPageInCache(1)
+                    || !isPageInCache(2)
+        } else if (pageNumberForVisibleIndex > totalPages) {
+            return !isPageInCache(pageNumberForVisibleIndex)
+                    || !isPageInCache(pageNumberForVisibleIndex - 1)
+                    || !isPageInCache(pageNumberForVisibleIndex + 1)
+        } else if (pageNumberForVisibleIndex > totalPages - 1) {
+            return !isPageInCache(pageNumberForVisibleIndex)
+                    || !isPageInCache(pageNumberForVisibleIndex - 1)
         } else {
-            return !isPageNrInCache(pageNumberForVisibleIndex)
-                    || !isPageNrInCache(pageNumberForVisibleIndex - 1)
-                    || !isPageNrInCache(pageNumberForVisibleIndex + 1)
-                    || !isPageNrInCache(pageNumberForVisibleIndex + 2)
+            return !isPageInCache(pageNumberForVisibleIndex)
+                    || !isPageInCache(pageNumberForVisibleIndex - 1)
+                    || !isPageInCache(pageNumberForVisibleIndex + 1)
+                    || !isPageInCache(pageNumberForVisibleIndex + 2)
         }
     }
 
-    internal fun calculatePageNumberForListIndex(listIndex: Int): Int = listIndex / pageSize
+    internal fun getPageNr(firstVisibleItemIndex: Int): Int = firstVisibleItemIndex / pageSize
 
-    internal fun calculatePageStartIndexToLoad(pageNr: Int): Int = pageNr * pageSize
+    internal fun getStartIndexOfPage(pageNr: Int): Int = pageNr * pageSize
 
-    internal fun isPageNrInCache(pageNr: Int): Boolean = cache.containsKey(pageNr)
+    internal fun isPageInCache(pageNr: Int): Boolean = cache.containsKey(pageNr)
 
     private fun forceRecompose() {
         recomposeStateChanger = !recomposeStateChanger

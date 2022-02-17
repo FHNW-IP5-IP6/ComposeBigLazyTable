@@ -94,39 +94,6 @@ internal class LazyTableViewModelTest {
         }
     }
 
-    @Test
-    fun `currentPage is 0 without doing any work`() {
-        printTestMethodName(object {}.javaClass.enclosingMethod.name)
-        assertEquals(0, viewModel.currentPage)
-    }
-
-    // TODO:
-    @Disabled("Index 0 out of bounds for length 0")
-    @Test
-    fun `currentPage is 24_999 after loadAllNeededPagesForIndex 999_999`() {
-        printTestMethodName(object {}.javaClass.enclosingMethod.name)
-        viewModel.loadAllNeededPagesForIndex(999_999)
-        assertEquals(24_999, viewModel.currentPage)
-    }
-
-    // TODO: When there is no Exception thrown at loadAllNeededPagesForIndex then too big indexes are possible
-    @Disabled("Index 0 out of bounds for length 0")
-    @Test
-    fun `currentPage is 25_000 after loadAllNeededPagesForIndex 1_000_000`() {
-        printTestMethodName(object {}.javaClass.enclosingMethod.name)
-        viewModel.loadAllNeededPagesForIndex(1_000_000)
-        assertEquals(25_000, viewModel.currentPage)
-    }
-
-    // TODO: When there is no Exception thrown at loadAllNeededPagesForIndex then too big indexes are possible
-    //  and set currentPage to a value which is higher than the last possible page nr
-    @Test
-    fun `currentPage is 25_001 after loadAllNeededPagesForIndex 1_000_050`() {
-        printTestMethodName(object {}.javaClass.enclosingMethod.name)
-        viewModel.loadAllNeededPagesForIndex(1_000_050)
-        assertEquals(25_001, viewModel.currentPage)
-    }
-
     // TODO:
     @Disabled("Exception in thread 'AWT-EventQueue-0 @coroutine#' java.lang.NoClassDefFoundError: Could not initialize class demo.bigLazyTable.model.AppState")
     @Test
@@ -143,8 +110,8 @@ internal class LazyTableViewModelTest {
         val isNumberOfPlaylistsAndPageSizeEven = numberOfPlaylists % 2 == 0 && viewModel.pageSize % 2 == 0
         val numberDividedByPageSize = numberOfPlaylists / viewModel.pageSize
         val expected = if (isNumberOfPlaylistsAndPageSizeEven) numberDividedByPageSize else numberDividedByPageSize + 1
-        assertEquals(expected, viewModel.nbrOfTotalPages)
-        Log.info { "expected: $expected == actual ${viewModel.nbrOfTotalPages}" }
+        assertEquals(expected, viewModel.totalPages)
+        Log.info { "expected: $expected == actual ${viewModel.totalPages}" }
     }
 
     // TODO:
@@ -239,7 +206,7 @@ internal class LazyTableViewModelTest {
 //        assertTrue(returnValue is List<*>)
         runBlocking {
             // TODO: Why do both return an empty list???
-            val playlistModels = viewModel.loadPageAndMapToModels(startIndexOfPage = 5665)
+            val playlistModels = viewModel.loadPageOfPlaylistModels(startIndexOfPage = 5665)
             val x = pagingService.getPage(startIndex = 0, pageSize = pageSize)
             println(x)
             assertEquals(0, x.first())
@@ -253,7 +220,7 @@ internal class LazyTableViewModelTest {
         )
         viewModel.addPageToCache(pageNr = 0, pageOfModels = playlistModels)
 
-        assertTrue(viewModel.isPageNrInCache(0))
+        assertTrue(viewModel.isPageInCache(0))
     }
 
     @Test
@@ -263,7 +230,7 @@ internal class LazyTableViewModelTest {
         )
         viewModel.addPageToCache(pageNr = 1, pageOfModels = playlistModels)
 
-        assertTrue(viewModel.isPageNrInCache(1))
+        assertTrue(viewModel.isPageInCache(1))
     }
 
     @Test
@@ -273,7 +240,7 @@ internal class LazyTableViewModelTest {
         )
         viewModel.addPageToCache(pageNr = 1, pageOfModels = playlistModels)
 
-        assertFalse(viewModel.isPageNrInCache(45))
+        assertFalse(viewModel.isPageInCache(45))
     }
 
     @Test
@@ -407,61 +374,61 @@ internal class LazyTableViewModelTest {
 
     @Test
     fun `calculatePageNumberForListIndex works with list index 0`() {
-        val pageNumber = viewModel.calculatePageNumberForListIndex(listIndex = 0)
+        val pageNumber = viewModel.getPageNr(firstVisibleItemIndex = 0)
         assertEquals(0, pageNumber)
     }
 
     @Test
     fun `calculatePageNumberForListIndex works with list index 40`() {
-        val pageNumber = viewModel.calculatePageNumberForListIndex(listIndex = 40)
+        val pageNumber = viewModel.getPageNr(firstVisibleItemIndex = 40)
         assertEquals(1, pageNumber)
     }
 
     @Test
     fun `calculatePageNumberForListIndex works with list index 25_000`() {
-        val pageNumber = viewModel.calculatePageNumberForListIndex(listIndex = 25_000)
+        val pageNumber = viewModel.getPageNr(firstVisibleItemIndex = 25_000)
         assertEquals(625, pageNumber)
     }
 
     @Test
     fun `calculatePageNumberForListIndex works with list index 999_960`() {
-        val pageNumber = viewModel.calculatePageNumberForListIndex(listIndex = 999_960)
+        val pageNumber = viewModel.getPageNr(firstVisibleItemIndex = 999_960)
         assertEquals(24_999, pageNumber)
     }
 
     @Test
     fun `calculatePageNumberForListIndex works with list index 999_961`() {
-        val pageNumber = viewModel.calculatePageNumberForListIndex(listIndex = 999_961)
+        val pageNumber = viewModel.getPageNr(firstVisibleItemIndex = 999_961)
         assertEquals(24_999, pageNumber)
     }
 
     @Test
     fun `calculatePageNumberForListIndex works with list index 1_000_000`() {
-        val pageNumber = viewModel.calculatePageNumberForListIndex(listIndex = 1_000_000)
+        val pageNumber = viewModel.getPageNr(firstVisibleItemIndex = 1_000_000)
         assertEquals(25_000, pageNumber)
     }
 
     @Test
     fun `calculatePageStartIndexToLoad works with pageNr 0`() {
-        val startIndexToLoad = viewModel.calculatePageStartIndexToLoad(pageNr = 0)
+        val startIndexToLoad = viewModel.getStartIndexOfPage(pageNr = 0)
         assertEquals(0, startIndexToLoad)
     }
 
     @Test
     fun `calculatePageStartIndexToLoad works with pageNr 1`() {
-        val startIndexToLoad = viewModel.calculatePageStartIndexToLoad(pageNr = 1)
+        val startIndexToLoad = viewModel.getStartIndexOfPage(pageNr = 1)
         assertEquals(40, startIndexToLoad)
     }
 
     @Test
     fun `calculatePageStartIndexToLoad works with pageNr 2`() {
-        val startIndexToLoad = viewModel.calculatePageStartIndexToLoad(pageNr = 2)
+        val startIndexToLoad = viewModel.getStartIndexOfPage(pageNr = 2)
         assertEquals(80, startIndexToLoad)
     }
 
     @Test
     fun `calculatePageStartIndexToLoad works with pageNr 625`() {
-        val startIndexToLoad = viewModel.calculatePageStartIndexToLoad(pageNr = 625)
+        val startIndexToLoad = viewModel.getStartIndexOfPage(pageNr = 625)
         assertEquals(25_000, startIndexToLoad)
     }
 
@@ -469,13 +436,13 @@ internal class LazyTableViewModelTest {
     @Disabled("expected: <true> but was: <false>")
     @Test
     fun `isPageInCache works with pageNr 1`() {
-        val isInCache = viewModel.isPageNrInCache(1)
+        val isInCache = viewModel.isPageInCache(1)
         assertEquals(true, isInCache)
     }
 
     @Test
     fun `isPageInCache doesnt work with pageNr 5345`() {
-        val isInCache = viewModel.isPageNrInCache(5345)
+        val isInCache = viewModel.isPageInCache(5345)
         assertEquals(false, isInCache)
     }
 

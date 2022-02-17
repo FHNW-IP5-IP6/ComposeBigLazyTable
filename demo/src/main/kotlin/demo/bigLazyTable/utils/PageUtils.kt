@@ -17,17 +17,18 @@ import kotlin.math.ceil
 //
 // In short, it depends if you want to pollute namespaces or not.
 // https://stackoverflow.com/questions/57318508/when-should-i-use-object-type-vs-straight-kotlin-file
-object MathUtils {
+object PageUtils {
 
     /**
      * Just a Wrapper function around the Kotlin [ceil] function with two Int Parameters
-     * @param number the number which should be divided
-     * @param dividedBy the number which divides [number]
-     * @return the next bigger int - Example: 10 / 3 = 4, where number=10 & dividedBy=3
+     * @param totalCount the total number of items which will be displayed
+     * @param pageSize the defined pageSize which will divide the [totalCount]
+     * @return the total pages for the defined [totalCount] & [pageSize] which is just the next bigger int of the
+     * division of those values - Example: 10 / 3 = 4, where [totalCount]=10 & [pageSize]=3
      */
-    fun roundDivisionToNextBiggerInt(
-        number: Int,
-        dividedBy: Int
-    ): Int = ceil(number.toDouble() / dividedBy).toInt()
+    fun getTotalPages(
+        totalCount: Int,
+        pageSize: Int
+    ): Int = ceil(totalCount.toDouble() / pageSize).toInt()
 
 }
