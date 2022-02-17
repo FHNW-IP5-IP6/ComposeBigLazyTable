@@ -39,6 +39,12 @@ class AppState(pagingService: IPagingService<*>) {
 
     lateinit var filteredList: MutableList<PlaylistModel?>
 
+    fun x() {
+        val x = ArrayList(Collections.nCopies(1_000_000, null))
+        x.clear()
+        x.addAll(ArrayList(Collections.nCopies(80, null)))
+    }
+
     // TODO:
 //    val filteredList = { filteredCount: Int -> ArrayList(Collections.nCopies(filteredCount, null)) }
 

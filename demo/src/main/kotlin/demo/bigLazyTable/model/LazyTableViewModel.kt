@@ -38,6 +38,12 @@ class LazyTableViewModel(
             val filteredCount = pagingService.getFilteredCount(newFilter)
 //            appState.displayedItemsCount = filteredCount
             appState.filteredList = ArrayList(ArrayList(Collections.nCopies(filteredCount, null)))
+
+            loadFirstPagesToFillCacheAndAddToAppStateList()
+            selectFirstPlaylist()
+            // TODO: Check also loadAllNeededPagesForIndex(0) instead of upper 2 calls
+
+            forceRecompose()
         }
     }
 
