@@ -12,7 +12,10 @@ import demo.bigLazyTable.data.database.SqliteDb
 import demo.bigLazyTable.model.AppState
 import demo.bigLazyTable.model.LazyTableViewModel
 import demo.bigLazyTable.ui.BigLazyTableUI
+import java.awt.Cursor
 import java.awt.Dimension
+
+lateinit var frameWindowScope: FrameWindowScope
 
 /**
  * @author Marco Sprenger, Livio Näf
@@ -24,6 +27,11 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "ComposeLists"
     ) {
+        // TODO: https://github.com/JetBrains/compose-jb/tree/master/tutorials/Mouse_Events#mouse-scroll-listeners
+//          https://github.com/JetBrains/compose-jb/tree/master/tutorials/Mouse_Events#mouse-rightmiddle-clicks-and-keyboard-modifiers
+
+        frameWindowScope = this
+
         // Needs remember. Without it, the first language change in no full-screen leads to a full-screen window
         remember { initializeWindowSize() }
 
@@ -58,4 +66,8 @@ fun FrameWindowScope.initializeWindowSize() {
         minimumSize = Dimension(1000, 800)
         placement = WindowPlacement.Maximized
     }
+}
+
+fun FrameWindowScope.getDefaultCursor() {
+    window.cursor = Cursor.getDefaultCursor()
 }

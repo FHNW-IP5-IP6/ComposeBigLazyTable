@@ -22,7 +22,7 @@ fun LazyTable(
     horizontalScrollState: ScrollState,
     appState: AppState
 ) {
-    val lazyListItems = appState.lazyModelList
+    val lazyListItems = if (viewModel.isFiltering) appState.filteredList else appState.lazyModelList
     val verticalLazyListState = rememberLazyListState()
 
     with(viewModel) {
@@ -39,9 +39,7 @@ fun LazyTable(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 state = verticalLazyListState
             ) {
-                items(
-                    items = lazyListItems
-                ) { playlistModel ->
+                items(items = lazyListItems) { playlistModel ->
                     when (playlistModel) {
                         null -> PlaylistRowPlaceholder(
                             horizontalScrollState = horizontalScrollState,

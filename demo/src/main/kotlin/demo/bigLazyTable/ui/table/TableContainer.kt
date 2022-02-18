@@ -31,7 +31,8 @@ fun RowScope.TableContainer(
             //PageInfoRow(viewModel = viewModel, currentPage = currentPage)
             HeaderRow(
                 horizontalScrollState = horizontalScrollState,
-                appState = appState
+                appState = appState,
+                viewModel = viewModel
             )
             LazyTable(
                 viewModel = viewModel,

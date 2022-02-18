@@ -23,7 +23,9 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
     private val name = StringAttribute(
         model = this,
         label = BLTLabels.NAME,
-        value = playlist.name
+        value = playlist.name,
+//      canBeFiltered: Boolean,
+//      databaseField: Column<*>/DatabasePlaylist
     )
 
     private val collaborative = BooleanAttribute(
