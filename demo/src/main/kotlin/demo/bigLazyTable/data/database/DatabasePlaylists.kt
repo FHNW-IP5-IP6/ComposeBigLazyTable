@@ -5,6 +5,7 @@ import org.jetbrains.exposed.sql.Table
 /**
  * @author Marco Sprenger, Livio Näf
  */
+// TODO: Align all =
 object DatabasePlaylists : Table() {
     val id = long("id")
     val name = varchar("name", length = 100)

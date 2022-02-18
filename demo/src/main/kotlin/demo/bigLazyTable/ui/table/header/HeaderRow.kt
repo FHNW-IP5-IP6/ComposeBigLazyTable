@@ -58,6 +58,8 @@ fun HeaderRow(
                                 IconButton(
                                     onClick = { viewModel.onNameFilterChanged("") },
 //                                    TODO: Why does it show the text cursor and not normal/hand?
+//                                    https://stackoverflow.com/questions/4274606/how-to-change-cursor-icon-in-java
+//                                    https://stackoverflow.com/questions/64855189/clickable-areas-of-image-mouseover-event-jetpack-compose-desktop
 //                                    modifier = Modifier.pointerMoveFilter(
 //                                        onEnter = {
 //                                            frameWindowScope.window.cursor = Cursor(HAND_CURSOR)

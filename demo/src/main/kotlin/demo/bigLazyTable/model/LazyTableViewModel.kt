@@ -15,6 +15,7 @@ private val Log = KotlinLogging.logger {}
  * TODO: Short description what this class is used for
  * @author Marco Sprenger, Livio Näf
  */
+// rename to Controller
 class LazyTableViewModel(
     private val pagingService: IPagingService<*>,
     val pageSize: Int = 40,
@@ -37,7 +38,11 @@ class LazyTableViewModel(
         if (isFiltering) {
             val filteredCount = pagingService.getFilteredCount(newFilter)
 //            appState.displayedItemsCount = filteredCount
-            appState.filteredList = ArrayList(ArrayList(Collections.nCopies(filteredCount, null)))
+            appState.filteredList = Collections.nCopies(filteredCount, null)
+
+            // TODO: Add Scheduler call
+//            scheduler.set {  }
+            Scheduler.set { loadAllNeededPagesForIndex(0) }
 
             loadFirstPagesToFillCacheAndAddToAppStateList()
             selectFirstPlaylist()

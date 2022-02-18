@@ -27,6 +27,9 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "ComposeLists"
     ) {
+        // TODO: https://github.com/JetBrains/compose-jb/tree/master/tutorials/Mouse_Events#mouse-scroll-listeners
+//          https://github.com/JetBrains/compose-jb/tree/master/tutorials/Mouse_Events#mouse-rightmiddle-clicks-and-keyboard-modifiers
+
         frameWindowScope = this
 
         // Needs remember. Without it, the first language change in no full-screen leads to a full-screen window
