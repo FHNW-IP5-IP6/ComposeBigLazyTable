@@ -7,7 +7,6 @@ import kotlinx.coroutines.*
 import mu.KotlinLogging
 import org.junit.platform.commons.util.LruCache
 import java.util.*
-import kotlin.collections.ArrayList
 
 private val Log = KotlinLogging.logger {}
 
@@ -15,8 +14,7 @@ private val Log = KotlinLogging.logger {}
  * TODO: Short description what this class is used for
  * @author Marco Sprenger, Livio Näf
  */
-// rename to Controller
-class LazyTableViewModel(
+class LazyTableController(
     private val pagingService: IPagingService<*>,
     val pageSize: Int = 40,
     private val appState: AppState
@@ -42,7 +40,7 @@ class LazyTableViewModel(
 
             // TODO: Add Scheduler call
 //            scheduler.set {  }
-            Scheduler.set { loadAllNeededPagesForIndex(0) }
+            scheduler.set { loadAllNeededPagesForIndex(0) }
 
             loadFirstPagesToFillCacheAndAddToAppStateList()
             selectFirstPlaylist()
@@ -52,7 +50,7 @@ class LazyTableViewModel(
         }
     }
 
-    val scheduler = Scheduler
+    val scheduler = Scheduler()
 
     private val totalCount by lazy { pagingService.getTotalCount() }
     val totalPages = PageUtils.getTotalPages(totalCount = totalCount, pageSize = pageSize)
@@ -60,14 +58,6 @@ class LazyTableViewModel(
 //    var totalDisplayedItems = if (nameFilter == "") totalCount else filteredCount(nameFilter)
 
     private var oldFirstVisibleItemIndex = firstPageIndex
-    var currentPage by mutableStateOf(0)
-    val nbrOfTotalPages by lazy {
-        println("Inside lazy nbrOfTotalPages")
-        MathUtils.roundDivisionToNextBiggerInt(
-            number = totalCount,
-            dividedBy = pageSize
-        )
-    }
 
     private val cacheSize = 4
     private val cache: LruCache<Int, List<PlaylistModel>> = LruCache(cacheSize)
@@ -96,7 +86,7 @@ class LazyTableViewModel(
         val fullList = if (isFiltering) appState.filteredList else appState.lazyModelList
         println("loadFirstPagesAndFillCacheAndSelectFirstPlaylist: appState.list size = ${fullList.size}")
         // TODO: NullPointerException
-        selectPlaylist(fullList.first()!!)
+        selectPlaylistModel(fullList.first()!!)
     }
 
     fun loadAllNeededPagesForIndex(firstVisibleItemIndex: Int) {
@@ -221,17 +211,12 @@ class LazyTableViewModel(
 
     }
 
-    // TODO: selectPlaylistWithLanguageSet, selectModel, setLanguageAndSelectModel
-    fun selectPlaylist(playlistModel: PlaylistModel) {
-        println("selectPlaylist ${playlistModel.id}")
+    fun selectPlaylistModel(playlistModel: PlaylistModel) {
         setCurrentLanguage(playlistModel = playlistModel)
         appState.selectedPlaylistModel = playlistModel
     }
 
     private fun setCurrentLanguage(playlistModel: PlaylistModel) {
-        val currentLanguage = playlistModel.getCurrentLanguage()
-        println("ViewModel setCurrentLanguage")
-        println("defaultPlaylistModel = ${appState.defaultPlaylistModel}")
         val currentLanguage = appState.defaultPlaylistModel.getCurrentLanguage()
         playlistModel.setCurrentLanguage(currentLanguage)
     }

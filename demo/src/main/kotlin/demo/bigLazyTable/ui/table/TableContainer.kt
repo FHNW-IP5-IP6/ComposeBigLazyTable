@@ -7,9 +7,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import demo.bigLazyTable.model.AppState
-import demo.bigLazyTable.model.LazyTableViewModel
+import demo.bigLazyTable.model.LazyTableController
 import demo.bigLazyTable.ui.table.header.HeaderRow
-import demo.bigLazyTable.ui.table.header.PageInfoRow
 import demo.bigLazyTable.ui.theme.*
 
 /**
@@ -18,7 +17,7 @@ import demo.bigLazyTable.ui.theme.*
 @Composable
 fun RowScope.TableContainer(
     weight: Float,
-    viewModel: LazyTableViewModel,
+    controller: LazyTableController,
     appState: AppState
 ) {
     val horizontalScrollState = rememberScrollState()
@@ -28,14 +27,13 @@ fun RowScope.TableContainer(
             modifier = Modifier.padding(horizontal = 5.dp),
             verticalArrangement = Arrangement.Top
         ) {
-            //PageInfoRow(viewModel = viewModel, currentPage = currentPage)
             HeaderRow(
                 horizontalScrollState = horizontalScrollState,
                 appState = appState,
-                viewModel = viewModel
+                controller = controller
             )
             LazyTable(
-                viewModel = viewModel,
+                controller = controller,
                 horizontalScrollState = horizontalScrollState,
                 appState = appState
             )

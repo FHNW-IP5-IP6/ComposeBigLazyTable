@@ -7,12 +7,10 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
-import bigLazyTable.paging.IPagingService
 import demo.bigLazyTable.data.database.DBService
 import demo.bigLazyTable.data.database.SqliteDb
 import demo.bigLazyTable.model.AppState
-import demo.bigLazyTable.model.LazyTableViewModel
-import demo.bigLazyTable.model.Playlist
+import demo.bigLazyTable.model.LazyTableController
 import demo.bigLazyTable.ui.BigLazyTableUI
 import java.awt.Cursor
 import java.awt.Dimension
@@ -29,8 +27,6 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "ComposeLists"
     ) {
-        // TODO: https://github.com/JetBrains/compose-jb/tree/master/tutorials/Mouse_Events#mouse-scroll-listeners
-//          https://github.com/JetBrains/compose-jb/tree/master/tutorials/Mouse_Events#mouse-rightmiddle-clicks-and-keyboard-modifiers
 
         frameWindowScope = this
 
@@ -45,19 +41,19 @@ fun main() = application {
             ).initializeConnection()
         }
 
-        val service = DBService
+        val service = DBService(40)
 
         // Needs remember. Without it, the view just shows empty (...) Items (happens after language change)
         val appState = remember { AppState(pagingService = service) }
 
-        val viewModel = remember {
-            LazyTableViewModel(
+        val controller = remember {
+            LazyTableController(
                 pagingService = service,
                 appState = appState
             ) // side effect: init loads first data to display
         }
         BigLazyTableUI(
-            viewModel = viewModel,
+            controller = controller,
             appState = appState
         )
     }

@@ -20,7 +20,7 @@ class LazyTableKtTestVariantJUnit5 {
 //        rule.setContent {
 //            val scrollState = rememberScrollState()
 //            LazyTable(
-//                viewModel = LazyTableViewModel(
+//                viewModel = LazyTableController(
 //                    FakePagingService(
 //                        numberOfPlaylists = 1_000_000,
 //                        pageSize = 40

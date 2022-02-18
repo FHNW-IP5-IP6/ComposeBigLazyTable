@@ -12,9 +12,9 @@ import org.junit.jupiter.api.assertThrows
 
 private val Log = KotlinLogging.logger {}
 
-internal class LazyTableViewModelTest {
+internal class LazyTableControllerTest {
 
-    private lateinit var viewModel: LazyTableViewModel
+    private lateinit var viewModel: LazyTableController
     private lateinit var pagingService: FakePagingService
     private lateinit var appState: AppState
 
@@ -28,7 +28,7 @@ internal class LazyTableViewModelTest {
             pageSize = pageSize
         )
         appState = AppState(pagingService = pagingService)
-        viewModel = LazyTableViewModel(
+        viewModel = LazyTableController(
             pagingService = pagingService,
             pageSize = pageSize,
             appState = appState
@@ -127,7 +127,7 @@ internal class LazyTableViewModelTest {
 
         // when
         playlistModel.setCurrentLanguage("deutsch")
-        viewModel.selectPlaylist(playlistModel = playlistModel)
+        viewModel.selectPlaylistModel(playlistModel = playlistModel)
 
         // then
         assertEquals(playlistModel, appState.selectedPlaylistModel)
@@ -147,7 +147,7 @@ internal class LazyTableViewModelTest {
 
         // when
         playlistModel.setCurrentLanguage("english")
-        viewModel.selectPlaylist(playlistModel = playlistModel)
+        viewModel.selectPlaylistModel(playlistModel = playlistModel)
 
         // then
         assertEquals(playlistModel, appState.selectedPlaylistModel)
@@ -160,7 +160,7 @@ internal class LazyTableViewModelTest {
         val playlistModel = PlaylistModel(Playlist(name = "test"), appState)
 
         // when
-        viewModel.selectPlaylist(playlistModel = playlistModel)
+        viewModel.selectPlaylistModel(playlistModel = playlistModel)
 
         // then
         assertEquals(playlistModel, appState.selectedPlaylistModel)
@@ -174,7 +174,7 @@ internal class LazyTableViewModelTest {
         // then
         assertDoesNotThrow {
             // when
-            viewModel.selectPlaylist(playlistModel = playlistModel)
+            viewModel.selectPlaylistModel(playlistModel = playlistModel)
         }
     }
 
@@ -184,7 +184,7 @@ internal class LazyTableViewModelTest {
         val playlistModel = PlaylistModel(Playlist(), appState)
 
         // when
-        viewModel.selectPlaylist(playlistModel = playlistModel)
+        viewModel.selectPlaylistModel(playlistModel = playlistModel)
 
         // then
         assertEquals(playlistModel, appState.selectedPlaylistModel)
@@ -195,9 +195,9 @@ internal class LazyTableViewModelTest {
     @Test
     fun `loadPageAndMapToPlaylistModels works with 0 as startIndexOfPage`() {
         // when
-//        // TODO: java.lang.NoSuchMethodException: demo.bigLazyTable.model.LazyTableViewModel.loadPageAndMapToPlaylistModels(int)
+//        // TODO: java.lang.NoSuchMethodException: demo.bigLazyTable.model.LazyTableController.loadPageAndMapToPlaylistModels(int)
 //        val loadPageAndMapToPlaylistModels =
-//            LazyTableViewModel::class.java.getDeclaredMethod("loadPageAndMapToPlaylistModels", Int::class.java).apply {
+//            LazyTableController::class.java.getDeclaredMethod("loadPageAndMapToPlaylistModels", Int::class.java).apply {
 //                isAccessible = true
 //            }
 //        val startIndexOfPage = 0
