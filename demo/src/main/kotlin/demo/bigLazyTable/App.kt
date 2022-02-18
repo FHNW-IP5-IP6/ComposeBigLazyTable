@@ -7,10 +7,12 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
+import bigLazyTable.paging.IPagingService
 import demo.bigLazyTable.data.database.DBService
 import demo.bigLazyTable.data.database.SqliteDb
 import demo.bigLazyTable.model.AppState
 import demo.bigLazyTable.model.LazyTableViewModel
+import demo.bigLazyTable.model.Playlist
 import demo.bigLazyTable.ui.BigLazyTableUI
 import java.awt.Cursor
 import java.awt.Dimension

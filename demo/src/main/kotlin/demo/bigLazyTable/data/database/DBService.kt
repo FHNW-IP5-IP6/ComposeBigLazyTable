@@ -6,10 +6,16 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
+// TODO: What is better Design?
+//  1. pass pageSize as param of the class
+//  2. pass pageSize as param of the getPage method
+
 /**
  * @author Marco Sprenger, Livio Näf
  */
-object DBService : IPagingService<Playlist> {
+// TODO: Adding own pageSize like this?
+// TODO: If I want to set a default value for pageSize to super.pageSize -> No supertypes are accessible in this context
+class DBService(override val pageSize: Int) : IPagingService<Playlist> {
 
     private val lastIndex by lazy {
         val totalCount = getTotalCount() - 1
