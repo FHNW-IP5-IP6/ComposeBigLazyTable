@@ -57,9 +57,7 @@ import composeForms.model.attributes.SelectionAttribute
 import composeForms.model.meanings.Default
 import composeForms.model.modelElements.Group
 import composeForms.model.modelElements.HeaderGroup
-import composeForms.ui.theme.ColorsUtil
-import composeForms.ui.theme.DropdownColors
-import composeForms.ui.theme.FormColors
+import composeForms.ui.theme.*
 
 val normalChars = listOf('a','b','c','d','e','f','g','h','i','j','k','l','n','o','p','q','r','s','t','u','v','x','y','z')
 val bigChars = listOf('m','w')
@@ -148,7 +146,7 @@ private fun TrailingIcon(attr: Attribute<*,*,*>,
     if(!showReadOnly && attr !is SelectionAttribute<*> && attr.meaning !== Default<Any>()){
         Row(modifier = Modifier.width(trailingIconWidth),
             horizontalArrangement = Arrangement.End){
-            Text(attr.meaning.addMeaning(attr.getValueAsText()), color = ColorsUtil.get(FormColors.RIGHTTRACK))
+            Text(attr.meaning.addMeaning(attr.getValueAsText()), color = RightTrackColor)
         }
     }
 }
@@ -245,7 +243,7 @@ private fun DefaultField(
                 onPreviewKeyEventDefaultField(attr, it, keyEventConsumed, keyEvent)
             },
         readOnly = showReadOnly || isSelectionField,
-        textStyle = TextStyle(color = ColorsUtil.get(FormColors.NORMALTEXT))
+        textStyle = TextStyle(color = NormalTextColor)
     )
 }
 
@@ -263,8 +261,9 @@ private fun DualField(dualAttribute: DualAttribute<*, *, *>, model: IModel<*>, g
     val isHeaderGroup = group is HeaderGroup
 
     val decision1IsSelected = dualAttribute.getValue() == dualAttribute.decision1SaveValue
-    val colorDecision1 = if(!decision1IsSelected) ColorsUtil.get(FormColors.RIGHTTRACK) else ColorsUtil.get(FormColors.NORMALTEXT)
-    val colorDecision2 = if(decision1IsSelected) ColorsUtil.get(FormColors.RIGHTTRACK) else ColorsUtil.get(FormColors.NORMALTEXT)
+
+    val colorDecision1 = if(!decision1IsSelected) RightTrackColor else NormalTextColor
+    val colorDecision2 = if(decision1IsSelected) RightTrackColor else NormalTextColor
 
     if(model.getCurrentFocusedAttribute() == dualAttribute){
         model.setFocusBlocked(true)
@@ -421,16 +420,11 @@ private fun DropDownElement(model: IModel<*>,
                             remove: (Any) -> Unit){
 
     val elementIsSelected       = currentSelectionValue.contains(label)
-    val elementIsSelectedBackgroundColor  = if(elementIsSelected) ColorsUtil.get(DropdownColors.BACKGROUND_ELEMENT_SEL)
-    else ColorsUtil.get(DropdownColors.BACKGROUND_ELEMENT_NOT_SEL)
-    val elementIsSelectedTextColor = if(elementIsSelected) {
-        ColorsUtil.get(DropdownColors.TEXT_ELEMENT_SEL)
-    } else {
-        ColorsUtil.get(DropdownColors.TEXT_ELEMENT_NOT_SEL)
-    }
+    val elementIsSelectedBackgroundColor  = if(elementIsSelected) BackgroundElementSel else BackgroundElementNotSel
+    val elementIsSelectedTextColor = if(elementIsSelected) TextElementSel else TextElementNotSel
 
     val borderStroke = if(index == selectedIndex.value){
-        BorderStroke(2.dp, ColorsUtil.get(FormColors.BACKGROUND_COLOR_GROUPS))
+        BorderStroke(2.dp, BackgroundColorGroups)
     }else{
         BorderStroke(0.dp, Color.Transparent)
     }

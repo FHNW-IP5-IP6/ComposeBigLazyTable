@@ -43,7 +43,11 @@ import composeForms.model.modelElements.Field
 import composeForms.model.modelElements.FieldSize
 import composeForms.model.modelElements.Group
 import composeForms.model.modelElements.HeaderGroup
-import composeForms.ui.theme.ColorsUtil.Companion.get
+import composeForms.ui.theme.BackgroundColorGroups
+import composeForms.ui.theme.BackgroundColorHeader
+import composeForms.ui.theme.ColorsUtil.get
+import composeForms.ui.theme.FontOnBackground
+//import composeForms.ui.theme.ColorsUtil.Companion.get
 import composeForms.ui.theme.FormColors
 
 /**
@@ -114,7 +118,7 @@ private fun HeaderGroup(model: IModel<*>, group: HeaderGroup<*>, isOpen: Boolean
 
             group.bottomSideHeader()
 
-            Divider(color = get(FormColors.BACKGROUND_COLOR_HEADER))
+            Divider(color = BackgroundColorHeader)
         }
     }
 }
@@ -171,14 +175,14 @@ private fun calculateNumberOfFieldsPerCell(group: Group<*>): MutableList<Mutable
  */
 @Composable
 private fun GroupTitle(model: IModel<*>, group: Group<*>, isOpen: Boolean, changeIsOpen: (Boolean) -> Unit = {}){
-    val backgroundColor = if(group is HeaderGroup) get(FormColors.BACKGROUND_COLOR_HEADER) else get(FormColors.BACKGROUND_COLOR_GROUPS)
+    val backgroundColor = if(group is HeaderGroup) BackgroundColorHeader else BackgroundColorGroups
     Card(
         modifier = Modifier.fillMaxWidth().height(38.dp).border(0.dp, Color.Transparent, RoundedCornerShape(10.dp)),
         backgroundColor = backgroundColor
     ){
         BoxWithConstraints(contentAlignment = Alignment.CenterEnd) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                Text(group.getTitle(), color = get(FormColors.FONT_ON_BACKGOUND))
+                Text(group.getTitle(), color = FontOnBackground)
             }
             if(!model.isWizardMode() || group is HeaderGroup) {
                 val icon = if (isOpen) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore
@@ -186,7 +190,7 @@ private fun GroupTitle(model: IModel<*>, group: Group<*>, isOpen: Boolean, chang
                 IconButton(onClick = { changeIsOpen(!isOpen) }, modifier = Modifier.align(Alignment.CenterEnd)){
                     Icon(icon,
                         contentDescription = text,
-                        tint = get(FormColors.FONT_ON_BACKGOUND))
+                        tint = FontOnBackground)
                 }
             }
         }

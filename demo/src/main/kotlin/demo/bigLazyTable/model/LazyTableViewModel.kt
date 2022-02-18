@@ -60,6 +60,14 @@ class LazyTableViewModel(
 //    var totalDisplayedItems = if (nameFilter == "") totalCount else filteredCount(nameFilter)
 
     private var oldFirstVisibleItemIndex = firstPageIndex
+    var currentPage by mutableStateOf(0)
+    val nbrOfTotalPages by lazy {
+        println("Inside lazy nbrOfTotalPages")
+        MathUtils.roundDivisionToNextBiggerInt(
+            number = totalCount,
+            dividedBy = pageSize
+        )
+    }
 
     private val cacheSize = 4
     private val cache: LruCache<Int, List<PlaylistModel>> = LruCache(cacheSize)
@@ -222,6 +230,9 @@ class LazyTableViewModel(
 
     private fun setCurrentLanguage(playlistModel: PlaylistModel) {
         val currentLanguage = playlistModel.getCurrentLanguage()
+        println("ViewModel setCurrentLanguage")
+        println("defaultPlaylistModel = ${appState.defaultPlaylistModel}")
+        val currentLanguage = appState.defaultPlaylistModel.getCurrentLanguage()
         playlistModel.setCurrentLanguage(currentLanguage)
     }
 

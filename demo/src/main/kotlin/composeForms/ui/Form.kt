@@ -36,7 +36,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import composeForms.model.IModel
 import composeForms.model.modelElements.HeaderGroup
-import composeForms.ui.theme.ColorsUtil.Companion.get
+import composeForms.ui.theme.BodyBackground
+import composeForms.ui.theme.ColorsUtil.get
+//import composeForms.ui.theme.ColorsUtil.Companion.get
 import composeForms.ui.theme.FormColors
 import demo.bigLazyTable.model.AppState
 
@@ -60,7 +62,7 @@ class Form {
         val showValidations = remember { mutableStateOf(false) }
         //addDefaultKeyBehaviour(composeForms.model, keyEventsFromUIElement){ showValidations.value = it }
 
-        Column(modifier = Modifier.fillMaxSize().background(get(FormColors.BODY_BACKGROUND))) {
+        Column(modifier = Modifier.fillMaxSize().background(BodyBackground)) {
             Header(model = model, appState = appState) { showValidations.value = it }
             StickyBody(model)
             Body(model, showValidations, keyEventsFromUIElement)

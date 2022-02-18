@@ -60,8 +60,9 @@ import composeForms.model.IModel
 import composeForms.model.attributes.Attribute
 import composeForms.model.attributes.DualAttribute
 import composeForms.model.modelElements.Group
-import composeForms.ui.theme.ColorsUtil.Companion.get
-import composeForms.ui.theme.FormColors
+import composeForms.ui.theme.*
+import composeForms.ui.theme.ColorsUtil.get
+//import composeForms.ui.theme.ColorsUtil.Companion.get
 
 /**
  * Thi file contains the function for specific input field.
@@ -186,17 +187,17 @@ private fun createUndoRedoButton(model: IModel<*>, attr: Attribute<*,*,*>, ctrlS
                 BoxWithTooltip(
                     tooltip = {
                         Surface(modifier = Modifier.shadow(4.dp), shape = RoundedCornerShape(4.dp)) {
-                            Column(modifier = Modifier.wrapContentWidth().background(get(FormColors.BACKGROUND_COLOR_LIGHT)),
+                            Column(modifier = Modifier.wrapContentWidth().background(BackgroundColorLight),
                                 horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
                                     text = model.getTooltipUndo(),
                                     modifier = Modifier.padding(4.dp),
-                                    color = get(FormColors.NORMALTEXT)
+                                    color = NormalTextColor
                                 )
                                 Text(
                                     text = "($ctrlString+Z)",
                                     modifier = Modifier.padding(4.dp),
-                                    color = get(FormColors.LABEL)
+                                    color = LabelColor
                                 )
                             }
                         }
@@ -219,17 +220,17 @@ private fun createUndoRedoButton(model: IModel<*>, attr: Attribute<*,*,*>, ctrlS
                 BoxWithTooltip(
                     tooltip = {
                         Surface(modifier = Modifier.shadow(4.dp), shape = RoundedCornerShape(4.dp)) {
-                            Column(modifier = Modifier.wrapContentWidth().background(get(FormColors.BACKGROUND_COLOR_LIGHT)),
+                            Column(modifier = Modifier.wrapContentWidth().background(BackgroundColorLight),
                                 horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
                                     text = model.getTooltipRedo(),
                                     modifier = Modifier.padding(4.dp),
-                                    color = get(FormColors.NORMALTEXT)
+                                    color = NormalTextColor
                                 )
                                 Text(
                                     text = "($ctrlString+SHIFT+Z)",
                                     modifier = Modifier.padding(4.dp),
-                                    color = get(FormColors.LABEL)
+                                    color = LabelColor
                                 )
                             }
                         }
@@ -311,9 +312,9 @@ private fun ErrorMessage(model: IModel<*>,
                     modifier = Modifier.width(maxWidth-errorIconWidth-4.dp),
                     horizontalArrangement = Arrangement.End) {
                     Card(modifier = Modifier
-                        .border(0.dp, get(FormColors.ERROR), RoundedCornerShape(33))
+                        .border(0.dp, ErrorColor, RoundedCornerShape(33))
                         .fillMaxHeight(),
-                        backgroundColor = get(FormColors.ERROR)
+                        backgroundColor = ErrorColor
                     ) {
                         val scrollState = rememberScrollState(0)
                         ErrorTexts(attr.getErrorMessages(), scrollState)
@@ -328,8 +329,8 @@ private fun ErrorMessage(model: IModel<*>,
                                     thickness = 8.dp,
                                     shape = RectangleShape,
                                     hoverDurationMillis = 0,
-                                    unhoverColor = get(FormColors.ERRORCONTRAST).copy(alpha = 0.3f),
-                                    hoverColor = get(FormColors.ERRORCONTRAST).copy(alpha = 0.4f)
+                                    unhoverColor = ErrorContrastColor.copy(alpha = 0.3f),
+                                    hoverColor = ErrorContrastColor.copy(alpha = 0.4f)
                                 )
                             )
                         }
@@ -362,17 +363,17 @@ private fun ErrorIcon(model: IModel<*>,
         if (error) {
             BoxWithTooltip(tooltip = {
                 Surface(modifier = Modifier.shadow(4.dp), shape = RoundedCornerShape(4.dp)) {
-                    Column(modifier = Modifier.wrapContentWidth().background(get(FormColors.BACKGROUND_COLOR_LIGHT)),
+                    Column(modifier = Modifier.wrapContentWidth().background(BackgroundColorLight),
                         horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = model.getTooltipMessage(),
                             modifier = Modifier.padding(4.dp),
-                            color = get(FormColors.NORMALTEXT)
+                            color = NormalTextColor
                         )
                         Text(
                             text = "($ctrlString+M)",
                             modifier = Modifier.padding(4.dp),
-                            color = get(FormColors.LABEL)
+                            color = LabelColor
                         )
                     }
                 }
@@ -382,7 +383,7 @@ private fun ErrorIcon(model: IModel<*>,
                     onClick = { showErrorMsg.value = !showErrorMsg.value },
                     modifier = Modifier.clip(CircleShape).size(20.dp)
                 ) {
-                    Icon(Icons.Filled.Error, "Error", tint = get(FormColors.ERROR))
+                    Icon(Icons.Filled.Error, "Error", tint = ErrorColor)
                 }
             }
         }
@@ -399,7 +400,7 @@ private fun ErrorTexts(messages: List<String>, scrollState: ScrollState){
             for (msg in messages) {
                 Text(
                     msg,
-                    color = get(FormColors.ERRORCONTRAST),
+                    color = ErrorContrastColor,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier.padding(
@@ -420,14 +421,14 @@ private fun ErrorTexts(messages: List<String>, scrollState: ScrollState){
  * Returning [Color] for focused [attr]
  */
 private fun getFocusedColor(attr: Attribute<*,*,*>): Color{
-    return if(attr.isValid()) get(FormColors.VALID) else if(attr.isRightTrackValid()) get(FormColors.RIGHTTRACK) else get(FormColors.ERROR)
+    return if(attr.isValid()) ValidColor else if(attr.isRightTrackValid()) RightTrackColor else ErrorColor
 }
 
 /**
  * Returning [Color] for unfocused [attr]
  */
 private fun getUnfocusedColor(attr: Attribute<*,*,*>, firstTimeUnfocused: Boolean, showValidationMessages: Boolean): Color{
-    return if((attr.isValid() || (firstTimeUnfocused && !showValidationMessages))) get(FormColors.RIGHTTRACK) else {get(FormColors.ERROR)}
+    return if((attr.isValid() || (firstTimeUnfocused && !showValidationMessages))) RightTrackColor else ErrorColor
 }
 
 /**
