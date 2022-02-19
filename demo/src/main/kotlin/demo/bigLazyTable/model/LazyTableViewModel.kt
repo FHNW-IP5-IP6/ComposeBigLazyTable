@@ -8,6 +8,7 @@ import mu.KotlinLogging
 import org.junit.platform.commons.util.LruCache
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.properties.Delegates
 
 private val Log = KotlinLogging.logger {}
 
@@ -36,25 +37,25 @@ class LazyTableViewModel(
         isFiltering = newFilter != ""
 
         if (isFiltering) {
-            val filteredCount = pagingService.getFilteredCount(newFilter)
-//            appState.displayedItemsCount = filteredCount
-            appState.filteredList = Collections.nCopies(filteredCount, null)
+            filteredCount = pagingService.getFilteredCount(newFilter)
+            appState.filteredList = ArrayList(Collections.nCopies(filteredCount, null))
 
-            // TODO: Add Scheduler call
-//            scheduler.set {  }
-            Scheduler.set { loadAllNeededPagesForIndex(0) }
-
-            loadFirstPagesToFillCacheAndAddToAppStateList()
-            selectFirstPlaylist()
-            // TODO: Check also loadAllNeededPagesForIndex(0) instead of upper 2 calls
-
+            Scheduler().set {
+//                println("onNameFilterChanged: oldFirstVisibleIndex = $oldFirstVisibleItemIndex")
+                // TODO: african music! shows only first item!
+                loadFirstPagesToFillCacheAndAddToAppStateList()
+                loadAllNeededPagesForIndex(oldFirstVisibleItemIndex)
+                selectFirstPlaylist() // TODO: Needed?
+                forceRecompose()
+            }
             forceRecompose()
         }
     }
 
-    val scheduler = Scheduler
+    val scheduler = Scheduler()
 
     private val totalCount by lazy { pagingService.getTotalCount() }
+    private var filteredCount by Delegates.notNull<Int>()
     val totalPages = PageUtils.getTotalPages(totalCount = totalCount, pageSize = pageSize)
 //    private var filteredCount = { filter: String -> pagingService.getFilteredCount(filter = filter) }
 //    var totalDisplayedItems = if (nameFilter == "") totalCount else filteredCount(nameFilter)
@@ -68,11 +69,11 @@ class LazyTableViewModel(
 
     init {
         // Get first cacheSize=4 pages on app initialization, to select one for the forms
-        CoroutineScope(Dispatchers.Main).launch {
+//        CoroutineScope(Dispatchers.Main).launch { // TODO: Check without this
 //            appState.displayedItemsCount = totalCount
             loadFirstPagesToFillCacheAndAddToAppStateList()
             selectFirstPlaylist()
-        }
+//        }
     }
 
     private fun loadFirstPagesToFillCacheAndAddToAppStateList() {
@@ -87,8 +88,7 @@ class LazyTableViewModel(
     private fun selectFirstPlaylist() {
         val fullList = if (isFiltering) appState.filteredList else appState.lazyModelList
         println("loadFirstPagesAndFillCacheAndSelectFirstPlaylist: appState.list size = ${fullList.size}")
-        // TODO: NullPointerException
-        selectPlaylist(fullList.first()!!)
+        fullList.first()?.let { firstPlaylist -> selectPlaylist(firstPlaylist) }
     }
 
     fun loadAllNeededPagesForIndex(firstVisibleItemIndex: Int) {
@@ -166,12 +166,11 @@ class LazyTableViewModel(
     internal fun addToAppStateList(startIndex: Int, newPageNr: Int) {
         if (isFiltering) {
             for (i in startIndex until startIndex + pageSize) {
-                if (i in firstPageIndex until totalCount) {
+                if (i in firstPageIndex until filteredCount-1) {
                     appState.filteredList.set(index = i, element = cache[newPageNr]!![i % pageSize])
                 }
             }
-        }
-        else {
+        } else {
             // Add new page to list
             for (i in startIndex until startIndex + pageSize) {
                 if (i in firstPageIndex until totalCount) {
@@ -202,8 +201,7 @@ class LazyTableViewModel(
                     appState.filteredList.set(index = i, element = null)
                 }
             }
-        }
-        else {
+        } else {
             for (i in startIndexOldPage until startIndexOldPage + pageSize) {
                 if (i in firstPageIndex until totalCount) {
                     appState.lazyModelList.set(index = i, element = null)
