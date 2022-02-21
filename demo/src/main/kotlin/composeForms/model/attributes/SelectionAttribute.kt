@@ -68,10 +68,20 @@ class SelectionAttribute<L>(
         it?.map{ it.getLanguageStringFromLabel(it, model.getCurrentLanguage())}.toString().removePrefix("[").removeSuffix("]")
     }
 
-) : Attribute<SelectionAttribute<L>, Set<L>, L>(model = model, value = value, label = label, required = required, readOnly = readOnly,
-    observedAttributes = observedAttributes, validators = validators, convertibles = convertibles, meaning = meaning,
-    formatter = formatter)
-        where L : ILabel, L: Enum<*> {
+) : Attribute<SelectionAttribute<L>, Set<L>, L>(
+    model = model,
+    value = value,
+    label = label,
+    required = required,
+    readOnly = readOnly,
+    observedAttributes = observedAttributes,
+    validators = validators,
+    convertibles = convertibles,
+    meaning = meaning,
+    formatter = formatter,
+    canBeFiltered = false,
+    databaseField = null
+) where L : ILabel, L: Enum<*> {
 
     override val typeT: Set<L>
         get() = setOf()

@@ -6,6 +6,7 @@ import composeForms.model.modelElements.Field
 import composeForms.model.modelElements.FieldSize
 import composeForms.model.modelElements.Group
 import composeForms.model.modelElements.HeaderGroup
+import demo.bigLazyTable.data.database.DatabasePlaylists
 import java.util.*
 
 /**
@@ -24,8 +25,8 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         model = this,
         label = BLTLabels.NAME,
         value = playlist.name,
-//      canBeFiltered: Boolean,
-//      databaseField: Column<*>/DatabasePlaylist
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.name
     )
 
     private val collaborative = BooleanAttribute(
@@ -33,14 +34,16 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         label = BLTLabels.COLLABORATIVE,
         trueText = BLTLabels.SELECTION_YES,
         falseText = BLTLabels.SELECTION_NO,
-        value = playlist.collaborative
+        value = playlist.collaborative,
     )
 
     private val modifiedAt = StringAttribute(
         model = this,
         label = BLTLabels.MODIFIED_AT,
         required = true,
-        value = playlist.modifiedAt
+        value = playlist.modifiedAt,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.modified_at
     )
 
     private val numTracks = IntegerAttribute(
@@ -82,7 +85,9 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
     private val track0ArtistName = StringAttribute(
         model = this,
         label = BLTLabels.TRACK_ARTIST_NAME,
-        value = playlist.track0ArtistName
+        value = playlist.track0ArtistName,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.track0_artist_name
     )
 
     private val track0TrackName = StringAttribute(
@@ -203,6 +208,8 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
     val lazyListAttributes = listOf(
         id,
         name,
+        modifiedAt,
+        track0ArtistName,
         numTracks,
         numFollowers,
         durationMs,

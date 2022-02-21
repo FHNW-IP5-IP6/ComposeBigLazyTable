@@ -36,33 +36,28 @@ fun HeaderRow(
     ) {
         for (attribute in appState.defaultPlaylistModel.lazyListAttributes) {
             Column {
-                if (attribute.getLabel() == "Name") { // at the moment only name can be filtered!
+                if (attribute.canBeFiltered) {
+
                     TextField(
                         modifier = Modifier.width(180.dp),
-                        value = viewModel.nameFilter,
-                        onValueChange = { viewModel.onNameFilterChanged(it) },
+                        value = viewModel.attributeFilter[attribute].toString(), //viewModel.nameFilter,
+                        onValueChange = {
+                            viewModel.lastFilteredAttribute = attribute // with one filter at a time approach
+                            viewModel.filteredAttributes.add(attribute) // with many filters approach
+
+                            viewModel.onFiltersChanged(attribute, it)
+                        }, //{ viewModel.onNameFilterChanged(it) },
                         textStyle = TextStyle(color = Color.White),
                         label = { Text("Filter", color = Color.White) },
                         singleLine = true,
                         trailingIcon = {
-                            if (viewModel.nameFilter != "") {
-                                IconButton(
-                                    onClick = { viewModel.onNameFilterChanged("") },
-//                                    TODO: Why does it show the text cursor and not normal/hand?
-//                                    https://stackoverflow.com/questions/4274606/how-to-change-cursor-icon-in-java
-//                                    https://stackoverflow.com/questions/64855189/clickable-areas-of-image-mouseover-event-jetpack-compose-desktop
-//                                    modifier = Modifier.pointerMoveFilter(
-//                                        onEnter = {
-//                                            frameWindowScope.window.cursor = Cursor(HAND_CURSOR)
-//                                            println("On Mouse(pointer) Enter")
-//                                            false
-//                                        },
-//                                        onExit = {
-//                                            frameWindowScope.getDefaultCursor()
-//                                            println("on Mouse(pointer) Exit")
-//                                            false
-//                                        })
-                                ) {
+                            if (/*viewModel.nameFilter*/viewModel.attributeFilter[attribute].toString() != "") {
+                                IconButton(onClick = {
+                                    viewModel.lastFilteredAttribute = null
+                                    viewModel.filteredAttributes.remove(attribute)
+                                    viewModel.onFiltersChanged(attribute, "")
+//                                    viewModel.onNameFilterChanged("")
+                                }) {
                                     Icon(
                                         imageVector = Icons.Filled.Close,
                                         contentDescription = "Clear Filter",
@@ -78,7 +73,6 @@ fun HeaderRow(
                         value = "",
                         onValueChange = {},
                         textStyle = TextStyle(color = Color.White),
-//                        label = { Text("Filter", color = Color.White) },
                         singleLine = true,
                         enabled = false
                     )

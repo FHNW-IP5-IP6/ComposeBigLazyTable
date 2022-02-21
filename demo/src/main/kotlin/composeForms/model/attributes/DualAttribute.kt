@@ -60,20 +60,30 @@ abstract class DualAttribute<D,T,L>(
     observedAttributes                  : List<(a: Attribute<*, *, *>) -> Unit>,
     meaning                             : SemanticMeaning<T>
 
-) : Attribute<DualAttribute<D, T, L>, T, L>(model = model, value = value, label = label, required = false,
-    readOnly = readOnly, observedAttributes = observedAttributes,
+) : Attribute<DualAttribute<D, T, L>, T, L>(
+    model = model,
+    value = value,
+    label = label,
+    required = false,
+    readOnly = readOnly,
+    observedAttributes = observedAttributes,
     validators = listOf(
-        object: CustomValidator<T, L>(validationMessage= model.getValidationMessageOfNonSemanticValidator(ValidatorType.DUALVALIDATOR),
-        validationFunction = {
-            it == decision1SaveValue || it == decision2SaveValue
-        }){
+        object :
+            CustomValidator<T, L>(validationMessage = model.getValidationMessageOfNonSemanticValidator(ValidatorType.DUALVALIDATOR),
+                validationFunction = {
+                    it == decision1SaveValue || it == decision2SaveValue
+                }) {
             override fun getDefaultValidationMessage(): String {
                 return "You must choose one of the two options given."
             }
         }
     ),
-    convertibles = emptyList(), meaning = meaning, formatter = IFormatter{ it.toString() })
-        where D : DualAttribute<D, T, L>, L : ILabel, L: Enum<*> {
+    convertibles = emptyList(),
+    meaning = meaning,
+    formatter = IFormatter { it.toString() },
+    canBeFiltered = false,
+    databaseField = null
+) where D : DualAttribute<D, T, L>, L : ILabel, L: Enum<*> {
 
 
     init{

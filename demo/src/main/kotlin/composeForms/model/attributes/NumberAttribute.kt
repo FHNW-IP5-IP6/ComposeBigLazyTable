@@ -61,7 +61,17 @@ abstract class NumberAttribute <N,T,L> (
     meaning                 : SemanticMeaning<T>,
     formatter               : IFormatter<T>?
 
-) : Attribute<N, T, L>(model = model, value = value, label = label, required = required, readOnly = readOnly,
-    observedAttributes = observedAttributes, validators = validators, convertibles = convertibles, meaning = meaning,
-    formatter = formatter)
-        where N : NumberAttribute<N, T, L>, T : Number, T : Comparable<T>, L: Enum<*>, L : ILabel
+) : Attribute<N, T, L>(
+    model = model,
+    value = value,
+    label = label,
+    required = required,
+    readOnly = readOnly,
+    observedAttributes = observedAttributes,
+    validators = validators,
+    convertibles = convertibles,
+    meaning = meaning,
+    formatter = formatter,
+    canBeFiltered = false,
+    databaseField = null
+) where N : NumberAttribute<N, T, L>, T : Number, T : Comparable<T>, L: Enum<*>, L : ILabel

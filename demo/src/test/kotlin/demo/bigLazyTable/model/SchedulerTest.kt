@@ -1,6 +1,5 @@
 package demo.bigLazyTable.model
 
-import kotlinx.coroutines.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -36,7 +35,7 @@ internal class SchedulerTest {
     fun setOverflow() {
         assertDoesNotThrow {
             for (i in 0 until 1_000_000_000) {
-                scheduler.set { doWork() }
+                scheduler.scheduleTask { doWork() }
             }
             Thread.sleep(1000)
         }

@@ -1,8 +1,10 @@
 package demo.bigLazyTable.data.database
 
+import bigLazyTable.paging.Filter
 import bigLazyTable.paging.IPagingService
 import demo.bigLazyTable.model.Playlist
 import demo.bigLazyTable.utils.PageUtils
+import org.jetbrains.exposed.sql.Column
 
 class FakePagingService(val numberOfPlaylists: Int, val pageSize: Int) : IPagingService<Playlist> {
 
@@ -23,10 +25,13 @@ class FakePagingService(val numberOfPlaylists: Int, val pageSize: Int) : IPaging
         }
     }
 
+    // TODO: Fix for new getPage Method signature
     override fun getPage(
         startIndex: Int,
         pageSize: Int,
+//        filter: Filter,
         filter: String,
+        dbField: Column<*>?,
         caseSensitive: Boolean,
         sorted: String
     ): List<Playlist> {

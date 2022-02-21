@@ -1,7 +1,9 @@
 package demo.bigLazyTable.model
 
 import androidx.compose.runtime.*
+import bigLazyTable.paging.Filter
 import bigLazyTable.paging.IPagingService
+import composeForms.model.attributes.Attribute
 import demo.bigLazyTable.utils.PageUtils
 import mu.KotlinLogging
 import org.junit.platform.commons.util.LruCache
@@ -23,14 +25,12 @@ class LazyTableController(
     private val firstPageNr = 0 // TODO: Use Nr everywhere!
     private val firstPageIndex = 0
 
-    var isFiltering by mutableStateOf(false)
-        private set
+    var filteredAttributes = mutableSetOf<Attribute<*, *, *>>()
+    var lastFilteredAttribute: Attribute<*,*,*>? = null
+    var attributeFilter: MutableMap<Attribute<*, *, *>, String> = mutableStateMapOf()
 
-    var nameFilter by mutableStateOf("")
-        private set
-
-    fun onNameFilterChanged(newFilter: String) {
-        nameFilter = newFilter
+    fun onFiltersChanged(attribute: Attribute<*,*,*>, newFilter: String) {
+        attributeFilter[attribute] = newFilter
 
         isFiltering = newFilter != ""
 
@@ -38,25 +38,46 @@ class LazyTableController(
             filteredCount = pagingService.getFilteredCount(newFilter)
             appState.filteredList = ArrayList(Collections.nCopies(filteredCount, null))
 
-            Scheduler().set {
-//                println("onNameFilterChanged: oldFirstVisibleIndex = $oldFirstVisibleItemIndex")
-                // TODO: african music! shows only first item!
+            Scheduler().scheduleTask {
                 loadFirstPagesToFillCacheAndAddToAppStateList()
-                loadAllNeededPagesForIndex(oldFirstVisibleItemIndex)
-                selectFirstPlaylist() // TODO: Needed?
                 forceRecompose()
             }
             forceRecompose()
         }
+        else {
+            lastFilteredAttribute = null
+            filteredAttributes.remove(attribute)
+        }
     }
+
+    var isFiltering by mutableStateOf(false)
+        private set
+
+//    var nameFilter by mutableStateOf("")
+//        private set
+//
+//    fun onNameFilterChanged(newFilter: String) {
+//        nameFilter = newFilter
+//
+//        isFiltering = newFilter != ""
+//
+//        if (isFiltering) {
+//            filteredCount = pagingService.getFilteredCount(newFilter)
+//            appState.filteredList = ArrayList(Collections.nCopies(filteredCount, null))
+//
+//            Scheduler().scheduleTask {
+//                loadFirstPagesToFillCacheAndAddToAppStateList()
+//                forceRecompose()
+//            }
+//            forceRecompose()
+//        }
+//    }
 
     val scheduler = Scheduler()
 
     private val totalCount by lazy { pagingService.getTotalCount() }
     private var filteredCount by Delegates.notNull<Int>()
     val totalPages = PageUtils.getTotalPages(totalCount = totalCount, pageSize = pageSize)
-//    private var filteredCount = { filter: String -> pagingService.getFilteredCount(filter = filter) }
-//    var totalDisplayedItems = if (nameFilter == "") totalCount else filteredCount(nameFilter)
 
     private var oldFirstVisibleItemIndex = firstPageIndex
 
@@ -66,6 +87,10 @@ class LazyTableController(
     var recomposeStateChanger by mutableStateOf(false)
 
     init {
+        appState.defaultPlaylistModel.lazyListAttributes.forEach { attribute ->
+            attributeFilter[attribute] = ""
+        }
+        println("attributeFilter: $attributeFilter")
         // Get first cacheSize=4 pages on app initialization, to select one for the forms
 //        CoroutineScope(Dispatchers.Main).launch { // TODO: Check without this
 //            appState.displayedItemsCount = totalCount
@@ -129,8 +154,18 @@ class LazyTableController(
     }
 
     internal fun loadPageOfPlaylistModels(startIndexOfPage: Int): List<PlaylistModel> {
-        println("loadPageAndMapToModels index=$startIndexOfPage filter=$nameFilter")
-        val page = pagingService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filter = nameFilter)
+        // TODO: Filter Class approach
+//        val filters: List<Filter> = filteredAttributes.map { Filter(attributeFilter[it] ?: "", it.databaseField, false) }
+//        println("Filters: $filters")
+//        val dbFields: List<Column<*>> = filteredAttributes.map { it.databaseField!! }
+//        println("loadPageAndMapToModels index=$startIndexOfPage filter=${filters.forEach { print(it.filter + " ") }}")
+
+        // TODO: First try with one filter at a time
+        val filter = attributeFilter[lastFilteredAttribute] ?: ""
+        val dbField = lastFilteredAttribute?.databaseField
+
+        val page = pagingService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filter = filter, dbField = dbField)
+//        val page = pagingService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filters = filters/*, dbFields = dbFields*/) // TODO: Fix this
         return page.toPlaylistModels()
     }
 

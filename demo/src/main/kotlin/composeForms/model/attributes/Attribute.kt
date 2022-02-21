@@ -35,6 +35,7 @@ import composeForms.model.validators.ValidationResult
 import composeForms.model.validators.ValidatorType
 import composeForms.model.validators.semanticValidators.SemanticValidator
 import composeForms.util.Utilities
+import org.jetbrains.exposed.sql.Column
 import java.util.*
 
 /**
@@ -71,7 +72,10 @@ abstract class Attribute <A,T,L> (
     var validators                          : List<SemanticValidator<T, L>>,
     var convertibles                        : List<CustomConvertible>,
     var meaning                             : SemanticMeaning<T>,
-    var formatter                           : IFormatter<T>?
+    var formatter                           : IFormatter<T>?,
+
+    var canBeFiltered                       : Boolean,
+    var databaseField                       : Column<*>?
 
 ) where A : Attribute<A, T, L>, T : Any?, L : ILabel, L: Enum<*> {
 

@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
  * If the scheduler is in process, after a short delay the newest task is executes.
  * After execution the scheduler checks if a new task is available, if not the scheduler is paused.
  */
-class Scheduler {
+class Scheduler(private val delay: Long = 50) {
     private var inProcess = false
     private var task: (() -> Unit)? = null
     private var taskToDo: (() -> Unit)? = null
@@ -24,7 +24,7 @@ class Scheduler {
         inProcess = true
         taskToDo = task
         CoroutineScope(Dispatchers.IO).launch {
-            delay(50) // TODO: Test with 0 delay
+            delay(delay) // TODO: Test with 0 delay
 
             if (taskToDo == task) {
                 taskToDo?.invoke()
@@ -38,7 +38,7 @@ class Scheduler {
     }
 
     // TODO: Should this be synchronized?
-    fun set(task: () -> Unit) {
+    fun scheduleTask(task: () -> Unit) {
         this.task = task
         process()
     }

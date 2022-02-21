@@ -1,8 +1,10 @@
 package demo.bigLazyTable.data.database
 
+import bigLazyTable.paging.Filter
 import bigLazyTable.paging.IPagingService
 import demo.bigLazyTable.model.Playlist
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
@@ -17,18 +19,49 @@ object DBService : IPagingService<Playlist> {
         totalCount
     }
 
-//    private val filteredCount by lazy {
-//        val filtered = getFilteredCount("elorette")
-//        println("DBService: filteredCount called with filteredCount = $filtered")
-//        filtered
-//    }
-//    var count = 0
-
     override fun getPage(
         startIndex: Int,
         pageSize: Int,
         filter: String,
+        dbField: Column<*>?,
         caseSensitive: Boolean,
+        sorted: String
+    ): List<Playlist> {
+        // TODO: check if lazy is working correctly without any downside
+        if (startIndex > lastIndex) throw IllegalArgumentException("startIndex must be smaller than/equal to the lastIndex and not $startIndex")
+        if (startIndex < 0) throw IllegalArgumentException("only positive values are allowed for startIndex")
+
+        val start: Long = /*if (filter == "") */startIndex.toLong()
+        println("Offset: Start = $start")
+        if (sorted != "ASC" && sorted != "DESC") {
+            return transaction {
+                DatabasePlaylists
+//                    .select { dbField?.let { caseSensitiveFilter(caseSensitive, it as Column<String>, filter) }!! }
+                    .selectWithAllFilters(caseSensitive, dbField, filter)
+                    .limit(n = pageSize, offset = start)
+                    .map { mapResultRowToPlaylist(it) }
+            }
+        }
+        else return emptyList() // TODO: Remove this & comment below code back in!
+//        else {
+//            val sortOrder = if (sorted == "ASC") SortOrder.ASC else SortOrder.DESC
+//            return transaction {
+//                DatabasePlaylists
+//                    .select { caseSensitiveFilter(caseSensitive, DatabasePlaylists.name, filter) }
+//                    .orderBy(DatabasePlaylists.name to sortOrder)
+//                    .limit(n = pageSize, offset = start)
+//                    .map { mapResultRowToPlaylist(it) }
+//            }
+//        }
+    }
+
+    override fun getPageNew(
+        startIndex: Int,
+        pageSize: Int,
+        filters: List<Filter>?,
+//        filter: String,
+//        dbFields: List<Column<*>>?,
+//        caseSensitive: Boolean,
         sorted: String
     ): List<Playlist> {
         // TODO: check if lazy is working correctly without any downside
@@ -51,20 +84,46 @@ object DBService : IPagingService<Playlist> {
         if (sorted != "ASC" && sorted != "DESC") {
             return transaction {
                 DatabasePlaylists
-                    .select { caseSensitiveFilter(caseSensitive, DatabasePlaylists.name, filter) }
-                    .limit(n = pageSize, offset = start)
-                    .map { mapResultRowToPlaylist(it) }
-            }
-        } else {
-            val sortOrder = if (sorted == "ASC") SortOrder.ASC else SortOrder.DESC
-            return transaction {
-                DatabasePlaylists
-                    .select { caseSensitiveFilter(caseSensitive, DatabasePlaylists.name, filter) }
-                    .orderBy(DatabasePlaylists.name to sortOrder)
+                    .selectWithAllFilters(filters)
                     .limit(n = pageSize, offset = start)
                     .map { mapResultRowToPlaylist(it) }
             }
         }
+        else return emptyList() // TODO: Remove this & comment below code back in!
+//        else {
+//            val sortOrder = if (sorted == "ASC") SortOrder.ASC else SortOrder.DESC
+//            return transaction {
+//                DatabasePlaylists
+//                    .select { caseSensitiveFilter(caseSensitive, DatabasePlaylists.name, filter) }
+//                    .orderBy(DatabasePlaylists.name to sortOrder)
+//                    .limit(n = pageSize, offset = start)
+//                    .map { mapResultRowToPlaylist(it) }
+//            }
+//        }
+    }
+
+    private fun Table.selectWithAllFilters(filters: List<Filter>?): Query {
+        if (filters == null || filters.isEmpty()) return Query(this, null)
+        if (filters.size == 1) {
+            val filter = filters.first()
+            return this.select { caseSensitiveFilter(filter.caseSensitive, filter.dbField as Column<String>, filter.filter) }
+        }
+
+        var sql: Op<Boolean> = filters.first().dbField as Column<String> like ""
+        for (filter in filters) {
+            sql = sql and (filter.dbField as Column<String> like "%${filter.filter}%")
+        }
+        return this.select { sql }
+    }
+
+    private fun Table.selectWithAllFilters(filter: Filter): Query {
+        if (filter.dbField == null) return Query(this, null)
+        return this.select { caseSensitiveFilter(filter.caseSensitive, filter.dbField as Column<String>, filter.filter) }
+    }
+
+    private fun Table.selectWithAllFilters(caseSensitive: Boolean, dbField: Column<*>?, filter: String): Query {
+        if (dbField == null) return Query(this, null)
+        return this.select { caseSensitiveFilter(caseSensitive, dbField as Column<String>, filter) }
     }
 
     // TODO: Move this knowledge into documentation
