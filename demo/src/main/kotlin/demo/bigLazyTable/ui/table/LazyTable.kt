@@ -13,12 +13,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import demo.bigLazyTable.model.AppState
-import demo.bigLazyTable.model.LazyTableViewModel
+import demo.bigLazyTable.model.LazyTableController
 import demo.bigLazyTable.ui.theme.CustomScrollbarStyle
 
 @Composable
 fun LazyTable(
-    viewModel: LazyTableViewModel,
+    viewModel: LazyTableController,
     horizontalScrollState: ScrollState,
     appState: AppState
 ) {
@@ -26,12 +26,18 @@ fun LazyTable(
     val verticalLazyListState = rememberLazyListState()
 
     with(viewModel) {
+        // TODO: Check if LaunchedEffect works with recomposeStateChanger as key
+//    LaunchedEffect(recomposeStateChanger) {
         val recomposeTrigger = recomposeStateChanger // must be here for recompose! TODO: better solution
 
-        Box(modifier = Modifier.fillMaxSize().padding(bottom = 16.dp)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 16.dp)
+        ) {
             val firstVisibleItemIndex = verticalLazyListState.firstVisibleItemIndex
-
             if (isTimeToLoadPage(firstVisibleItemIndex)) {
+                // TODO: Code feels confusing to read! instead of set -> scheduleTask, ???
                 scheduler.set { loadAllNeededPagesForIndex(firstVisibleItemIndex) }
             }
 
@@ -63,5 +69,7 @@ fun LazyTable(
                 style = CustomScrollbarStyle
             )
         }
+
+//    }
     }
 }

@@ -10,7 +10,7 @@ import androidx.compose.ui.window.application
 import demo.bigLazyTable.data.database.DBService
 import demo.bigLazyTable.data.database.SqliteDb
 import demo.bigLazyTable.model.AppState
-import demo.bigLazyTable.model.LazyTableViewModel
+import demo.bigLazyTable.model.LazyTableController
 import demo.bigLazyTable.ui.BigLazyTableUI
 import java.awt.Cursor
 import java.awt.Dimension
@@ -49,7 +49,7 @@ fun main() = application {
         val appState = remember { AppState(pagingService = service) }
 
         val viewModel = remember {
-            LazyTableViewModel(
+            LazyTableController(
                 pagingService = service,
                 appState = appState
             ) // side effect: init loads first data to display

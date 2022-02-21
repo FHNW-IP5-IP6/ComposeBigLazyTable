@@ -3,7 +3,6 @@ package demo.bigLazyTable.model
 import androidx.compose.runtime.*
 import bigLazyTable.paging.IPagingService
 import demo.bigLazyTable.utils.PageUtils
-import kotlinx.coroutines.*
 import mu.KotlinLogging
 import org.junit.platform.commons.util.LruCache
 import java.util.*
@@ -16,10 +15,9 @@ private val Log = KotlinLogging.logger {}
  * TODO: Short description what this class is used for
  * @author Marco Sprenger, Livio Näf
  */
-// rename to Controller
-class LazyTableViewModel(
+class LazyTableController(
     private val pagingService: IPagingService<*>,
-    val pageSize: Int = 40,
+    val pageSize: Int = 40, // TODO: If enough time - make dynamic
     private val appState: AppState
 ) {
     private val firstPageNr = 0 // TODO: Use Nr everywhere!
@@ -71,8 +69,8 @@ class LazyTableViewModel(
         // Get first cacheSize=4 pages on app initialization, to select one for the forms
 //        CoroutineScope(Dispatchers.Main).launch { // TODO: Check without this
 //            appState.displayedItemsCount = totalCount
-            loadFirstPagesToFillCacheAndAddToAppStateList()
-            selectFirstPlaylist()
+        loadFirstPagesToFillCacheAndAddToAppStateList()
+        selectFirstPlaylist()
 //        }
     }
 
@@ -93,7 +91,7 @@ class LazyTableViewModel(
 
     fun loadAllNeededPagesForIndex(firstVisibleItemIndex: Int) {
         // Calculate current page visible in UI
-        val currPage = getPageNr(firstVisibleItemIndex = firstVisibleItemIndex)
+        val currPage = getVisiblePageNr(firstVisibleItemIndex = firstVisibleItemIndex)
 
         // If firstVisibleItemIndex > oldFirstVisibleItemIndex --> scrolled down
         // If firstVisibleItemIndex < oldFirstVisibleItemIndex --> scrolled up
@@ -115,7 +113,7 @@ class LazyTableViewModel(
     internal fun loadPage(pageNrToLoad: Int, scrolledDown: Boolean) {
         if (!isPageInCache(pageNrToLoad)) {
             // Calculate start index for page to load
-            val pageStartIndexToLoad = getStartIndexOfPage(pageNr = pageNrToLoad)
+            val pageStartIndexToLoad = getFirstIndexOfPage(pageNr = pageNrToLoad)
 
             //val playlistModels = requestDataAsync(scope = pagingScope, startIndexOfPage = pageStartIndexToLoad)
             val playlistModels = loadPageOfPlaylistModels(pageStartIndexToLoad)
@@ -228,34 +226,41 @@ class LazyTableViewModel(
         if (firstVisibleItemIndex < firstPageIndex) throw IllegalArgumentException("firstVisibleItemIndex should be positive")
         if (firstVisibleItemIndex >= totalCount) throw IllegalArgumentException("firstVisibleItemIndex should be smaller than total count")
 
-        val pageNumberForVisibleIndex = getPageNr(firstVisibleItemIndex)
+        val visiblePageNr = getVisiblePageNr(firstVisibleItemIndex)
 
         // Catch all edge cases, to load only data if necessarily
-        if (pageNumberForVisibleIndex == firstPageIndex) {
-            return !isPageInCache(pageNumberForVisibleIndex)
+        return if (visiblePageNr == firstPageIndex) {
+            (!isPageInCache(visiblePageNr)
                     || !isPageInCache(1)
-                    || !isPageInCache(2)
-        } else if (pageNumberForVisibleIndex > totalPages) {
-            return !isPageInCache(pageNumberForVisibleIndex)
-                    || !isPageInCache(pageNumberForVisibleIndex - 1)
-                    || !isPageInCache(pageNumberForVisibleIndex + 1)
-        } else if (pageNumberForVisibleIndex > totalPages - 1) {
-            return !isPageInCache(pageNumberForVisibleIndex)
-                    || !isPageInCache(pageNumberForVisibleIndex - 1)
-        } else {
-            return !isPageInCache(pageNumberForVisibleIndex)
-                    || !isPageInCache(pageNumberForVisibleIndex - 1)
-                    || !isPageInCache(pageNumberForVisibleIndex + 1)
-                    || !isPageInCache(pageNumberForVisibleIndex + 2)
+                    || !isPageInCache(2))
+        } else if (visiblePageNr > totalPages) {
+            (!isPageInCache(visiblePageNr)
+                    || !isPageInCache(visiblePageNr - 1)
+                    || !isPageInCache(visiblePageNr + 1))
+        } else if (visiblePageNr > totalPages - 1) {
+            (!isPageInCache(visiblePageNr)
+                    || !isPageInCache(visiblePageNr - 1))
         }
+        else areNextAndPreviousPagesNotInCache(visiblePageNr)
     }
 
-    internal fun getPageNr(firstVisibleItemIndex: Int): Int = firstVisibleItemIndex / pageSize
+    private fun areNextAndPreviousPagesNotInCache(visiblePageNr: Int): Boolean {
+        return !isPageInCache(visiblePageNr)
+                || !isPageInCache(visiblePageNr - 1)
+                || !isPageInCache(visiblePageNr + 1)
+                || !isPageInCache(visiblePageNr + 2)
+    }
 
-    internal fun getStartIndexOfPage(pageNr: Int): Int = pageNr * pageSize
+    internal fun getVisiblePageNr(firstVisibleItemIndex: Int): Int =
+        firstVisibleItemIndex / pageSize
 
-    internal fun isPageInCache(pageNr: Int): Boolean = cache.containsKey(pageNr)
+    internal fun getFirstIndexOfPage(pageNr: Int): Int =
+        pageNr * pageSize
 
+    internal fun isPageInCache(pageNr: Int): Boolean =
+        cache.containsKey(pageNr)
+
+    // TODO: Instead add member pagesLoaded: Boolean & Make a LaunchedEffect in LazyTable
     private fun forceRecompose() {
         recomposeStateChanger = !recomposeStateChanger
     }

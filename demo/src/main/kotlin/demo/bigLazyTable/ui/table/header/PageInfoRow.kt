@@ -11,11 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import demo.bigLazyTable.model.LazyTableViewModel
+import demo.bigLazyTable.model.LazyTableController
 import demo.bigLazyTable.ui.theme.BackgroundColorHeader
 
 @Composable
-fun PageInfoRow(viewModel: LazyTableViewModel, currentPage: Int) = Row(
+fun PageInfoRow(viewModel: LazyTableController, currentPage: Int) = Row(
     modifier = Modifier
         .background(BackgroundColorHeader)
         .fillMaxWidth()
