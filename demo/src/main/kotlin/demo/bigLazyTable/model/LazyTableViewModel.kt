@@ -166,7 +166,7 @@ class LazyTableViewModel(
     internal fun addToAppStateList(startIndex: Int, newPageNr: Int) {
         if (isFiltering) {
             for (i in startIndex until startIndex + pageSize) {
-                if (i in firstPageIndex until filteredCount-1) {
+                if (i in firstPageIndex until filteredCount) {
                     appState.filteredList.set(index = i, element = cache[newPageNr]!![i % pageSize])
                 }
             }
@@ -197,7 +197,7 @@ class LazyTableViewModel(
 
         if (isFiltering) {
             for (i in startIndexOldPage until startIndexOldPage + pageSize) {
-                if (i in firstPageIndex until totalCount) {
+                if (i in firstPageIndex until filteredCount) {
                     appState.filteredList.set(index = i, element = null)
                 }
             }

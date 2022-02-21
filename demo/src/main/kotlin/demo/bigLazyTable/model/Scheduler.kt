@@ -32,7 +32,7 @@ class Scheduler {
         }.invokeOnCompletion {
             inProcess = false
             if (task == taskToDo) task = null
-            println("process called")
+//            println("process called") // TODO: Find out how often process is called with recursion
             process()
         }
     }
