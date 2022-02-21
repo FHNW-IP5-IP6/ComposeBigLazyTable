@@ -41,7 +41,7 @@ fun main() = application {
             ).initializeConnection()
         }
 
-        val service = DBService(40)
+        val service = DBService
 
         // Needs remember. Without it, the view just shows empty (...) Items (happens after language change)
         val appState = remember { AppState(pagingService = service) }

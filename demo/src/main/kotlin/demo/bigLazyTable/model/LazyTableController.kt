@@ -188,7 +188,7 @@ class LazyTableController(
     // TODO: isEnd? index? previousOrNextPage? index +- cacheSize?
     internal fun calculateStartIndexOfOldPage(index: Int, isEnd: Boolean): Int {
         val previousOrNextPage = if (isEnd) index - cacheSize else index + cacheSize
-        return previousOrNextPage * pagingService.pageSize
+        return previousOrNextPage * pageSize
     }
 
     internal fun removeOldPageFromList(startIndexOldPage: Int) {
