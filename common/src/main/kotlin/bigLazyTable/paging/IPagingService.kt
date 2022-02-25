@@ -18,7 +18,7 @@ interface IPagingService<T> {
     // TODO: does it make sense to add a Filter Object with filter: String & caseSensitive: Boolean as Parameters?
     fun getPageNew(startIndex: Int, pageSize: Int, filters: List<Filter>?, sorted: String = ""): List<T>
 
-    fun getFilteredCount(filter: String, caseSensitive: Boolean = false): Int
+    fun getFilteredCount(filter: String, dbField: Column<*>?, caseSensitive: Boolean = false): Int
 
     fun getTotalCount(): Int
 

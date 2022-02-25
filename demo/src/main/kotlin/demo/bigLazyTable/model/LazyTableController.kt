@@ -5,6 +5,9 @@ import bigLazyTable.paging.Filter
 import bigLazyTable.paging.IPagingService
 import composeForms.model.attributes.Attribute
 import demo.bigLazyTable.utils.PageUtils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import org.junit.platform.commons.util.LruCache
 import java.util.*
@@ -26,16 +29,17 @@ class LazyTableController(
     private val firstPageIndex = 0
 
     var filteredAttributes = mutableSetOf<Attribute<*, *, *>>()
-    var lastFilteredAttribute: Attribute<*,*,*>? = null
+    var lastFilteredAttribute: Attribute<*, *, *>? = null
     var attributeFilter: MutableMap<Attribute<*, *, *>, String> = mutableStateMapOf()
 
-    fun onFiltersChanged(attribute: Attribute<*,*,*>, newFilter: String) {
+    fun onFiltersChanged(attribute: Attribute<*, *, *>, newFilter: String) {
         attributeFilter[attribute] = newFilter
 
         isFiltering = newFilter != ""
 
         if (isFiltering) {
-            filteredCount = pagingService.getFilteredCount(newFilter)
+            filteredCount = pagingService.getFilteredCount(filter = newFilter, dbField = attribute.databaseField)
+            println("filtered Count = $filteredCount")
             appState.filteredList = ArrayList(Collections.nCopies(filteredCount, null))
 
             Scheduler().scheduleTask {
@@ -43,8 +47,7 @@ class LazyTableController(
                 forceRecompose()
             }
             forceRecompose()
-        }
-        else {
+        } else {
             lastFilteredAttribute = null
             filteredAttributes.remove(attribute)
         }
@@ -88,15 +91,16 @@ class LazyTableController(
 
     init {
         appState.defaultPlaylistModel.lazyListAttributes.forEach { attribute ->
-            attributeFilter[attribute] = ""
+            if (attribute.canBeFiltered) {
+                attributeFilter[attribute] = ""
+            }
         }
-        println("attributeFilter: $attributeFilter")
+        println("attributeFilter: ${attributeFilter.size}")
         // Get first cacheSize=4 pages on app initialization, to select one for the forms
-//        CoroutineScope(Dispatchers.Main).launch { // TODO: Check without this
-//            appState.displayedItemsCount = totalCount
-        loadFirstPagesToFillCacheAndAddToAppStateList()
-        selectFirstPlaylist()
-//        }
+        CoroutineScope(Dispatchers.Main).launch {
+            loadFirstPagesToFillCacheAndAddToAppStateList()
+            selectFirstPlaylist()
+        }
     }
 
     private fun loadFirstPagesToFillCacheAndAddToAppStateList() {
@@ -160,12 +164,19 @@ class LazyTableController(
 //        val dbFields: List<Column<*>> = filteredAttributes.map { it.databaseField!! }
 //        println("loadPageAndMapToModels index=$startIndexOfPage filter=${filters.forEach { print(it.filter + " ") }}")
 
+//        val page = pagingService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filters = filters/*, dbFields = dbFields*/) // TODO: Fix this
+
         // TODO: First try with one filter at a time
         val filter = attributeFilter[lastFilteredAttribute] ?: ""
         val dbField = lastFilteredAttribute?.databaseField
 
-        val page = pagingService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filter = filter, dbField = dbField)
-//        val page = pagingService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filters = filters/*, dbFields = dbFields*/) // TODO: Fix this
+        val page = pagingService.getPage(
+            startIndex = startIndexOfPage,
+            pageSize = pageSize,
+            filter = filter,
+            dbField = dbField
+        )
+
         return page.toPlaylistModels()
     }
 
@@ -275,8 +286,7 @@ class LazyTableController(
         } else if (visiblePageNr > totalPages - 1) {
             (!isPageInCache(visiblePageNr)
                     || !isPageInCache(visiblePageNr - 1))
-        }
-        else areNextAndPreviousPagesNotInCache(visiblePageNr)
+        } else areNextAndPreviousPagesNotInCache(visiblePageNr)
     }
 
     private fun areNextAndPreviousPagesNotInCache(visiblePageNr: Int): Boolean {

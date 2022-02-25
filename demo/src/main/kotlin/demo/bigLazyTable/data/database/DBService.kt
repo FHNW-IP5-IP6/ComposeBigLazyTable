@@ -37,12 +37,11 @@ object DBService : IPagingService<Playlist> {
             return transaction {
                 DatabasePlaylists
 //                    .select { dbField?.let { caseSensitiveFilter(caseSensitive, it as Column<String>, filter) }!! }
-                    .selectWithAllFilters(caseSensitive, dbField, filter)
+                    .selectWithFilter(caseSensitive, dbField, filter)
                     .limit(n = pageSize, offset = start)
                     .map { mapResultRowToPlaylist(it) }
             }
-        }
-        else return emptyList() // TODO: Remove this & comment below code back in!
+        } else return emptyList() // TODO: Remove this & comment below code back in!
 //        else {
 //            val sortOrder = if (sorted == "ASC") SortOrder.ASC else SortOrder.DESC
 //            return transaction {
@@ -68,19 +67,8 @@ object DBService : IPagingService<Playlist> {
         if (startIndex > lastIndex) throw IllegalArgumentException("startIndex must be smaller than/equal to the lastIndex and not $startIndex")
         if (startIndex < 0) throw IllegalArgumentException("only positive values are allowed for startIndex")
 
-//        println("filteredCount is $filteredCount")
-//        println("start: count is $count")
-        val start: Long = /*if (filter == "") */startIndex.toLong()
+        val start: Long = startIndex.toLong()
         println("Offset: Start = $start")
-//        } else if (filteredCount >= pageSize) {
-//            count += pageSize
-//            println("filteredCount >= pageSize: count is $count")
-//            count.toLong()
-//        } else {
-//            count += filteredCount
-//            println("filteredCount < pageSize: count is $count")
-//            count.toLong()
-//        }
         if (sorted != "ASC" && sorted != "DESC") {
             return transaction {
                 DatabasePlaylists
@@ -88,8 +76,7 @@ object DBService : IPagingService<Playlist> {
                     .limit(n = pageSize, offset = start)
                     .map { mapResultRowToPlaylist(it) }
             }
-        }
-        else return emptyList() // TODO: Remove this & comment below code back in!
+        } else return emptyList() // TODO: Remove this & comment below code back in!
 //        else {
 //            val sortOrder = if (sorted == "ASC") SortOrder.ASC else SortOrder.DESC
 //            return transaction {
@@ -106,7 +93,13 @@ object DBService : IPagingService<Playlist> {
         if (filters == null || filters.isEmpty()) return Query(this, null)
         if (filters.size == 1) {
             val filter = filters.first()
-            return this.select { caseSensitiveFilter(filter.caseSensitive, filter.dbField as Column<String>, filter.filter) }
+            return this.select {
+                caseSensitiveFilter(
+                    filter.caseSensitive,
+                    filter.dbField as Column<String>,
+                    filter.filter
+                )
+            }
         }
 
         var sql: Op<Boolean> = filters.first().dbField as Column<String> like ""
@@ -116,12 +109,18 @@ object DBService : IPagingService<Playlist> {
         return this.select { sql }
     }
 
-    private fun Table.selectWithAllFilters(filter: Filter): Query {
+    private fun Table.selectWithFilter(filter: Filter): Query {
         if (filter.dbField == null) return Query(this, null)
-        return this.select { caseSensitiveFilter(filter.caseSensitive, filter.dbField as Column<String>, filter.filter) }
+        return this.select {
+            caseSensitiveFilter(
+                filter.caseSensitive,
+                filter.dbField as Column<String>,
+                filter.filter
+            )
+        }
     }
 
-    private fun Table.selectWithAllFilters(caseSensitive: Boolean, dbField: Column<*>?, filter: String): Query {
+    private fun Table.selectWithFilter(caseSensitive: Boolean, dbField: Column<*>?, filter: String): Query {
         if (dbField == null) return Query(this, null)
         return this.select { caseSensitiveFilter(caseSensitive, dbField as Column<String>, filter) }
     }
@@ -141,16 +140,16 @@ object DBService : IPagingService<Playlist> {
         else columnWhichShouldMatch.lowerCase() like "%${filter.lowercase(Locale.getDefault())}%"
     }
 
-    fun getSortedPage() {
-
-    }
-
-    override fun getFilteredCount(filter: String, caseSensitive: Boolean): Int = transaction {
+    override fun getFilteredCount(filter: String, dbField: Column<*>?, caseSensitive: Boolean): Int {
         if (filter == "") throw IllegalArgumentException("Filter must be set - empty string is not allowed (leads to java.lang.OutOfMemoryError: Java heap space)")
-        DatabasePlaylists
-            .select { caseSensitiveFilter(caseSensitive, DatabasePlaylists.name, filter) }
-            .count()
-            .toInt()
+        if (dbField == null) return 0
+
+        return transaction {
+            DatabasePlaylists
+                .select { caseSensitiveFilter(caseSensitive, dbField as Column<String>, filter) }
+                .count()
+                .toInt()
+        }
     }
 
     override fun getTotalCount(): Int = transaction {

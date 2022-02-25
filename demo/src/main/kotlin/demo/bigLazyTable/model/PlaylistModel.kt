@@ -29,14 +29,6 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         databaseField = DatabasePlaylists.name
     )
 
-    private val collaborative = BooleanAttribute(
-        model = this,
-        label = BLTLabels.COLLABORATIVE,
-        trueText = BLTLabels.SELECTION_YES,
-        falseText = BLTLabels.SELECTION_NO,
-        value = playlist.collaborative,
-    )
-
     private val modifiedAt = StringAttribute(
         model = this,
         label = BLTLabels.MODIFIED_AT,
@@ -44,6 +36,22 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         value = playlist.modifiedAt,
         canBeFiltered = true,
         databaseField = DatabasePlaylists.modified_at
+    )
+
+    private val track0ArtistName = StringAttribute(
+        model = this,
+        label = BLTLabels.TRACK_ARTIST_NAME,
+        value = playlist.track0ArtistName,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.track0_artist_name
+    )
+
+    private val collaborative = BooleanAttribute(
+        model = this,
+        label = BLTLabels.COLLABORATIVE,
+        trueText = BLTLabels.SELECTION_YES,
+        falseText = BLTLabels.SELECTION_NO,
+        value = playlist.collaborative,
     )
 
     private val numTracks = IntegerAttribute(
@@ -80,14 +88,6 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         model = this,
         label = BLTLabels.NUM_ARTISTS,
         value = playlist.numArtists
-    )
-
-    private val track0ArtistName = StringAttribute(
-        model = this,
-        label = BLTLabels.TRACK_ARTIST_NAME,
-        value = playlist.track0ArtistName,
-        canBeFiltered = true,
-        databaseField = DatabasePlaylists.track0_artist_name
     )
 
     private val track0TrackName = StringAttribute(
