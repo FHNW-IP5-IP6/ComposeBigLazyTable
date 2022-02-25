@@ -1,6 +1,7 @@
 package demo.bigLazyTable.model
 
 import androidx.compose.runtime.*
+import bigLazyTable.paging.Filter
 import bigLazyTable.paging.IPagingService
 import composeForms.model.attributes.Attribute
 import demo.bigLazyTable.utils.PageUtils
@@ -8,6 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
+import org.jetbrains.exposed.sql.Column
 import org.junit.platform.commons.util.LruCache
 import java.util.*
 import kotlin.collections.ArrayList
@@ -27,6 +29,7 @@ class LazyTableController(
     private val firstPageNr = 0 // TODO: Use Nr everywhere!
     private val firstPageIndex = 0
 
+    var filters = listOf<Filter>()
     var filteredAttributes = mutableSetOf<Attribute<*, *, *>>()
     var lastFilteredAttribute: Attribute<*, *, *>? = null
     var attributeFilter: MutableMap<Attribute<*, *, *>, String> = mutableStateMapOf()
@@ -39,7 +42,14 @@ class LazyTableController(
         if (isFiltering) {
 
             filterScheduler.scheduleTask {
-                filteredCount = pagingService.getFilteredCount(filter = newFilter, dbField = attribute.databaseField)
+                filters = filteredAttributes.map { attribute ->
+                    Filter(
+                        filter = attributeFilter[attribute] ?: "",
+                        dbField = attribute.databaseField,
+                        caseSensitive = false
+                    )
+                }
+                filteredCount = pagingService.getFilteredCountNew(filters = filters)
                 println("filtered Count = $filteredCount")
                 appState.filteredList = ArrayList(Collections.nCopies(filteredCount, null))
 
@@ -55,7 +65,7 @@ class LazyTableController(
         private set
 
     val scheduler = Scheduler()
-    val filterScheduler = Scheduler(100)
+    private val filterScheduler = Scheduler(100)
 
     private val totalCount by lazy { pagingService.getTotalCount() }
     private var filteredCount by Delegates.notNull<Int>()
@@ -143,23 +153,32 @@ class LazyTableController(
     // TODO: Instead of string more generic
     internal fun loadPageOfPlaylistModels(startIndexOfPage: Int): List<PlaylistModel> {
         // TODO: Filter Class approach
-//        val filters: List<Filter> = filteredAttributes.map { Filter(attributeFilter[it] ?: "", it.databaseField, false) }
-//        println("Filters: $filters")
-//        val dbFields: List<Column<*>> = filteredAttributes.map { it.databaseField!! }
-//        println("loadPageAndMapToModels index=$startIndexOfPage filter=${filters.forEach { print(it.filter + " ") }}")
+        val filters: List<Filter> = filteredAttributes.map { attribute ->
+            Filter(
+                filter = attributeFilter[attribute] ?: "",
+                dbField = attribute.databaseField,
+                caseSensitive = false
+            )
+        }
+        println("Filters: $filters")
+        println("loadPageAndMapToModels index=$startIndexOfPage filter=${filters.forEach { print(it.filter + " ") }}")
 
-//        val page = pagingService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filters = filters/*, dbFields = dbFields*/) // TODO: Fix this
-
-        // TODO: First try with one filter at a time
-        val filter = attributeFilter[lastFilteredAttribute] ?: ""
-        val dbField = lastFilteredAttribute?.databaseField
-
-        val page = pagingService.getPage(
+        val page = pagingService.getPageNew(
             startIndex = startIndexOfPage,
             pageSize = pageSize,
-            filter = filter,
-            dbField = dbField
-        )
+            filters = filters
+        ) // TODO: Fix this
+
+        // TODO: First try with one filter at a time
+//        val filter = attributeFilter[lastFilteredAttribute] ?: ""
+//        val dbField = lastFilteredAttribute?.databaseField
+//
+//        val page = pagingService.getPage(
+//            startIndex = startIndexOfPage,
+//            pageSize = pageSize,
+//            filter = filter,
+//            dbField = dbField
+//        )
 
         return page.toPlaylistModels()
     }

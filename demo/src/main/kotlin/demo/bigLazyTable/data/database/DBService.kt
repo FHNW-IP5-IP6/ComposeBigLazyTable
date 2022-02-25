@@ -57,7 +57,7 @@ object DBService : IPagingService<Playlist> {
     override fun getPageNew(
         startIndex: Int,
         pageSize: Int,
-        filters: List<Filter>?,
+        filters: List<Filter>,
 //        filter: String,
 //        dbFields: List<Column<*>>?,
 //        caseSensitive: Boolean,
@@ -89,25 +89,20 @@ object DBService : IPagingService<Playlist> {
 //        }
     }
 
-    private fun Table.selectWithAllFilters(filters: List<Filter>?): Query {
-        if (filters == null || filters.isEmpty()) return Query(this, null)
+    private fun Table.selectWithAllFilters(filters: List<Filter>): Query {
+        if (filters.isEmpty()) return Query(this, null)
 
         if (filters.size == 1) {
             val filter = filters.first()
-            return this.select {
-                caseSensitiveFilter(
-                    filter.caseSensitive,
-                    filter.dbField as Column<String>,
-                    filter.filter
-                )
-            }
+            return selectWithFilter(filter = filter)
         }
 
         val firstFilter = filters.first()
         var sql: Op<Boolean> = firstFilter.dbField as Column<String> like "%${firstFilter.filter}%"
-        for (filter in filters) {
+        for (i in 1 until filters.size/*filter in filters*/) {
             // TODO: as Column<Double/Float/Int/...> equals filter.toDouble()/usw
 //            when (dbField)
+            val filter = filters[i]
             sql = sql and (filter.dbField as Column<String> like "%${filter.filter}%")
         }
         return this.select { sql }
@@ -115,13 +110,12 @@ object DBService : IPagingService<Playlist> {
 
     private fun Table.selectWithFilter(filter: Filter): Query {
         if (filter.dbField == null) return Query(this, null)
-        return this.select {
-            caseSensitiveFilter(
-                filter.caseSensitive,
-                filter.dbField as Column<String>,
-                filter.filter
-            )
-        }
+
+        return selectWithFilter(
+            caseSensitive = filter.caseSensitive,
+            dbField = filter.dbField,
+            filter = filter.filter
+        )
     }
 
     private fun Table.selectWithFilter(caseSensitive: Boolean, dbField: Column<*>?, filter: String): Query {
@@ -217,5 +211,16 @@ object DBService : IPagingService<Playlist> {
             it[DatabasePlaylists.track4_duration_ms],
             it[DatabasePlaylists.track4_album_name]
         )
+    }
+
+    override fun getFilteredCountNew(filters: List<Filter>): Int {
+        if (filters.isEmpty()) throw IllegalArgumentException("A Filter must be set - Passed an empty filter list")
+
+        return transaction {
+            DatabasePlaylists
+                .selectWithAllFilters(filters = filters)
+                .count()
+                .toInt()
+        }
     }
 }

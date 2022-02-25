@@ -21,9 +21,11 @@ interface IPagingService<T> {
     fun getPage(startIndex: Int, pageSize: Int, filter: String = "", dbField: Column<*>?, caseSensitive: Boolean = false, sorted: String = ""): List<T>
 
     // TODO: 1 sort
-    fun getPageNew(startIndex: Int, pageSize: Int, filters: List<Filter>?, sorted: String = ""): List<T>
+    fun getPageNew(startIndex: Int, pageSize: Int, filters: List<Filter>, sorted: String = ""): List<T>
 
     fun getFilteredCount(filter: String, dbField: Column<*>?, caseSensitive: Boolean = false): Int
+
+    fun getFilteredCountNew(filters: List<Filter>): Int
 
     fun getTotalCount(): Int
 
