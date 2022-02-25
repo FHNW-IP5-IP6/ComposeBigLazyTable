@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm")
-    //id("org.jetbrains.compose") version "1.0.0-alpha3"
     id("org.jetbrains.compose") version "1.1.0"
 
     kotlin("plugin.serialization") version("1.4.32")

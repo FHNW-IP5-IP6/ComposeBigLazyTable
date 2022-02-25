@@ -4,7 +4,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm")
-    //id("org.jetbrains.compose") version "1.0.0-alpha3"
     id("org.jetbrains.compose") version "1.1.0"
     id("org.sonarqube") version "3.3"
 }
@@ -31,7 +30,6 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation(project(":common"))
-                implementation(project(":desktop"))
 
                 // Is this for Forms?
                 implementation("org.jetbrains.compose.material:material-icons-extended-desktop:0.4.0")

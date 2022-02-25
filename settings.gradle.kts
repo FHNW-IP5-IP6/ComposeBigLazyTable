@@ -9,8 +9,6 @@ pluginManagement {
 
 rootProject.name = "ComposeBigLazyTable"
 
-//include(":android")
 include(":common")
-include(":desktop")
 include(":demo")
 include(":web")
