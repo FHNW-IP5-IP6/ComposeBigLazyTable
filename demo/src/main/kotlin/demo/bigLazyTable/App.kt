@@ -27,8 +27,6 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "ComposeLists"
     ) {
-        // TODO: https://github.com/JetBrains/compose-jb/tree/master/tutorials/Mouse_Events#mouse-scroll-listeners
-//          https://github.com/JetBrains/compose-jb/tree/master/tutorials/Mouse_Events#mouse-rightmiddle-clicks-and-keyboard-modifiers
 
         frameWindowScope = this
 
@@ -48,14 +46,14 @@ fun main() = application {
         // Needs remember. Without it, the view just shows empty (...) Items (happens after language change)
         val appState = remember { AppState(pagingService = service) }
 
-        val viewModel = remember {
+        val controller = remember {
             LazyTableController(
                 pagingService = service,
                 appState = appState
             ) // side effect: init loads first data to display
         }
         BigLazyTableUI(
-            viewModel = viewModel,
+            controller = controller,
             appState = appState
         )
     }

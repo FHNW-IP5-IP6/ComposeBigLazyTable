@@ -20,7 +20,7 @@ import demo.bigLazyTable.ui.theme.BackgroundColorLight
 
 @Composable
 fun PlaylistRow(
-    viewModel: LazyTableController,
+    controller: LazyTableController,
     playlistModel: PlaylistModel,
     horizontalScrollState: ScrollState,
     appState: AppState
@@ -35,7 +35,7 @@ fun PlaylistRow(
             .padding(horizontal = 5.dp)
             .selectable(
                 selected = isSelected,
-                onClick = { viewModel.selectPlaylist(playlistModel) }
+                onClick = { controller.selectPlaylistModel(playlistModel) }
             )
             .horizontalScroll(horizontalScrollState),
         horizontalArrangement = Arrangement.SpaceBetween,

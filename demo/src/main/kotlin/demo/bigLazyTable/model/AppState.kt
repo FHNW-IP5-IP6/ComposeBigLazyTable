@@ -12,8 +12,6 @@ import kotlin.collections.ArrayList
  */
 class AppState(pagingService: IPagingService<*>) {
 
-    var displayedItemsCount = pagingService.getTotalCount()
-
     /**
      * Default PlaylistModel to store global data for Form and LazyList
      * Stores:
@@ -34,18 +32,14 @@ class AppState(pagingService: IPagingService<*>) {
      * All elements in the LazyList cache are stored in this list. The rest is filled with the defaultPlaylistModel to
      * provide the default loading data.
      */
-    var lazyModelList: MutableList<PlaylistModel?> = ArrayList(Collections.nCopies(displayedItemsCount, null))
+    var lazyModelList: MutableList<PlaylistModel?> = ArrayList(Collections.nCopies(pagingService.getTotalCount(), null))
 
+    /**
+     * List of filtered Models. Size is the filteredCount of the provided data.
+     * All elements in the filteredList cache are stored in this list. The rest is filled with the defaultPlaylistModel
+     * to provide the default loading data.
+     */
     var filteredList: MutableList<PlaylistModel?> = ArrayList(Collections.nCopies(40, null))
-
-    fun x() {
-        val x = ArrayList(Collections.nCopies(1_000_000, null))
-        x.clear()
-        x.addAll(ArrayList(Collections.nCopies(80, null)))
-    }
-
-    // TODO:
-//    val filteredList = { filteredCount: Int -> ArrayList(Collections.nCopies(filteredCount, null)) }
 
     /**
      * List of all Models with changes. Used to prevent loosing changed data if new data is loaded from the service.

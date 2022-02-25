@@ -15,18 +15,7 @@ internal class SchedulerTest {
 
     @BeforeEach
     fun setUp() {
-        scheduler = Scheduler
-    }
-
-    @Test
-    fun set() {
-//        val scope = CoroutineScope(newFixedThreadPoolContext(4, "synchroPool"))
-//        for (i in 0 until 1_000_000) {
-//            scope.launch {
-//                delay(1000)
-//                scheduler.set { println("Task $i") }
-//            }
-//        }
+        scheduler = Scheduler()
     }
 
     // TODO: Disable when finished

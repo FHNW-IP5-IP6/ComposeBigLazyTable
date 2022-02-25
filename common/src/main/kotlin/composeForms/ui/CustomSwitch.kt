@@ -48,9 +48,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import composeForms.ui.theme.*
 import kotlinx.coroutines.flow.collect
-import composeForms.ui.theme.ColorsUtil
-import composeForms.ui.theme.FormColors
 import kotlin.math.roundToInt
 /**
  * This file contains a custom switch, where the appearance can be changed.
@@ -152,21 +151,21 @@ fun CustomSwitch(
         val switchColors = if(booleanSwitch){
             SwitchDefaults.colors(
                 /*Thumb*/
-                checkedThumbColor = ColorsUtil.get(FormColors.SWITCH_THUMB),
-                uncheckedThumbColor = ColorsUtil.get(FormColors.BODY_BACKGROUND),
+                checkedThumbColor = SwitchThumb,
+                uncheckedThumbColor = BodyBackground,
                 /*Track*/
-                disabledUncheckedTrackColor =  ColorsUtil.get(FormColors.UNCHECKEDTRACKCOLOR))
+                disabledUncheckedTrackColor =  UncheckedTrackColor)
         }else{
             SwitchDefaults.colors(
                 /*Thumb*/
-                checkedThumbColor = ColorsUtil.get(FormColors.SWITCH_THUMB),
-                uncheckedThumbColor = ColorsUtil.get(FormColors.SWITCH_THUMB),
-                disabledCheckedThumbColor = ColorsUtil.get(FormColors.BODY_BACKGROUND),
-                disabledUncheckedThumbColor = ColorsUtil.get(FormColors.BODY_BACKGROUND),
+                checkedThumbColor = SwitchThumb,
+                uncheckedThumbColor = SwitchThumb,
+                disabledCheckedThumbColor = BodyBackground,
+                disabledUncheckedThumbColor = BodyBackground,
                 /*Track*/
-                uncheckedTrackColor = ColorsUtil.get(FormColors.SWITCH_THUMB).copy(alpha = 0.54f),
-                disabledCheckedTrackColor = ColorsUtil.get(FormColors.UNCHECKEDTRACKCOLOR),
-                disabledUncheckedTrackColor = ColorsUtil.get(FormColors.UNCHECKEDTRACKCOLOR),
+                uncheckedTrackColor = SwitchThumb.copy(alpha = 0.54f),
+                disabledCheckedTrackColor = UncheckedTrackColor,
+                disabledUncheckedTrackColor = UncheckedTrackColor,
             )
         }
 

@@ -25,7 +25,7 @@ import kotlin.collections.ArrayList
 fun HeaderRow(
     horizontalScrollState: ScrollState,
     appState: AppState,
-    viewModel: LazyTableController
+    controller: LazyTableController
 ) {
     Row(
         modifier = Modifier
@@ -42,24 +42,24 @@ fun HeaderRow(
 
                     TextField(
                         modifier = Modifier.width(180.dp),
-                        value = viewModel.attributeFilter[attribute].toString(),
+                        value = controller.attributeFilter[attribute].toString(),
                         onValueChange = { newValue ->
-                            viewModel.lastFilteredAttribute = attribute
-                            viewModel.filteredAttributes.add(attribute)
+                            controller.lastFilteredAttribute = attribute
+                            controller.filteredAttributes.add(attribute)
 
-                            viewModel.onFiltersChanged(attribute, newValue)
+                            controller.onFiltersChanged(attribute, newValue)
                         },
                         textStyle = TextStyle(color = Color.White),
                         label = { Text("Filter", color = Color.White) },
                         singleLine = true,
                         trailingIcon = {
-                            if (viewModel.attributeFilter[attribute].toString() != "") {
+                            if (controller.attributeFilter[attribute].toString() != "") {
                                 IconButton(onClick = {
-                                    viewModel.lastFilteredAttribute = null
-                                    viewModel.filteredAttributes.remove(attribute)
+                                    controller.lastFilteredAttribute = null
+                                    controller.filteredAttributes.remove(attribute)
                                     appState.filteredList.clear()
                                     appState.filteredList = ArrayList(Collections.nCopies(40, null))
-                                    viewModel.onFiltersChanged(attribute, "")
+                                    controller.onFiltersChanged(attribute, "")
                                 }) {
                                     Icon(
                                         imageVector = Icons.Filled.Close,

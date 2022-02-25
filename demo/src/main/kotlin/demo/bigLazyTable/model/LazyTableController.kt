@@ -238,15 +238,13 @@ class LazyTableController(
 
     }
 
-    // TODO: selectPlaylistWithLanguageSet, selectModel, setLanguageAndSelectModel
-    fun selectPlaylist(playlistModel: PlaylistModel) {
-        println("selectPlaylist ${playlistModel.id}")
+    fun selectPlaylistModel(playlistModel: PlaylistModel) {
         setCurrentLanguage(playlistModel = playlistModel)
         appState.selectedPlaylistModel = playlistModel
     }
 
     private fun setCurrentLanguage(playlistModel: PlaylistModel) {
-        val currentLanguage = playlistModel.getCurrentLanguage()
+        val currentLanguage = appState.defaultPlaylistModel.getCurrentLanguage()
         playlistModel.setCurrentLanguage(currentLanguage)
     }
 

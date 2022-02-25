@@ -17,12 +17,12 @@ import demo.bigLazyTable.ui.theme.BigLazyTableTheme
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun BigLazyTableUI(viewModel: LazyTableController, appState: AppState) {
+fun BigLazyTableUI(controller: LazyTableController, appState: AppState) {
     BigLazyTableTheme {
         Row(modifier = Modifier.fillMaxSize()) {
             TableContainer(
                 weight = 2f,
-                viewModel = viewModel,
+                controller = controller,
                 appState = appState
             )
             FormContainer(

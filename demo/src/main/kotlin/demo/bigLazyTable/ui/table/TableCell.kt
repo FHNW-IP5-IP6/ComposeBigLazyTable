@@ -9,18 +9,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import composeForms.model.attributes.Attribute
-
-// TODO: Make Example Application to play around with the TableCell and its attribute
-@Composable
-fun RowScope.AttributeTableCell(
-    attribute: Attribute<*, *, *>,
-    backgroundColor: Color
-) = TableCell(
-    text = attribute.getValueAsText(),
-    backgroundColor = backgroundColor,
-    hasError = !attribute.isValid()
-)
 
 @Composable
 fun TableCell(

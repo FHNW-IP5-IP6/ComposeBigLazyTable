@@ -125,6 +125,7 @@ abstract class BaseModel<L>(private val title: L,
 
 
     override fun getTitle(): String {
+        println("getTitle is called") // 2 times
         return title.getLanguageStringFromLabel(title, getCurrentLanguage())
     }
 
@@ -208,6 +209,7 @@ abstract class BaseModel<L>(private val title: L,
      * @param lang : String
      */
     override fun setCurrentLanguage(lang: String){
+        println("setCurrentLanguage is called with lang $lang")
         currentLanguage.value = lang
         allGroups.forEach { it.getAttributes().forEach{ attribute -> attribute.setCurrentLanguage(lang) }}
         getCurrentFocusedAttribute()?.let { publishAll(it) }
@@ -221,7 +223,12 @@ abstract class BaseModel<L>(private val title: L,
     }
 
     override fun getCurrentLanguage(): String {
-        return currentLanguage.value
+        val language by lazy { currentLanguage.value } // has no effect - will still be printed million of times
+        // TODO: Why is this function called all the time
+        //  How to change this behaviour?
+        println("getCurrentLanguage is called & returns ${currentLanguage.value}")
+        println("lazylanguage returns $language")
+        return language
     }
 
     final override fun getPossibleLanguages(): List<String> {

@@ -7,6 +7,7 @@ import org.jetbrains.skia.Surface
 import org.junit.Rule
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class LazyTableKtTestVariantJUnit5 {
@@ -19,7 +20,7 @@ class LazyTableKtTestVariantJUnit5 {
 //        rule.setContent {
 //            val scrollState = rememberScrollState()
 //            LazyTable(
-//                viewModel = LazyTableViewModel(
+//                viewModel = LazyTableController(
 //                    FakePagingService(
 //                        numberOfPlaylists = 1_000_000,
 //                        pageSize = 40
@@ -34,7 +35,8 @@ class LazyTableKtTestVariantJUnit5 {
     fun tearDown() {
     }
 
-    // TODO: lateinit property scene has not been initialized
+    // TODO:
+    @Disabled("lateinit property scene has not been initialized")
     @Test
     fun lazyTable() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)

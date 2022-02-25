@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -18,13 +17,14 @@ import demo.bigLazyTable.ui.theme.CustomScrollbarStyle
 
 @Composable
 fun LazyTable(
-    viewModel: LazyTableController,
+    controller: LazyTableController,
     horizontalScrollState: ScrollState,
     appState: AppState
 ) {
+    val lazyListItems = if (controller.isFiltering) appState.filteredList else appState.lazyModelList
     val verticalLazyListState = rememberLazyListState()
 
-    with(viewModel) {
+    with(controller) {
         val recomposeTrigger = recomposeStateChanger // must be here for recompose! TODO: better solution
 
             Box(
@@ -36,8 +36,8 @@ fun LazyTable(
                 if (isTimeToLoadPage(firstVisibleItemIndex)) {
                     scheduler.scheduleTask { loadAllNeededPagesForIndex(firstVisibleItemIndex) }
                 }
-//                if (viewModel.isFiltering) {
-                    LaunchedEffect(key1 = viewModel.isFiltering) {
+//                if (controller.isFiltering) {
+                    LaunchedEffect(key1 = controller.isFiltering) {
                         verticalLazyListState.scrollToItem(0)
                     }
 //                }
@@ -46,7 +46,7 @@ fun LazyTable(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                     state = verticalLazyListState
                 ) {
-                    val lazyListItems = if (viewModel.isFiltering) appState.filteredList else appState.lazyModelList
+                    val lazyListItems = if (controller.isFiltering) appState.filteredList else appState.lazyModelList
                     items(items = lazyListItems) { playlistModel ->
                         when (playlistModel) {
                             null -> PlaylistRowPlaceholder(
@@ -54,7 +54,7 @@ fun LazyTable(
                                 appState = appState
                             )
                             else -> PlaylistRow(
-                                viewModel = viewModel,
+                                controller = controller,
                                 playlistModel = playlistModel,
                                 horizontalScrollState = horizontalScrollState,
                                 appState = appState
