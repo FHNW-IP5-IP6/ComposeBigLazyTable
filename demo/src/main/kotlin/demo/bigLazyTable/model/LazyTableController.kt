@@ -94,7 +94,7 @@ class LazyTableController(
     private fun selectFirstPlaylist() {
         val fullList = if (isFiltering) appState.filteredList else appState.lazyModelList
         println("loadFirstPagesAndFillCacheAndSelectFirstPlaylist: appState.list size = ${fullList.size}")
-        fullList.first()?.let { firstPlaylist -> selectPlaylist(firstPlaylist) }
+        fullList.first()?.let { firstPlaylist -> selectPlaylistModel(firstPlaylist) }
     }
 
     fun loadAllNeededPagesForIndex(firstVisibleItemIndex: Int) {
