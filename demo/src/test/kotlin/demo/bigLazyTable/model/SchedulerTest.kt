@@ -14,25 +14,37 @@ internal class SchedulerTest {
     lateinit var scheduler: Scheduler
 
     @BeforeEach
-    fun setUp() {
+    fun createScheduler() {
         scheduler = Scheduler()
     }
 
-    // TODO: Disable when finished
-    @Disabled("Why is it disbaled & when to enable back")
     @Test
-    fun setOverflow() {
+    fun zeroDelayOverflow() {
+        scheduler = Scheduler(delayInMillis = 0)
         assertDoesNotThrow {
-            for (i in 0 until 1_000_000_000) {
-                scheduler.set { doWork() }
+            for (i in 0 until 1_000_000) {
+                scheduler.set { doWork(40) }
             }
             Thread.sleep(1000)
         }
     }
 
-    // TODO: Add delay < 50
-    private fun doWork() {
-        Thread.sleep(40)
+    @Disabled("Why is it disbaled & when to enable back")
+    @Test
+    fun setOverflow() {
+        assertDoesNotThrow {
+            for (i in 0 until 1_000_000) {
+                scheduler.set { doWork(40) }
+            }
+            Thread.sleep(1000)
+        }
+    }
+
+    /*
+    Helper functions
+     */
+    private fun doWork(sleepInMillis: Long) {
+        Thread.sleep(sleepInMillis)
         println("Work done")
     }
 }

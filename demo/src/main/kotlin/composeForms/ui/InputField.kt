@@ -179,6 +179,7 @@ private fun LabelAndUndoAndRedoButton(model: IModel<*>, attr: Attribute<*, *, *>
  * @param ctrlString: String representing the operating systems control button
  * @param color: Color for the icon
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun createUndoRedoButton(model: IModel<*>, attr: Attribute<*,*,*>, ctrlString: String, color: Color){
     Row(modifier = Modifier.width(56.dp)) {
@@ -352,6 +353,7 @@ private fun ErrorMessage(model: IModel<*>,
  * @param showErrorMsg: flag that indicates if the error is shown
  * @param errorIconWidth: width of the error icon
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ErrorIcon(model: IModel<*>,
                       ctrlString: String,

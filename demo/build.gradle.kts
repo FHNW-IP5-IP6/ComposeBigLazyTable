@@ -4,7 +4,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm")
-    id("org.jetbrains.compose") version "1.0.0-alpha3"
+    //id("org.jetbrains.compose") version "1.0.0-alpha3"
+    id("org.jetbrains.compose") version "1.1.0"
     id("org.sonarqube") version "3.3"
 }
 
@@ -52,18 +53,16 @@ kotlin {
 
                 // Forms
                 implementation("com.hivemq:hivemq-community-edition-embedded:2021.1")
+
+                implementation(getSkiaDependency()) // WORKAROUND
             }
         }
         named("test") {
             dependencies {
                 implementation(compose.desktop.currentOs)
 
-                // Mock
-                implementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
-                implementation("io.mockk:mockk:1.11.0")
-
                 // UI Testing
-                implementation("androidx.compose.ui:ui-test-desktop:1.0.0-beta06")
+                //implementation("androidx.compose.ui:ui-test-desktop:1.0.0-beta06")
                 implementation("org.jetbrains.compose.ui:ui-test-junit4-desktop:1.0.1")
                 implementation(getSkiaDependency()) // WORKAROUND
 

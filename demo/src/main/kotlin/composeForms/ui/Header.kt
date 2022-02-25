@@ -22,8 +22,7 @@
 
 package composeForms.ui
 
-import androidx.compose.desktop.AppManager
-import androidx.compose.desktop.Window
+import androidx.compose.ui.window.Window
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,6 +34,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -43,15 +43,16 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.application
 import composeForms.model.IModel
 import composeForms.server.QRCodeService
 import composeForms.ui.theme.*
 import composeForms.ui.theme.ColorsUtil.get
 //import composeForms.ui.theme.ColorsUtil.Companion.get
 import demo.bigLazyTable.model.AppState
+import java.awt.Dimension
 
 /**
  * Header provides the element for interacting with the composeForms.model. Providing buttons to interact for example the save button.
@@ -141,6 +142,7 @@ fun Header(model : IModel<*>, appState: AppState?, changeShowError: (Boolean) ->
  * @param showError: flag that indicates if an error is present
  * @param onErrorClick: function that is invoke if the showError is true
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun HeaderButtonWithIcon(buttonIcon: ImageVector, tooltipText: String = "", tooltipShortcutText: String = "",
                                  enabled: Boolean, onClick : () -> Unit,
@@ -274,7 +276,7 @@ private fun WizardModeButtons(model: IModel<*>, ctrlString: String, changeShowEr
                 val isLastWizardGroup = isLastWizardGroup()
                 save()
                 if (isLastWizardGroup) {
-                    AppManager.focusedWindow?.close()
+                    //AppManager.focusedWindow?.close()
                 }
             },
             errorIcon = Icons.Filled.Error,
@@ -293,6 +295,7 @@ private fun WizardModeButtons(model: IModel<*>, ctrlString: String, changeShowEr
  *
  * @param model: composeForms.model that contains the autosave information
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun AutoSaveSwitch(model: IModel<*>){
     with(model){
@@ -361,6 +364,7 @@ private fun AutoSaveSwitch(model: IModel<*>){
  * Create dropdown element with information on [model], with the current language as selection check and [selectedIndex]
  * marking the current position of selection
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun DropdownElement(model: IModel<*>, language: String, index: Int, selectedIndex: MutableState<Int>, appState: AppState?){
     val elementIsSelected = model.isCurrentLanguage(language)
@@ -421,15 +425,18 @@ private fun AutoSaveStateIcon(model: IModel<*>){
  */
 private fun openQrCodeWindow(model: IModel<*>, size : Int){
     with(model){
-        Window(title = "QR Code", size = IntSize(size, size)) {
-            val img = remember { mutableStateOf(ImageBitmap(size,size)) }
-            val ip = getIPAdress()
-            QRCodeService().getQRCode("https://stevevogel1.github.io/ComposeForms/$ip", size){ img.value = it}
+        application {
+            Window(onCloseRequest = ::exitApplication, title = "QR Code") {
+                window.size = Dimension(size, size)
+                val img = remember { mutableStateOf(ImageBitmap(size,size)) }
+                val ip = getIPAdress()
+                QRCodeService().getQRCode("https://stevevogel1.github.io/ComposeForms/$ip", size){ img.value = it}
 
-            Row(modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically){
-                Image(img.value, "QR Code")
+                Row(modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically){
+                    Image(img.value, "QR Code")
+                }
             }
         }
     }

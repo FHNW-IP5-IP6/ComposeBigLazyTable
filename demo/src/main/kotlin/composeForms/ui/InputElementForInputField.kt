@@ -410,6 +410,7 @@ private fun DropDownMenu(
  * @param add: function that gets invoked for adding an element
  * @param remove: function that gets invoked for removing an element
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun DropDownElement(model: IModel<*>,
                             label: Any?, currentSelectionValue: Set<*>,

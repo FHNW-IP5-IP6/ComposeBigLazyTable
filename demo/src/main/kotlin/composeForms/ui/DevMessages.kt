@@ -22,7 +22,7 @@
 
 package composeForms.ui
 
-import androidx.compose.desktop.Window
+import androidx.compose.ui.window.Window
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.application
 import composeForms.model.IModel
 import composeForms.ui.theme.BackgroundColorHeader
 import composeForms.ui.theme.BodyBackground
@@ -47,6 +48,7 @@ import composeForms.ui.theme.ColorsUtil.get
 import composeForms.ui.theme.FontOnBackground
 //import composeForms.ui.theme.ColorsUtil.Companion.get
 import composeForms.ui.theme.FormColors
+import java.awt.Dimension
 
 /**
  * External Window for showing thrown exceptions the composeForms.model : [IModel] has been informed of.
@@ -60,31 +62,34 @@ fun ExceptionWindow(model: IModel<*>){
         if (hasException()) {
             val showDetails = remember { mutableStateOf(false) }
             if (!showingException.value) {
-                Window(size = IntSize(1000, 300), title = getTitle()) {
+                application {
+                    Window(onCloseRequest = ::exitApplication, title = getTitle()) {
+                        window.size = Dimension(1000, 300)
 
-                    Column {
-                        //Title
-                        Box(
-                            modifier = Modifier.fillMaxWidth().height(38.dp)
-                                .border(0.dp, Color.Transparent, RoundedCornerShape(10.dp))
-                                .background(BackgroundColorHeader),
-                            contentAlignment = Alignment.Center
-                        ){
-                            Text("Error occurred", color = BodyBackground)
-                        }
-
-                        //Content
-                        val buttonText = if(showDetails.value) "Hide Details" else "Show Details"
-                        Column(modifier = Modifier.fillMaxWidth().padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text("Please contact your administrator. Following error occurred:", fontWeight = FontWeight.Bold)
-                            Text(model.getException()?.message ?: "No message was set")
-                            Button(
-                                colors = ButtonDefaults.buttonColors(backgroundColor = BackgroundColorHeader),
-                                onClick = { showDetails.value = !showDetails.value } ) {
-                                Text(buttonText, color = FontOnBackground)
+                        Column {
+                            //Title
+                            Box(
+                                modifier = Modifier.fillMaxWidth().height(38.dp)
+                                    .border(0.dp, Color.Transparent, RoundedCornerShape(10.dp))
+                                    .background(BackgroundColorHeader),
+                                contentAlignment = Alignment.Center
+                            ){
+                                Text("Error occurred", color = BodyBackground)
                             }
-                            DetailList(model, showDetails.value)
+
+                            //Content
+                            val buttonText = if(showDetails.value) "Hide Details" else "Show Details"
+                            Column(modifier = Modifier.fillMaxWidth().padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Text("Please contact your administrator. Following error occurred:", fontWeight = FontWeight.Bold)
+                                Text(model.getException()?.message ?: "No message was set")
+                                Button(
+                                    colors = ButtonDefaults.buttonColors(backgroundColor = BackgroundColorHeader),
+                                    onClick = { showDetails.value = !showDetails.value } ) {
+                                    Text(buttonText, color = FontOnBackground)
+                                }
+                                DetailList(model, showDetails.value)
+                            }
                         }
                     }
                 }

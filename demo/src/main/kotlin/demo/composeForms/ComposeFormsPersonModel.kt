@@ -306,7 +306,7 @@ class ComposeFormsPersonModel : BaseModel<ComposeFormsPersonLabels>(title = Comp
                     println("Downloading")
                     connect()
                     val allBytes = inputStream.readBytes()
-                    personPicture.value = org.jetbrains.skija.Image.makeFromEncoded(allBytes).asImageBitmap()
+                    personPicture.value = org.jetbrains.skia.Image.makeFromEncoded(allBytes).asImageBitmap()
                 }
             } catch (e: Exception) {
                 personPicture.value = ImageBitmap( 256, 256, ImageBitmapConfig.Alpha8, colorSpace = ColorSpaces.LinearExtendedSrgb)

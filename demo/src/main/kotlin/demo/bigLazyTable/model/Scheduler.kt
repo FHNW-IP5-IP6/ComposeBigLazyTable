@@ -23,7 +23,7 @@ class Scheduler(private val delayInMillis: Long = 50) {
         inProcess = true
         taskToDo = task
         CoroutineScope(Dispatchers.IO).launch {
-            delay(delayInMillis) // TODO: Test with 0 delay
+            delay(delayInMillis)
 
             if (taskToDo == task) {
                 taskToDo?.invoke()
