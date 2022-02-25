@@ -2,11 +2,16 @@ package demo.bigLazyTable.model
 
 import androidx.compose.runtime.*
 import bigLazyTable.paging.IPagingService
+import composeForms.model.attributes.Attribute
 import demo.bigLazyTable.utils.PageUtils
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import org.junit.platform.commons.util.LruCache
 import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.properties.Delegates
 
 private val Log = KotlinLogging.logger {}
 
@@ -16,46 +21,45 @@ private val Log = KotlinLogging.logger {}
  */
 class LazyTableController(
     private val pagingService: IPagingService<*>,
-    val pageSize: Int = 40,
+    val pageSize: Int = 40, // TODO: If enough time - make dynamic
     private val appState: AppState
 ) {
     private val firstPageNr = 0 // TODO: Use Nr everywhere!
     private val firstPageIndex = 0
 
-    var isFiltering by mutableStateOf(false)
-        private set
+    var filteredAttributes = mutableSetOf<Attribute<*, *, *>>()
+    var lastFilteredAttribute: Attribute<*, *, *>? = null
+    var attributeFilter: MutableMap<Attribute<*, *, *>, String> = mutableStateMapOf()
 
-    var nameFilter by mutableStateOf("")
-        private set
-
-    fun onNameFilterChanged(newFilter: String) {
-        nameFilter = newFilter
+    // TODO: Spinner instead of empty ... Rows when filtering?
+    fun onFiltersChanged(attribute: Attribute<*, *, *>, newFilter: String) {
+        attributeFilter[attribute] = newFilter
 
         isFiltering = newFilter != ""
-
         if (isFiltering) {
-            val filteredCount = pagingService.getFilteredCount(newFilter)
-//            appState.displayedItemsCount = filteredCount
-            appState.filteredList = Collections.nCopies(filteredCount, null)
 
-            // TODO: Add Scheduler call
-//            scheduler.set {  }
-            scheduler.set { loadAllNeededPagesForIndex(0) }
+            filterScheduler.scheduleTask {
+                filteredCount = pagingService.getFilteredCount(filter = newFilter, dbField = attribute.databaseField)
+                println("filtered Count = $filteredCount")
+                appState.filteredList = ArrayList(Collections.nCopies(filteredCount, null))
 
-            loadFirstPagesToFillCacheAndAddToAppStateList()
-            selectFirstPlaylist()
-            // TODO: Check also loadAllNeededPagesForIndex(0) instead of upper 2 calls
-
-            forceRecompose()
+                loadFirstPagesToFillCacheAndAddToAppStateList()
+            }
+        } else {
+            lastFilteredAttribute = null
+            filteredAttributes.remove(attribute)
         }
     }
 
+    var isFiltering by mutableStateOf(false)
+        private set
+
     val scheduler = Scheduler()
+    val filterScheduler = Scheduler(100)
 
     private val totalCount by lazy { pagingService.getTotalCount() }
+    private var filteredCount by Delegates.notNull<Int>()
     val totalPages = PageUtils.getTotalPages(totalCount = totalCount, pageSize = pageSize)
-//    private var filteredCount = { filter: String -> pagingService.getFilteredCount(filter = filter) }
-//    var totalDisplayedItems = if (nameFilter == "") totalCount else filteredCount(nameFilter)
 
     private var oldFirstVisibleItemIndex = firstPageIndex
 
@@ -65,9 +69,14 @@ class LazyTableController(
     var recomposeStateChanger by mutableStateOf(false)
 
     init {
+        appState.defaultPlaylistModel.displayedAttributesInTable.forEach { attribute ->
+            if (attribute.canBeFiltered) {
+                attributeFilter[attribute] = ""
+            }
+        }
+        println("attributeFilter: ${attributeFilter.size}")
         // Get first cacheSize=4 pages on app initialization, to select one for the forms
         CoroutineScope(Dispatchers.Main).launch {
-//            appState.displayedItemsCount = totalCount
             loadFirstPagesToFillCacheAndAddToAppStateList()
             selectFirstPlaylist()
         }
@@ -80,18 +89,17 @@ class LazyTableController(
             addPageToCache(pageNr = pageNr, pageOfModels = models)
             addToAppStateList(startIndex = startIndexOfPage, newPageNr = pageNr)
         }
+        forceRecompose()
     }
 
     private fun selectFirstPlaylist() {
         val fullList = if (isFiltering) appState.filteredList else appState.lazyModelList
         println("loadFirstPagesAndFillCacheAndSelectFirstPlaylist: appState.list size = ${fullList.size}")
-        // TODO: NullPointerException
-        selectPlaylistModel(fullList.first()!!)
+        fullList.first()?.let { firstPlaylist -> selectPlaylistModel(firstPlaylist) }
     }
 
     fun loadAllNeededPagesForIndex(firstVisibleItemIndex: Int) {
-        // Calculate current page visible in UI
-        val currPage = getPageNr(firstVisibleItemIndex = firstVisibleItemIndex)
+        val currentPageNr = getVisiblePageNr(firstVisibleItemIndex = firstVisibleItemIndex)
 
         // If firstVisibleItemIndex > oldFirstVisibleItemIndex --> scrolled down
         // If firstVisibleItemIndex < oldFirstVisibleItemIndex --> scrolled up
@@ -102,35 +110,57 @@ class LazyTableController(
 
         // Load cache size pages
         for (i in -1 until cacheSize - 1) {
-            val pageToLoad = currPage + i
-            if (pageToLoad in firstPageNr until totalPages) {
-                loadPage(pageNrToLoad = pageToLoad, scrolledDown = scrolledDown)
+            val pageNr = currentPageNr + i
+
+            // TODO: TotalPages is always with total count
+            //  Must this be set again but with filteredCount like below?
+//              totalPages = PageUtils.getTotalPages(totalCount = filteredCount, pageSize = pageSize)
+            if (pageNr in firstPageNr until totalPages) {
+                loadPage(pageNr = pageNr, scrolledDown = scrolledDown)
             }
         }
         forceRecompose()
     }
 
-    internal fun loadPage(pageNrToLoad: Int, scrolledDown: Boolean) {
-        if (!isPageInCache(pageNrToLoad)) {
+    internal fun loadPage(pageNr: Int, scrolledDown: Boolean) {
+        if (!isPageInCache(pageNr)) {
             // Calculate start index for page to load
-            val pageStartIndexToLoad = getStartIndexOfPage(pageNr = pageNrToLoad)
+            val pageStartIndexToLoad = getFirstIndexOfPage(pageNr = pageNr)
 
             //val playlistModels = requestDataAsync(scope = pagingScope, startIndexOfPage = pageStartIndexToLoad)
             val playlistModels = loadPageOfPlaylistModels(pageStartIndexToLoad)
             //addPageToCache(pageNr = pageNrToLoad, pageOfModels = playlistModels.await())
-            addPageToCache(pageNr = pageNrToLoad, pageOfModels = playlistModels)
+            addPageToCache(pageNr = pageNr, pageOfModels = playlistModels)
 
             updateAppStateList(
                 pageStartIndexToLoad = pageStartIndexToLoad,
-                pageToLoad = pageNrToLoad,
+                pageToLoad = pageNr,
                 isEnd = scrolledDown
             )
         }
     }
 
+    // TODO: Instead of string more generic
     internal fun loadPageOfPlaylistModels(startIndexOfPage: Int): List<PlaylistModel> {
-        println("loadPageAndMapToModels index=$startIndexOfPage filter=$nameFilter")
-        val page = pagingService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filter = nameFilter)
+        // TODO: Filter Class approach
+//        val filters: List<Filter> = filteredAttributes.map { Filter(attributeFilter[it] ?: "", it.databaseField, false) }
+//        println("Filters: $filters")
+//        val dbFields: List<Column<*>> = filteredAttributes.map { it.databaseField!! }
+//        println("loadPageAndMapToModels index=$startIndexOfPage filter=${filters.forEach { print(it.filter + " ") }}")
+
+//        val page = pagingService.getPage(startIndex = startIndexOfPage, pageSize = pageSize, filters = filters/*, dbFields = dbFields*/) // TODO: Fix this
+
+        // TODO: First try with one filter at a time
+        val filter = attributeFilter[lastFilteredAttribute] ?: ""
+        val dbField = lastFilteredAttribute?.databaseField
+
+        val page = pagingService.getPage(
+            startIndex = startIndexOfPage,
+            pageSize = pageSize,
+            filter = filter,
+            dbField = dbField
+        )
+
         return page.toPlaylistModels()
     }
 
@@ -164,12 +194,11 @@ class LazyTableController(
     internal fun addToAppStateList(startIndex: Int, newPageNr: Int) {
         if (isFiltering) {
             for (i in startIndex until startIndex + pageSize) {
-                if (i in firstPageIndex until totalCount) {
+                if (i in firstPageIndex until filteredCount) {
                     appState.filteredList.set(index = i, element = cache[newPageNr]!![i % pageSize])
                 }
             }
-        }
-        else {
+        } else {
             // Add new page to list
             for (i in startIndex until startIndex + pageSize) {
                 if (i in firstPageIndex until totalCount) {
@@ -196,12 +225,11 @@ class LazyTableController(
 
         if (isFiltering) {
             for (i in startIndexOldPage until startIndexOldPage + pageSize) {
-                if (i in firstPageIndex until totalCount) {
+                if (i in firstPageIndex until filteredCount) {
                     appState.filteredList.set(index = i, element = null)
                 }
             }
-        }
-        else {
+        } else {
             for (i in startIndexOldPage until startIndexOldPage + pageSize) {
                 if (i in firstPageIndex until totalCount) {
                     appState.lazyModelList.set(index = i, element = null)
@@ -226,34 +254,40 @@ class LazyTableController(
         if (firstVisibleItemIndex < firstPageIndex) throw IllegalArgumentException("firstVisibleItemIndex should be positive")
         if (firstVisibleItemIndex >= totalCount) throw IllegalArgumentException("firstVisibleItemIndex should be smaller than total count")
 
-        val pageNumberForVisibleIndex = getPageNr(firstVisibleItemIndex)
+        val visiblePageNr = getVisiblePageNr(firstVisibleItemIndex)
 
         // Catch all edge cases, to load only data if necessarily
-        if (pageNumberForVisibleIndex == firstPageIndex) {
-            return !isPageInCache(pageNumberForVisibleIndex)
+        return if (visiblePageNr == firstPageIndex) {
+            (!isPageInCache(visiblePageNr)
                     || !isPageInCache(1)
-                    || !isPageInCache(2)
-        } else if (pageNumberForVisibleIndex > totalPages) {
-            return !isPageInCache(pageNumberForVisibleIndex)
-                    || !isPageInCache(pageNumberForVisibleIndex - 1)
-                    || !isPageInCache(pageNumberForVisibleIndex + 1)
-        } else if (pageNumberForVisibleIndex > totalPages - 1) {
-            return !isPageInCache(pageNumberForVisibleIndex)
-                    || !isPageInCache(pageNumberForVisibleIndex - 1)
-        } else {
-            return !isPageInCache(pageNumberForVisibleIndex)
-                    || !isPageInCache(pageNumberForVisibleIndex - 1)
-                    || !isPageInCache(pageNumberForVisibleIndex + 1)
-                    || !isPageInCache(pageNumberForVisibleIndex + 2)
-        }
+                    || !isPageInCache(2))
+        } else if (visiblePageNr > totalPages) {
+            (!isPageInCache(visiblePageNr)
+                    || !isPageInCache(visiblePageNr - 1)
+                    || !isPageInCache(visiblePageNr + 1))
+        } else if (visiblePageNr > totalPages - 1) {
+            (!isPageInCache(visiblePageNr)
+                    || !isPageInCache(visiblePageNr - 1))
+        } else areNextAndPreviousPagesNotInCache(visiblePageNr)
     }
 
-    internal fun getPageNr(firstVisibleItemIndex: Int): Int = firstVisibleItemIndex / pageSize
+    private fun areNextAndPreviousPagesNotInCache(visiblePageNr: Int): Boolean {
+        return !isPageInCache(visiblePageNr)
+                || !isPageInCache(visiblePageNr - 1)
+                || !isPageInCache(visiblePageNr + 1)
+                || !isPageInCache(visiblePageNr + 2)
+    }
 
-    internal fun getStartIndexOfPage(pageNr: Int): Int = pageNr * pageSize
+    internal fun getVisiblePageNr(firstVisibleItemIndex: Int): Int =
+        firstVisibleItemIndex / pageSize
 
-    internal fun isPageInCache(pageNr: Int): Boolean = cache.containsKey(pageNr)
+    internal fun getFirstIndexOfPage(pageNr: Int): Int =
+        pageNr * pageSize
 
+    internal fun isPageInCache(pageNr: Int): Boolean =
+        cache.containsKey(pageNr)
+
+    // TODO: Instead add member pagesLoaded: Boolean & Make a LaunchedEffect in LazyTable
     private fun forceRecompose() {
         recomposeStateChanger = !recomposeStateChanger
     }

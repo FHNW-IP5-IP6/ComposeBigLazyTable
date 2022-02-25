@@ -30,6 +30,7 @@ import composeForms.model.meanings.Default
 import composeForms.model.meanings.SemanticMeaning
 import composeForms.model.validators.semanticValidators.SelectionValidator
 import composeForms.model.validators.semanticValidators.SemanticValidator
+import org.jetbrains.exposed.sql.Column
 
 /**
  * The [SelectionAttribute] is the implementation of type set of Labels.
@@ -66,12 +67,25 @@ class SelectionAttribute<L>(
     meaning             : SemanticMeaning<Set<L>>               = Default(),
     formatter           : IFormatter<Set<L>>                    = IFormatter{
         it?.map{ it.getLanguageStringFromLabel(it, model.getCurrentLanguage())}.toString().removePrefix("[").removeSuffix("]")
-    }
+    },
 
-) : Attribute<SelectionAttribute<L>, Set<L>, L>(model = model, value = value, label = label, required = required, readOnly = readOnly,
-    observedAttributes = observedAttributes, validators = validators, convertibles = convertibles, meaning = meaning,
-    formatter = formatter)
-        where L : ILabel, L: Enum<*> {
+    canBeFiltered       : Boolean                               = true,
+    databaseField       : Column<*>?                            = null
+
+) : Attribute<SelectionAttribute<L>, Set<L>, L>(
+    model = model,
+    value = value,
+    label = label,
+    required = required,
+    readOnly = readOnly,
+    observedAttributes = observedAttributes,
+    validators = validators,
+    convertibles = convertibles,
+    meaning = meaning,
+    formatter = formatter,
+    canBeFiltered = canBeFiltered,
+    databaseField = databaseField
+) where L : ILabel, L: Enum<*> {
 
     override val typeT: Set<L>
         get() = setOf()

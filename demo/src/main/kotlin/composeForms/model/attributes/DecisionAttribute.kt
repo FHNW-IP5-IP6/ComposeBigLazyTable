@@ -26,6 +26,7 @@ import composeForms.model.ILabel
 import composeForms.model.IModel
 import composeForms.model.meanings.Default
 import composeForms.model.meanings.SemanticMeaning
+import org.jetbrains.exposed.sql.Column
 
 /**
  * The [DecisionAttribute] is an attribute implementation to represent a decision between two values (Strings).
@@ -54,12 +55,25 @@ open class DecisionAttribute<L>(
     value                               : String                                = decisionText1.getLanguageStringFromLabel(decisionText1, model.getCurrentLanguage()),
     readOnly                            : Boolean                               = false,
     observedAttributes                  : List<(a: Attribute<*,*,*>) -> Unit>   = emptyList(),
-    meaning                             : SemanticMeaning<Any>                  = Default()
+    meaning                             : SemanticMeaning<Any>                  = Default(),
 
-    ) : DualAttribute<DecisionAttribute<L>, Any, L>(model = model, value = value, label = label,
-        decision1Text = decisionText1, decision2Text = decisionText2, decision1SaveValue = decisionText1.getLanguageStringFromLabel(decisionText1, model.getCurrentLanguage()),
-        decision2SaveValue = decisionText2.getLanguageStringFromLabel(decisionText2, model.getCurrentLanguage()), readOnly = readOnly, observedAttributes = observedAttributes,
-        meaning = meaning) where L: Enum<*>, L : ILabel {
+    canBeFiltered                       : Boolean                               = true,
+    databaseField                       : Column<*>?                            = null
+
+) : DualAttribute<DecisionAttribute<L>, Any, L>(
+    model = model,
+    value = value,
+    label = label,
+    decision1Text = decisionText1,
+    decision2Text = decisionText2,
+    decision1SaveValue = decisionText1.getLanguageStringFromLabel(decisionText1, model.getCurrentLanguage()),
+    decision2SaveValue = decisionText2.getLanguageStringFromLabel(decisionText2, model.getCurrentLanguage()),
+    readOnly = readOnly,
+    observedAttributes = observedAttributes,
+    meaning = meaning,
+    canBeFiltered = canBeFiltered,
+    databaseField = databaseField
+) where L: Enum<*>, L : ILabel {
 
 
     override val typeT: String

@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import bigLazyTable.paging.IPagingService
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.properties.Delegates
 
 /**
  * @author Marco Sprenger, Livio Näf
@@ -40,7 +39,7 @@ class AppState(pagingService: IPagingService<*>) {
      * All elements in the filteredList cache are stored in this list. The rest is filled with the defaultPlaylistModel
      * to provide the default loading data.
      */
-    lateinit var filteredList: MutableList<PlaylistModel?>
+    var filteredList: MutableList<PlaylistModel?> = ArrayList(Collections.nCopies(40, null))
 
     /**
      * List of all Models with changes. Used to prevent loosing changed data if new data is loaded from the service.

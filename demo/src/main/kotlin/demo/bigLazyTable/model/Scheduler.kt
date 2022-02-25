@@ -35,7 +35,7 @@ class Scheduler(private val delayInMillis: Long = 50) {
         }
     }
 
-    fun set(task: () -> Unit) {
+    fun scheduleTask(task: () -> Unit) {
         this.task = task
         process()
     }

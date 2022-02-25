@@ -32,6 +32,10 @@ sourceSets {
             api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
             testImplementation("io.mockk:mockk:1.11.0")
 
+            implementation("org.jetbrains.exposed:exposed-core:0.35.3")
+            implementation("org.jetbrains.exposed:exposed-dao:0.35.3")
+            implementation("org.jetbrains.exposed:exposed-jdbc:0.35.3")
+
             implementation(compose.desktop.currentOs)
         }
     }

@@ -248,7 +248,7 @@ internal class LazyTableControllerTest {
     @Test
     fun `loadPage works with pageNrToLoad 0 & scrolledDown = false`() {
         assertDoesNotThrow {
-            viewModel.loadPage(pageNrToLoad = 0, scrolledDown = false)
+            viewModel.loadPage(pageNr = 0, scrolledDown = false)
         }
     }
 
@@ -257,7 +257,7 @@ internal class LazyTableControllerTest {
     @Test
     fun `loadPage works with pageNrToLoad 0 & scrolledDown = true`() {
         assertDoesNotThrow {
-            viewModel.loadPage(pageNrToLoad = 0, scrolledDown = true)
+            viewModel.loadPage(pageNr = 0, scrolledDown = true)
         }
     }
 
@@ -266,7 +266,7 @@ internal class LazyTableControllerTest {
     @Test
     fun `loadPage works with pageNrToLoad 100 & scrolledDown = true`() {
         assertDoesNotThrow {
-            viewModel.loadPage(pageNrToLoad = 100, scrolledDown = true)
+            viewModel.loadPage(pageNr = 100, scrolledDown = true)
         }
     }
 
@@ -381,61 +381,61 @@ internal class LazyTableControllerTest {
 
     @Test
     fun `calculatePageNumberForListIndex works with list index 0`() {
-        val pageNumber = viewModel.getPageNr(firstVisibleItemIndex = 0)
+        val pageNumber = viewModel.getVisiblePageNr(firstVisibleItemIndex = 0)
         assertEquals(0, pageNumber)
     }
 
     @Test
     fun `calculatePageNumberForListIndex works with list index 40`() {
-        val pageNumber = viewModel.getPageNr(firstVisibleItemIndex = 40)
+        val pageNumber = viewModel.getVisiblePageNr(firstVisibleItemIndex = 40)
         assertEquals(1, pageNumber)
     }
 
     @Test
     fun `calculatePageNumberForListIndex works with list index 25_000`() {
-        val pageNumber = viewModel.getPageNr(firstVisibleItemIndex = 25_000)
+        val pageNumber = viewModel.getVisiblePageNr(firstVisibleItemIndex = 25_000)
         assertEquals(625, pageNumber)
     }
 
     @Test
     fun `calculatePageNumberForListIndex works with list index 999_960`() {
-        val pageNumber = viewModel.getPageNr(firstVisibleItemIndex = 999_960)
+        val pageNumber = viewModel.getVisiblePageNr(firstVisibleItemIndex = 999_960)
         assertEquals(24_999, pageNumber)
     }
 
     @Test
     fun `calculatePageNumberForListIndex works with list index 999_961`() {
-        val pageNumber = viewModel.getPageNr(firstVisibleItemIndex = 999_961)
+        val pageNumber = viewModel.getVisiblePageNr(firstVisibleItemIndex = 999_961)
         assertEquals(24_999, pageNumber)
     }
 
     @Test
     fun `calculatePageNumberForListIndex works with list index 1_000_000`() {
-        val pageNumber = viewModel.getPageNr(firstVisibleItemIndex = 1_000_000)
+        val pageNumber = viewModel.getVisiblePageNr(firstVisibleItemIndex = 1_000_000)
         assertEquals(25_000, pageNumber)
     }
 
     @Test
     fun `calculatePageStartIndexToLoad works with pageNr 0`() {
-        val startIndexToLoad = viewModel.getStartIndexOfPage(pageNr = 0)
+        val startIndexToLoad = viewModel.getFirstIndexOfPage(pageNr = 0)
         assertEquals(0, startIndexToLoad)
     }
 
     @Test
     fun `calculatePageStartIndexToLoad works with pageNr 1`() {
-        val startIndexToLoad = viewModel.getStartIndexOfPage(pageNr = 1)
+        val startIndexToLoad = viewModel.getFirstIndexOfPage(pageNr = 1)
         assertEquals(40, startIndexToLoad)
     }
 
     @Test
     fun `calculatePageStartIndexToLoad works with pageNr 2`() {
-        val startIndexToLoad = viewModel.getStartIndexOfPage(pageNr = 2)
+        val startIndexToLoad = viewModel.getFirstIndexOfPage(pageNr = 2)
         assertEquals(80, startIndexToLoad)
     }
 
     @Test
     fun `calculatePageStartIndexToLoad works with pageNr 625`() {
-        val startIndexToLoad = viewModel.getStartIndexOfPage(pageNr = 625)
+        val startIndexToLoad = viewModel.getFirstIndexOfPage(pageNr = 625)
         assertEquals(25_000, startIndexToLoad)
     }
 

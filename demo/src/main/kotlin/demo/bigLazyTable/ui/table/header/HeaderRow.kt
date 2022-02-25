@@ -18,6 +18,8 @@ import demo.bigLazyTable.model.AppState
 import demo.bigLazyTable.model.LazyTableController
 import demo.bigLazyTable.ui.table.TableCell
 import demo.bigLazyTable.ui.theme.BackgroundColorHeader
+import java.util.*
+import kotlin.collections.ArrayList
 
 @Composable
 fun HeaderRow(
@@ -34,35 +36,31 @@ fun HeaderRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        for (attribute in appState.defaultPlaylistModel.lazyListAttributes) {
+        for (attribute in appState.defaultPlaylistModel.displayedAttributesInTable) {
             Column {
-                if (attribute.getLabel() == "Name") { // at the moment only name can be filtered!
+                if (attribute.canBeFiltered) {
+
                     TextField(
                         modifier = Modifier.width(180.dp),
-                        value = controller.nameFilter,
-                        onValueChange = { controller.onNameFilterChanged(it) },
+                        value = controller.attributeFilter[attribute].toString(),
+                        onValueChange = { newValue ->
+                            controller.lastFilteredAttribute = attribute
+                            controller.filteredAttributes.add(attribute)
+
+                            controller.onFiltersChanged(attribute, newValue)
+                        },
                         textStyle = TextStyle(color = Color.White),
                         label = { Text("Filter", color = Color.White) },
                         singleLine = true,
                         trailingIcon = {
-                            if (controller.nameFilter != "") {
-                                IconButton(
-                                    onClick = { controller.onNameFilterChanged("") },
-//                                    TODO: Why does it show the text cursor and not normal/hand?
-//                                    https://stackoverflow.com/questions/4274606/how-to-change-cursor-icon-in-java
-//                                    https://stackoverflow.com/questions/64855189/clickable-areas-of-image-mouseover-event-jetpack-compose-desktop
-//                                    modifier = Modifier.pointerMoveFilter(
-//                                        onEnter = {
-//                                            frameWindowScope.window.cursor = Cursor(HAND_CURSOR)
-//                                            println("On Mouse(pointer) Enter")
-//                                            false
-//                                        },
-//                                        onExit = {
-//                                            frameWindowScope.getDefaultCursor()
-//                                            println("on Mouse(pointer) Exit")
-//                                            false
-//                                        })
-                                ) {
+                            if (controller.attributeFilter[attribute].toString() != "") {
+                                IconButton(onClick = {
+                                    controller.lastFilteredAttribute = null
+                                    controller.filteredAttributes.remove(attribute)
+                                    appState.filteredList.clear()
+                                    appState.filteredList = ArrayList(Collections.nCopies(40, null))
+                                    controller.onFiltersChanged(attribute, "")
+                                }) {
                                     Icon(
                                         imageVector = Icons.Filled.Close,
                                         contentDescription = "Clear Filter",
@@ -78,7 +76,6 @@ fun HeaderRow(
                         value = "",
                         onValueChange = {},
                         textStyle = TextStyle(color = Color.White),
-//                        label = { Text("Filter", color = Color.White) },
                         singleLine = true,
                         enabled = false
                     )

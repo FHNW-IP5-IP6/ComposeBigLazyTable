@@ -29,6 +29,7 @@ import composeForms.model.formatter.IFormatter
 import composeForms.model.meanings.Default
 import composeForms.model.meanings.SemanticMeaning
 import composeForms.model.validators.semanticValidators.SemanticValidator
+import org.jetbrains.exposed.sql.Column
 
 /**
  * The [StringAttribute] is the attribute implementation for type String.
@@ -56,16 +57,29 @@ class StringAttribute<L>(
     value                   : String?                               = null,
     required                : Boolean                               = false,
     readOnly                : Boolean                               = false,
-    observedAttributes      : List<(a: Attribute<*, *, *>) -> Unit>   = emptyList(),
+    observedAttributes      : List<(a: Attribute<*, *, *>) -> Unit> = emptyList(),
     validators              : List<SemanticValidator<String, L>>    = mutableListOf(),
     convertibles            : List<CustomConvertible>               = emptyList(),
     meaning                 : SemanticMeaning<String>               = Default(),
-    formatter               : IFormatter<String>?                   = null
+    formatter               : IFormatter<String>?                   = null,
 
-) : Attribute<StringAttribute<L>, String, L>(model = model, value = value, label = label, required = required,
-    readOnly = readOnly, observedAttributes = observedAttributes ,validators = validators,
-    convertibles = convertibles, meaning = meaning, formatter =  formatter)
-        where L: Enum<*>, L : ILabel {
+    canBeFiltered           : Boolean                               = true,
+    databaseField           : Column<*>?                            = null
+
+) : Attribute<StringAttribute<L>, String, L>(
+    model = model,
+    value = value,
+    label = label,
+    required = required,
+    readOnly = readOnly,
+    observedAttributes = observedAttributes,
+    validators = validators,
+    convertibles = convertibles,
+    meaning = meaning,
+    formatter = formatter,
+    canBeFiltered = canBeFiltered,
+    databaseField = databaseField
+) where L: Enum<*>, L : ILabel {
 
     override val typeT: String
         get() = "0"

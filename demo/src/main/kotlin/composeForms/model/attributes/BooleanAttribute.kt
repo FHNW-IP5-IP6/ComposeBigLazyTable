@@ -26,6 +26,7 @@ import composeForms.model.ILabel
 import composeForms.model.IModel
 import composeForms.model.meanings.Default
 import composeForms.model.meanings.SemanticMeaning
+import org.jetbrains.exposed.sql.Column
 
 /**
  * The [BooleanAttribute] is the attribute implementation of type Boolean.
@@ -55,12 +56,25 @@ class BooleanAttribute<L>(
     meaning                 : SemanticMeaning<Boolean>              = Default(),
 
     falseText               : L                                     = Decision.False as L,
-    trueText                : L                                     = Decision.True as L
+    trueText                : L                                     = Decision.True as L,
 
-    ) : DualAttribute<BooleanAttribute<L>, Boolean, L>(model = model, label = label, decision1Text = falseText,
-    decision2Text = trueText, decision1SaveValue = false, decision2SaveValue = true , value = value, readOnly = readOnly,
-    observedAttributes = observedAttributes, meaning = meaning
-    ) where L : ILabel, L: Enum<*> {
+    canBeFiltered           : Boolean                               = true,
+    databaseField           : Column<*>?                            = null
+
+) : DualAttribute<BooleanAttribute<L>, Boolean, L>(
+    model = model,
+    label = label,
+    decision1Text = falseText,
+    decision2Text = trueText,
+    decision1SaveValue = false,
+    decision2SaveValue = true,
+    value = value,
+    readOnly = readOnly,
+    observedAttributes = observedAttributes,
+    meaning = meaning,
+    canBeFiltered = canBeFiltered,
+    databaseField = databaseField
+) where L : ILabel, L: Enum<*> {
 
     override val typeT: Boolean
         get() = false

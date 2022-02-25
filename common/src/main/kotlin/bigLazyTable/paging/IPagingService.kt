@@ -1,16 +1,29 @@
 package bigLazyTable.paging
 
+import org.jetbrains.exposed.sql.Column
+
+data class Filter(
+    val filter: String, //Int/usw generisch
+    val dbField: Column<*>?,
+    var caseSensitive: Boolean
+)
+
+data class Sort(
+    val dbField: Column<*>?,
+    val sorted: String // ENUM/
+)
+
 /**
  * @author Marco Sprenger, Livio Näf
  */
 interface IPagingService<T> {
 
-    // TODO: Do we even need pageSize as a parameter if it is always the same value which will be set at the beginning?
-    //  Because now the Service has a reference to the pageSize and it will make it duplicated
-    // TODO: does it make sense to add a Filter Object with filter: String & caseSensitive: Boolean as Parameters?
-    fun getPage(startIndex: Int, pageSize: Int, filter: String = "", caseSensitive: Boolean = false, sorted: String = ""): List<T>
+    fun getPage(startIndex: Int, pageSize: Int, filter: String = "", dbField: Column<*>?, caseSensitive: Boolean = false, sorted: String = ""): List<T>
 
-    fun getFilteredCount(filter: String, caseSensitive: Boolean = false): Int
+    // TODO: 1 sort
+    fun getPageNew(startIndex: Int, pageSize: Int, filters: List<Filter>?, sorted: String = ""): List<T>
+
+    fun getFilteredCount(filter: String, dbField: Column<*>?, caseSensitive: Boolean = false): Int
 
     fun getTotalCount(): Int
 

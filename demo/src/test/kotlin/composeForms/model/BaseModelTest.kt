@@ -439,7 +439,7 @@ internal class BaseModelTest {
         //when
         attr = object : Attribute<StringAttribute<Label>, String, Label>(model,
             Label.NO_OF_CHILDREN, null, false, false, emptyList(), emptyList(),
-            emptyList(), Default(), IFormatter{it?:""}){
+            emptyList(), Default(), IFormatter{it?:""}, false, null){
             override val typeT: String
                 get() = ""
         }
