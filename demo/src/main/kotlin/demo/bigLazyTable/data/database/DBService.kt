@@ -31,7 +31,7 @@ object DBService : IPagingService<Playlist> {
         if (startIndex > lastIndex) throw IllegalArgumentException("startIndex must be smaller than/equal to the lastIndex and not $startIndex")
         if (startIndex < 0) throw IllegalArgumentException("only positive values are allowed for startIndex")
 
-        val start: Long = /*if (filter == "") */startIndex.toLong()
+        val start: Long = startIndex.toLong()
         println("Offset: Start = $start")
         if (sorted != "ASC" && sorted != "DESC") {
             return transaction {

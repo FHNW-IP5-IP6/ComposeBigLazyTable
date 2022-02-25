@@ -6,6 +6,7 @@ data class Filter(
     val filter: String,
     val dbField: Column<*>?,
     var caseSensitive: Boolean
+    // TODO: Add Sorted here? because it uses the same dbField as we pass for a filter -> renameClass to FilterSort?
 )
 
 /**
