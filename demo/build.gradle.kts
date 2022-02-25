@@ -59,6 +59,10 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.currentOs)
 
+                // Mock
+                implementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
+                implementation("io.mockk:mockk:1.11.0")
+
                 // UI Testing
                 //implementation("androidx.compose.ui:ui-test-desktop:1.0.0-beta06")
                 implementation("org.jetbrains.compose.ui:ui-test-junit4-desktop:1.0.1")
