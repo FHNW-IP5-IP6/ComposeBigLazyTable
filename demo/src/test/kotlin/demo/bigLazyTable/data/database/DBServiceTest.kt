@@ -14,6 +14,7 @@ import java.util.NoSuchElementException
 
 private val Log = KotlinLogging.logger {}
 
+@Disabled
 internal class DBServiceTest {
 
     private lateinit var dbService: DBService
