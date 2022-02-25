@@ -22,6 +22,8 @@ enum class BLTLabels(val deutsch: String, val english: String) : ILabel {
     SELECTION_NO("Nein", "No"),
     MODIFIED_AT("Geändert am", "Modified at"),
     NUM_TRACKS("Anz. Songs", "No. of tracks"),
+    NUM_TRACKS_DOUBLE("Anz. Songs Double", "No. of tracks Double"),
+    NUM_TRACKS_FLOAT("Anz. Songs Float", "No. of tracks Float"),
     NUM_ALBUMS("Anz. Alben", "No. of albums"),
     NUM_FOLLOWERS("Anz. Follower", "No. of followers"),
     NUM_EDITS("Anz. Änderungen", "No. of edits"),

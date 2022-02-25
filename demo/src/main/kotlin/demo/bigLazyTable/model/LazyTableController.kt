@@ -31,22 +31,20 @@ class LazyTableController(
     var lastFilteredAttribute: Attribute<*, *, *>? = null
     var attributeFilter: MutableMap<Attribute<*, *, *>, String> = mutableStateMapOf()
 
+    // TODO: Spinner instead of empty ... Rows when filtering?
     fun onFiltersChanged(attribute: Attribute<*, *, *>, newFilter: String) {
         attributeFilter[attribute] = newFilter
 
         isFiltering = newFilter != ""
-
         if (isFiltering) {
-            filteredCount = pagingService.getFilteredCount(filter = newFilter, dbField = attribute.databaseField)
-            println("filtered Count = $filteredCount")
-            appState.filteredList = ArrayList(Collections.nCopies(filteredCount, null))
 
-            Scheduler().scheduleTask {
+            scheduler.scheduleTask {
+                filteredCount = pagingService.getFilteredCount(filter = newFilter, dbField = attribute.databaseField)
+                println("filtered Count = $filteredCount")
+                appState.filteredList = ArrayList(Collections.nCopies(filteredCount, null))
+
                 loadFirstPagesToFillCacheAndAddToAppStateList()
-                loadAllNeededPagesForIndex(oldFirstVisibleItemIndex)
-                forceRecompose()
             }
-            forceRecompose()
         } else {
             lastFilteredAttribute = null
             filteredAttributes.remove(attribute)
@@ -55,26 +53,6 @@ class LazyTableController(
 
     var isFiltering by mutableStateOf(false)
         private set
-
-//    var nameFilter by mutableStateOf("")
-//        private set
-//
-//    fun onNameFilterChanged(newFilter: String) {
-//        nameFilter = newFilter
-//
-//        isFiltering = newFilter != ""
-//
-//        if (isFiltering) {
-//            filteredCount = pagingService.getFilteredCount(newFilter)
-//            appState.filteredList = ArrayList(Collections.nCopies(filteredCount, null))
-//
-//            Scheduler().scheduleTask {
-//                loadFirstPagesToFillCacheAndAddToAppStateList()
-//                forceRecompose()
-//            }
-//            forceRecompose()
-//        }
-//    }
 
     val scheduler = Scheduler()
 
@@ -110,6 +88,7 @@ class LazyTableController(
             addPageToCache(pageNr = pageNr, pageOfModels = models)
             addToAppStateList(startIndex = startIndexOfPage, newPageNr = pageNr)
         }
+        forceRecompose()
     }
 
     private fun selectFirstPlaylist() {

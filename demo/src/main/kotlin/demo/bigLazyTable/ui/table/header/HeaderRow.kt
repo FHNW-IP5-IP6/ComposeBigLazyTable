@@ -18,6 +18,8 @@ import demo.bigLazyTable.model.AppState
 import demo.bigLazyTable.model.LazyTableController
 import demo.bigLazyTable.ui.table.TableCell
 import demo.bigLazyTable.ui.theme.BackgroundColorHeader
+import java.util.*
+import kotlin.collections.ArrayList
 
 @Composable
 fun HeaderRow(
@@ -40,23 +42,24 @@ fun HeaderRow(
 
                     TextField(
                         modifier = Modifier.width(180.dp),
-                        value = viewModel.attributeFilter[attribute].toString(), //viewModel.nameFilter,
-                        onValueChange = {
-                            viewModel.lastFilteredAttribute = attribute // with one filter at a time approach
-                            viewModel.filteredAttributes.add(attribute) // with many filters approach
+                        value = viewModel.attributeFilter[attribute].toString(),
+                        onValueChange = { newValue ->
+                            viewModel.lastFilteredAttribute = attribute
+                            viewModel.filteredAttributes.add(attribute)
 
-                            viewModel.onFiltersChanged(attribute, it)
-                        }, //{ viewModel.onNameFilterChanged(it) },
+                            viewModel.onFiltersChanged(attribute, newValue)
+                        },
                         textStyle = TextStyle(color = Color.White),
                         label = { Text("Filter", color = Color.White) },
                         singleLine = true,
                         trailingIcon = {
-                            if (/*viewModel.nameFilter*/viewModel.attributeFilter[attribute].toString() != "") {
+                            if (viewModel.attributeFilter[attribute].toString() != "") {
                                 IconButton(onClick = {
                                     viewModel.lastFilteredAttribute = null
                                     viewModel.filteredAttributes.remove(attribute)
+                                    appState.filteredList.clear()
+                                    appState.filteredList = ArrayList(Collections.nCopies(40, null))
                                     viewModel.onFiltersChanged(attribute, "")
-//                                    viewModel.onNameFilterChanged("")
                                 }) {
                                     Icon(
                                         imageVector = Icons.Filled.Close,

@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -35,6 +36,11 @@ fun LazyTable(
                 if (isTimeToLoadPage(firstVisibleItemIndex)) {
                     scheduler.scheduleTask { loadAllNeededPagesForIndex(firstVisibleItemIndex) }
                 }
+//                if (viewModel.isFiltering) {
+                    LaunchedEffect(key1 = viewModel.isFiltering) {
+                        verticalLazyListState.scrollToItem(0)
+                    }
+//                }
 
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(4.dp),

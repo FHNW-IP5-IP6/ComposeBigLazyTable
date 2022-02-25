@@ -13,6 +13,7 @@ import demo.bigLazyTable.data.database.DatabasePlaylists
  */
 class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTLabels>(title = BLTLabels.TITLE) {
 
+    // Our Filter treats all values as Strings so
     // TODO: Add a floatingPointAttribute (Double/Float) to test if it works aswell with them
     // TODO: Add a DecisionAttribute to test (Is like BooleanAttri. a DualAttribute
     // TODO: Add a SelectionAttribute to test
@@ -69,6 +70,22 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         databaseField = DatabasePlaylists.num_tracks
     )
 
+    private val numTracksDouble = DoubleAttribute(
+        model = this,
+        label = BLTLabels.NUM_TRACKS_DOUBLE,
+        value = playlist.numTracksDouble,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.num_tracks_double
+    )
+
+    private val numTracksFloat = FloatAttribute(
+        model = this,
+        label = BLTLabels.NUM_TRACKS_FLOAT,
+        value = playlist.numTracksFloat,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.num_tracks_float
+    )
+
     val displayedAttributesInTable = listOf(
         id,
         name,
@@ -76,19 +93,21 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         track0ArtistName,
         collaborative,
         numTracks,
+        numTracksDouble,
+        numTracksFloat
     )
 
-    private val numAlbums = IntegerAttribute(
-        model = this,
-        label = BLTLabels.NUM_ALBUMS,
-        value = playlist.numAlbums
-    )
-
-    private val numFollowers = IntegerAttribute(
-        model = this,
-        label = BLTLabels.NUM_FOLLOWERS,
-        value = playlist.numFollowers
-    )
+//    private val numAlbums = IntegerAttribute(
+//        model = this,
+//        label = BLTLabels.NUM_ALBUMS,
+//        value = playlist.numAlbums
+//    )
+//
+//    private val numFollowers = IntegerAttribute(
+//        model = this,
+//        label = BLTLabels.NUM_FOLLOWERS,
+//        value = playlist.numFollowers
+//    )
 
     private val numEdits = IntegerAttribute(
         model = this,
@@ -236,8 +255,8 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         Field(collaborative, FieldSize.SMALL),
         Field(modifiedAt, FieldSize.SMALL),
         Field(numTracks, FieldSize.SMALL),
-        Field(numAlbums, FieldSize.SMALL),
-        Field(numFollowers, FieldSize.SMALL),
+//        Field(numAlbums, FieldSize.SMALL),
+//        Field(numFollowers, FieldSize.SMALL),
         Field(numEdits, FieldSize.SMALL),
         Field(numArtists, FieldSize.SMALL),
         Field(durationMs, FieldSize.SMALL),
