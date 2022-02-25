@@ -91,6 +91,7 @@ object DBService : IPagingService<Playlist> {
 
     private fun Table.selectWithAllFilters(filters: List<Filter>?): Query {
         if (filters == null || filters.isEmpty()) return Query(this, null)
+
         if (filters.size == 1) {
             val filter = filters.first()
             return this.select {
@@ -102,8 +103,11 @@ object DBService : IPagingService<Playlist> {
             }
         }
 
-        var sql: Op<Boolean> = filters.first().dbField as Column<String> like ""
+        val firstFilter = filters.first()
+        var sql: Op<Boolean> = firstFilter.dbField as Column<String> like "%${firstFilter.filter}%"
         for (filter in filters) {
+            // TODO: as Column<Double/Float/Int/...> equals filter.toDouble()/usw
+//            when (dbField)
             sql = sql and (filter.dbField as Column<String> like "%${filter.filter}%")
         }
         return this.select { sql }
@@ -176,6 +180,7 @@ object DBService : IPagingService<Playlist> {
      * @param resultRow the return type of a query from the Exposed framework
      * @return a Playlist filled with all the needed attributes from the [resultRow]
      */
+    // TODO: Playlist in data layer
     private fun mapResultRowToPlaylist(resultRow: ResultRow): Playlist = resultRow.let {
         Playlist(
             it[DatabasePlaylists.id],

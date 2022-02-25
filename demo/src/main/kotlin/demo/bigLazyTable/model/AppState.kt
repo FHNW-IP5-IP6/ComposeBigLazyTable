@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import bigLazyTable.paging.IPagingService
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.properties.Delegates
 
 /**
  * @author Marco Sprenger, Livio Näf

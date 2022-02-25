@@ -1,6 +1,5 @@
 package demo.bigLazyTable.data.database
 
-import bigLazyTable.paging.Filter
 import bigLazyTable.paging.IPagingService
 import demo.bigLazyTable.model.Playlist
 import demo.bigLazyTable.utils.PageUtils

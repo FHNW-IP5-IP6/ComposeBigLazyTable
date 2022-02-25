@@ -3,10 +3,14 @@ package bigLazyTable.paging
 import org.jetbrains.exposed.sql.Column
 
 data class Filter(
-    val filter: String,
+    val filter: String, //Int/usw generisch
     val dbField: Column<*>?,
     var caseSensitive: Boolean
-    // TODO: Add Sorted here? because it uses the same dbField as we pass for a filter -> renameClass to FilterSort?
+)
+
+data class Sort(
+    val dbField: Column<*>?,
+    val sorted: String // ENUM/
 )
 
 /**
@@ -16,7 +20,7 @@ interface IPagingService<T> {
 
     fun getPage(startIndex: Int, pageSize: Int, filter: String = "", dbField: Column<*>?, caseSensitive: Boolean = false, sorted: String = ""): List<T>
 
-    // TODO: does it make sense to add a Filter Object with filter: String & caseSensitive: Boolean as Parameters?
+    // TODO: 1 sort
     fun getPageNew(startIndex: Int, pageSize: Int, filters: List<Filter>?, sorted: String = ""): List<T>
 
     fun getFilteredCount(filter: String, dbField: Column<*>?, caseSensitive: Boolean = false): Int

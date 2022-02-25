@@ -139,6 +139,7 @@ class LazyTableController(
         }
     }
 
+    // TODO: Instead of string more generic
     internal fun loadPageOfPlaylistModels(startIndexOfPage: Int): List<PlaylistModel> {
         // TODO: Filter Class approach
 //        val filters: List<Filter> = filteredAttributes.map { Filter(attributeFilter[it] ?: "", it.databaseField, false) }
