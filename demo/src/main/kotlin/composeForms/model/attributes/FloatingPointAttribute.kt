@@ -28,6 +28,7 @@ import composeForms.model.IModel
 import composeForms.model.formatter.IFormatter
 import composeForms.model.meanings.SemanticMeaning
 import composeForms.model.validators.semanticValidators.SemanticValidator
+import org.jetbrains.exposed.sql.Column
 
 /**
  *
@@ -60,9 +61,22 @@ abstract class FloatingPointAttribute <F,T,L> (
     validators                  : List<SemanticValidator<T,L>>,
     convertibles                : List<CustomConvertible>,
     meaning                     : SemanticMeaning<T>,
-    formatter                   : IFormatter<T>?
+    formatter                   : IFormatter<T>?,
 
-) : NumberAttribute<F, T, L>(model = model, value = value, label = label, required = required, readOnly = readOnly,
-    observedAttributes = observedAttributes, validators = validators, convertibles = convertibles, meaning = meaning,
-    formatter = formatter)
-        where F : FloatingPointAttribute<F, T, L>, T : Number, T : Comparable<T>, L: Enum<*>, L : ILabel
+    canBeFiltered                       : Boolean,
+    databaseField                       : Column<*>?
+
+) : NumberAttribute<F, T, L>(
+    model = model,
+    value = value,
+    label = label,
+    required = required,
+    readOnly = readOnly,
+    observedAttributes = observedAttributes,
+    validators = validators,
+    convertibles = convertibles,
+    meaning = meaning,
+    formatter = formatter,
+    canBeFiltered = canBeFiltered,
+    databaseField = databaseField
+) where F : FloatingPointAttribute<F, T, L>, T : Number, T : Comparable<T>, L: Enum<*>, L : ILabel

@@ -246,14 +246,14 @@ internal class LazyTableControllerTest {
     @Test
     fun `loadPage works with pageNrToLoad 0 & scrolledDown = false`() {
         assertDoesNotThrow {
-            viewModel.loadPage(pageNrToLoad = 0, scrolledDown = false)
+            viewModel.loadPage(pageNr = 0, scrolledDown = false)
         }
     }
 
     @Test
     fun `loadPage works with pageNrToLoad 0 & scrolledDown = true`() {
         assertDoesNotThrow {
-            viewModel.loadPage(pageNrToLoad = 0, scrolledDown = true)
+            viewModel.loadPage(pageNr = 0, scrolledDown = true)
         }
     }
 
@@ -262,7 +262,7 @@ internal class LazyTableControllerTest {
     @Test
     fun `loadPage works with pageNrToLoad 100 & scrolledDown = true`() {
         assertDoesNotThrow {
-            viewModel.loadPage(pageNrToLoad = 100, scrolledDown = true)
+            viewModel.loadPage(pageNr = 100, scrolledDown = true)
         }
     }
 

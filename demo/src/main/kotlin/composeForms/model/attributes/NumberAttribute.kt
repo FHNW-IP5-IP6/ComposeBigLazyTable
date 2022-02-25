@@ -28,6 +28,7 @@ import composeForms.model.IModel
 import composeForms.model.formatter.IFormatter
 import composeForms.model.meanings.SemanticMeaning
 import composeForms.model.validators.semanticValidators.SemanticValidator
+import org.jetbrains.exposed.sql.Column
 
 /**
  * The [NumberAttribute] is an abstract attribute for all types of numbers.
@@ -59,7 +60,10 @@ abstract class NumberAttribute <N,T,L> (
     validators              : List<SemanticValidator<T,L>>,
     convertibles            : List<CustomConvertible>,
     meaning                 : SemanticMeaning<T>,
-    formatter               : IFormatter<T>?
+    formatter               : IFormatter<T>?,
+
+    canBeFiltered           : Boolean,
+    databaseField           : Column<*>?
 
 ) : Attribute<N, T, L>(
     model = model,
@@ -72,6 +76,6 @@ abstract class NumberAttribute <N,T,L> (
     convertibles = convertibles,
     meaning = meaning,
     formatter = formatter,
-    canBeFiltered = false,
-    databaseField = null
+    canBeFiltered = canBeFiltered,
+    databaseField = databaseField
 ) where N : NumberAttribute<N, T, L>, T : Number, T : Comparable<T>, L: Enum<*>, L : ILabel

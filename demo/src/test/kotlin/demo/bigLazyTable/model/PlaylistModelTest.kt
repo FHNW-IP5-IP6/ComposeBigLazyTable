@@ -1,7 +1,6 @@
 package demo.bigLazyTable.model
 
 import demo.bigLazyTable.data.database.FakePagingService
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -31,7 +30,7 @@ internal class PlaylistModelTest {
 
     @Test
     fun getLazyListAttributes() {
-        assertTrue(playlistModel.lazyListAttributes.isNotEmpty())
+        assertTrue(playlistModel.displayedAttributesInTable.isNotEmpty())
     }
 
     @Test

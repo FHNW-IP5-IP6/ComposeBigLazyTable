@@ -29,6 +29,7 @@ import composeForms.model.formatter.IFormatter
 import composeForms.model.meanings.Default
 import composeForms.model.meanings.SemanticMeaning
 import composeForms.model.validators.semanticValidators.SemanticValidator
+import org.jetbrains.exposed.sql.Column
 
 /**
  * The [DoubleAttribute] is the attribute implementation of type Double.
@@ -61,12 +62,25 @@ class DoubleAttribute<L>(
     validators              : List<SemanticValidator<Double,L>> = mutableListOf(),
     convertibles            : List<CustomConvertible>           = emptyList(),
     meaning                 : SemanticMeaning<Double>           = Default(),
-    formatter               : IFormatter<Double>?               = null
+    formatter               : IFormatter<Double>?               = null,
 
-) : FloatingPointAttribute<DoubleAttribute<L>, Double, L>(model = model, value = value, label = label, required = required,
-    readOnly = readOnly, observedAttributes = observedAttributes, validators = validators, convertibles = convertibles,
-    meaning = meaning, formatter = formatter)
-    where L: Enum<*>, L : ILabel {
+    canBeFiltered           : Boolean                           = true,
+    databaseField           : Column<*>?                        = null
+
+) : FloatingPointAttribute<DoubleAttribute<L>, Double, L>(
+    model = model,
+    value = value,
+    label = label,
+    required = required,
+    readOnly = readOnly,
+    observedAttributes = observedAttributes,
+    validators = validators,
+    convertibles = convertibles,
+    meaning = meaning,
+    formatter = formatter,
+    canBeFiltered = canBeFiltered,
+    databaseField = databaseField
+) where L: Enum<*>, L : ILabel {
 
     override val typeT: Double
         get() = 0.0

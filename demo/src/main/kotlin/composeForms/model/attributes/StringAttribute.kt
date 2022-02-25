@@ -79,8 +79,7 @@ class StringAttribute<L>(
     formatter = formatter,
     canBeFiltered = canBeFiltered,
     databaseField = databaseField
-)
-        where L: Enum<*>, L : ILabel {
+) where L: Enum<*>, L : ILabel {
 
     override val typeT: String
         get() = "0"

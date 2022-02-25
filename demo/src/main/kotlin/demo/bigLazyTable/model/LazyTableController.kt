@@ -1,7 +1,6 @@
 package demo.bigLazyTable.model
 
 import androidx.compose.runtime.*
-import bigLazyTable.paging.Filter
 import bigLazyTable.paging.IPagingService
 import composeForms.model.attributes.Attribute
 import demo.bigLazyTable.utils.PageUtils
@@ -44,6 +43,7 @@ class LazyTableController(
 
             Scheduler().scheduleTask {
                 loadFirstPagesToFillCacheAndAddToAppStateList()
+                loadAllNeededPagesForIndex(oldFirstVisibleItemIndex)
                 forceRecompose()
             }
             forceRecompose()
@@ -90,7 +90,7 @@ class LazyTableController(
     var recomposeStateChanger by mutableStateOf(false)
 
     init {
-        appState.defaultPlaylistModel.lazyListAttributes.forEach { attribute ->
+        appState.defaultPlaylistModel.displayedAttributesInTable.forEach { attribute ->
             if (attribute.canBeFiltered) {
                 attributeFilter[attribute] = ""
             }
@@ -119,8 +119,7 @@ class LazyTableController(
     }
 
     fun loadAllNeededPagesForIndex(firstVisibleItemIndex: Int) {
-        // Calculate current page visible in UI
-        val currPage = getVisiblePageNr(firstVisibleItemIndex = firstVisibleItemIndex)
+        val currentPageNr = getVisiblePageNr(firstVisibleItemIndex = firstVisibleItemIndex)
 
         // If firstVisibleItemIndex > oldFirstVisibleItemIndex --> scrolled down
         // If firstVisibleItemIndex < oldFirstVisibleItemIndex --> scrolled up
@@ -131,27 +130,31 @@ class LazyTableController(
 
         // Load cache size pages
         for (i in -1 until cacheSize - 1) {
-            val pageToLoad = currPage + i
-            if (pageToLoad in firstPageNr until totalPages) {
-                loadPage(pageNrToLoad = pageToLoad, scrolledDown = scrolledDown)
+            val pageNr = currentPageNr + i
+
+            // TODO: TotalPages is always with total count
+            //  Must this be set again but with filteredCount like below?
+//              totalPages = PageUtils.getTotalPages(totalCount = filteredCount, pageSize = pageSize)
+            if (pageNr in firstPageNr until totalPages) {
+                loadPage(pageNr = pageNr, scrolledDown = scrolledDown)
             }
         }
         forceRecompose()
     }
 
-    internal fun loadPage(pageNrToLoad: Int, scrolledDown: Boolean) {
-        if (!isPageInCache(pageNrToLoad)) {
+    internal fun loadPage(pageNr: Int, scrolledDown: Boolean) {
+        if (!isPageInCache(pageNr)) {
             // Calculate start index for page to load
-            val pageStartIndexToLoad = getFirstIndexOfPage(pageNr = pageNrToLoad)
+            val pageStartIndexToLoad = getFirstIndexOfPage(pageNr = pageNr)
 
             //val playlistModels = requestDataAsync(scope = pagingScope, startIndexOfPage = pageStartIndexToLoad)
             val playlistModels = loadPageOfPlaylistModels(pageStartIndexToLoad)
             //addPageToCache(pageNr = pageNrToLoad, pageOfModels = playlistModels.await())
-            addPageToCache(pageNr = pageNrToLoad, pageOfModels = playlistModels)
+            addPageToCache(pageNr = pageNr, pageOfModels = playlistModels)
 
             updateAppStateList(
                 pageStartIndexToLoad = pageStartIndexToLoad,
-                pageToLoad = pageNrToLoad,
+                pageToLoad = pageNr,
                 isEnd = scrolledDown
             )
         }

@@ -40,7 +40,7 @@ fun PlaylistRow(
             .horizontalScroll(horizontalScrollState),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        for (attribute in playlistModel.lazyListAttributes) {
+        for (attribute in playlistModel.displayedAttributesInTable) {
             TableCell(
                 text = attribute.getValueAsText(),
                 backgroundColor = backgroundColor,
@@ -56,7 +56,7 @@ fun PlaylistRowPlaceholder(
     horizontalScrollState: ScrollState,
     appState: AppState
 ) {
-    val lazyListAttributes = appState.defaultPlaylistModel.lazyListAttributes
+    val lazyListAttributes = appState.defaultPlaylistModel.displayedAttributesInTable
 
     Row(
         modifier = Modifier

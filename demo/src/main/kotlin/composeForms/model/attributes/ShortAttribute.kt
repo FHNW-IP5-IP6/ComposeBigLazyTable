@@ -29,6 +29,7 @@ import composeForms.model.formatter.IFormatter
 import composeForms.model.meanings.Default
 import composeForms.model.meanings.SemanticMeaning
 import composeForms.model.validators.semanticValidators.SemanticValidator
+import org.jetbrains.exposed.sql.Column
 
 /**
  * The [ShortAttribute] is the attribute implementation of type Short.
@@ -54,19 +55,32 @@ class ShortAttribute<L>(
     label                   : L,
 
     //optional parameters
-    value                   : Short?                            = null,
-    required                : Boolean                           = false,
-    readOnly                : Boolean                           = false,
-    observedAttributes      : List<(Attribute<*, *, *>) -> Unit>  = emptyList(),
-    validators              : List<SemanticValidator<Short,L>>  = mutableListOf(),
-    convertibles            : List<CustomConvertible>           = emptyList(),
-    meaning                 : SemanticMeaning<Short>            = Default(),
-    formatter               : IFormatter<Short>?                = null
+    value                   : Short?                                = null,
+    required                : Boolean                               = false,
+    readOnly                : Boolean                               = false,
+    observedAttributes      : List<(Attribute<*, *, *>) -> Unit>    = emptyList(),
+    validators              : List<SemanticValidator<Short,L>>      = mutableListOf(),
+    convertibles            : List<CustomConvertible>               = emptyList(),
+    meaning                 : SemanticMeaning<Short>                = Default(),
+    formatter               : IFormatter<Short>?                    = null,
 
-) : NumberAttribute<ShortAttribute<L>, Short, L>(model = model, value = value, label = label, required = required,
-    readOnly = readOnly, observedAttributes = observedAttributes, validators = validators,
-    convertibles = convertibles, meaning = meaning, formatter = formatter)
-        where L: Enum<*>, L : ILabel {
+    canBeFiltered           : Boolean                               = true,
+    databaseField           : Column<*>?                            = null
+
+) : NumberAttribute<ShortAttribute<L>, Short, L>(
+    model = model,
+    value = value,
+    label = label,
+    required = required,
+    readOnly = readOnly,
+    observedAttributes = observedAttributes,
+    validators = validators,
+    convertibles = convertibles,
+    meaning = meaning,
+    formatter = formatter,
+    canBeFiltered = canBeFiltered,
+    databaseField = databaseField
+) where L: Enum<*>, L : ILabel {
 
     override val typeT: Short
         get() = 0

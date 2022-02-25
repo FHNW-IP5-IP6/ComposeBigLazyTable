@@ -28,6 +28,7 @@ import composeForms.model.formatter.IFormatter
 import composeForms.model.meanings.SemanticMeaning
 import composeForms.model.validators.ValidatorType
 import composeForms.model.validators.semanticValidators.CustomValidator
+import org.jetbrains.exposed.sql.Column
 
 /**
  * The [DualAttribute] is an abstract attribute. The value contains one of two decisions that can be chosen.
@@ -58,7 +59,10 @@ abstract class DualAttribute<D,T,L>(
     value                               : T,
     readOnly                            : Boolean,
     observedAttributes                  : List<(a: Attribute<*, *, *>) -> Unit>,
-    meaning                             : SemanticMeaning<T>
+    meaning                             : SemanticMeaning<T>,
+
+    canBeFiltered                       : Boolean,
+    databaseField                       : Column<*>?
 
 ) : Attribute<DualAttribute<D, T, L>, T, L>(
     model = model,
@@ -81,15 +85,13 @@ abstract class DualAttribute<D,T,L>(
     convertibles = emptyList(),
     meaning = meaning,
     formatter = IFormatter { it.toString() },
-    canBeFiltered = false,
-    databaseField = null
+    canBeFiltered = canBeFiltered,
+    databaseField = databaseField
 ) where D : DualAttribute<D, T, L>, L : ILabel, L: Enum<*> {
-
 
     init{
         checkDevValues()
     }
-
 
     /**
      * This function checks if the value matches one of the two possible choices.

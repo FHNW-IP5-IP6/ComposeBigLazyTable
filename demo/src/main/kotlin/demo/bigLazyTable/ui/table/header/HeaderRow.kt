@@ -34,7 +34,7 @@ fun HeaderRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        for (attribute in appState.defaultPlaylistModel.lazyListAttributes) {
+        for (attribute in appState.defaultPlaylistModel.displayedAttributesInTable) {
             Column {
                 if (attribute.canBeFiltered) {
 

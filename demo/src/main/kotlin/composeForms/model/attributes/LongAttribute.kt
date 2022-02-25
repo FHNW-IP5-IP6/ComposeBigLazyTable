@@ -29,6 +29,7 @@ import composeForms.model.formatter.IFormatter
 import composeForms.model.meanings.Default
 import composeForms.model.meanings.SemanticMeaning
 import composeForms.model.validators.semanticValidators.SemanticValidator
+import org.jetbrains.exposed.sql.Column
 
 /**
  * The [LongAttribute] is the attribute implementation of the type Long.
@@ -61,12 +62,25 @@ class LongAttribute<L>(
     validators              : List<SemanticValidator<Long,L>>       = mutableListOf(),
     convertibles            : List<CustomConvertible>               = emptyList(),
     meaning                 : SemanticMeaning<Long>                 = Default(),
-    formatter               : IFormatter<Long>?                     = null
+    formatter               : IFormatter<Long>?                     = null,
 
-                       ) : NumberAttribute<LongAttribute<L>, Long, L>(model = model, value = value, label = label, required = required,
-    readOnly = readOnly, observedAttributes = observedAttributes, validators = validators, convertibles = convertibles, meaning = meaning,
-    formatter = formatter)
-        where L: Enum<*>, L : ILabel {
+    canBeFiltered           : Boolean                               = true,
+    databaseField           : Column<*>?                            = null
+
+) : NumberAttribute<LongAttribute<L>, Long, L>(
+    model = model,
+    value = value,
+    label = label,
+    required = required,
+    readOnly = readOnly,
+    observedAttributes = observedAttributes,
+    validators = validators,
+    convertibles = convertibles,
+    meaning = meaning,
+    formatter = formatter,
+    canBeFiltered = canBeFiltered,
+    databaseField = databaseField
+) where L: Enum<*>, L : ILabel {
 
     override val typeT: Long
         get() = 0

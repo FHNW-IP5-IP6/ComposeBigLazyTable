@@ -7,18 +7,23 @@ import composeForms.model.modelElements.FieldSize
 import composeForms.model.modelElements.Group
 import composeForms.model.modelElements.HeaderGroup
 import demo.bigLazyTable.data.database.DatabasePlaylists
-import java.util.*
 
 /**
  * @author Marco Sprenger, Livio Näf
  */
 class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTLabels>(title = BLTLabels.TITLE) {
 
+    // TODO: Add a floatingPointAttribute (Double/Float) to test if it works aswell with them
+    // TODO: Add a DecisionAttribute to test (Is like BooleanAttri. a DualAttribute
+    // TODO: Add a SelectionAttribute to test
+
     val id = LongAttribute(
         model = this,
         label = BLTLabels.ID,
         value = playlist.id,
-        readOnly = true
+        readOnly = true,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.id
     )
 
     private val name = StringAttribute(
@@ -52,12 +57,25 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         trueText = BLTLabels.SELECTION_YES,
         falseText = BLTLabels.SELECTION_NO,
         value = playlist.collaborative,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.collaborative
     )
 
     private val numTracks = IntegerAttribute(
         model = this,
         label = BLTLabels.NUM_TRACKS,
-        value = playlist.numTracks
+        value = playlist.numTracks,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.num_tracks
+    )
+
+    val displayedAttributesInTable = listOf(
+        id,
+        name,
+        modifiedAt,
+        track0ArtistName,
+        collaborative,
+        numTracks,
     )
 
     private val numAlbums = IntegerAttribute(
@@ -202,23 +220,6 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         model = this,
         label = BLTLabels.TRACK_ALBUM_NAME,
         value = playlist.track4AlbumName
-    )
-
-    //    val lazyListAttributes = listOf<Attribute<*, *, *>>(id, name, numTracks, numFollowers, durationMs)
-    val lazyListAttributes = listOf(
-        id,
-        name,
-        modifiedAt,
-        track0ArtistName,
-        numTracks,
-        numFollowers,
-        durationMs,
-        numEdits,
-        numAlbums,
-        numArtists,
-        numFollowers,
-        numFollowers,
-        numTracks
     )
 
     private val headerGroup = HeaderGroup(
