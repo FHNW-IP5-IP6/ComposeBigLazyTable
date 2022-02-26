@@ -214,7 +214,7 @@ object DBService : IPagingService<Playlist> {
     }
 
     override fun getFilteredCountNew(filters: List<Filter>): Int {
-        if (filters.isEmpty()) throw IllegalArgumentException("A Filter must be set - Passed an empty filter list")
+        if (filters.isEmpty()) throw IllegalArgumentException("A Filter must be set - Passed an empty filter list to getFilteredCountNew")
 
         return transaction {
             DatabasePlaylists

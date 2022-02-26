@@ -44,21 +44,15 @@ fun HeaderRow(
                         modifier = Modifier.width(180.dp),
                         value = controller.attributeFilter[attribute].toString(),
                         onValueChange = { newValue ->
-                            controller.lastFilteredAttribute = attribute
-                            controller.filteredAttributes.add(attribute)
-
                             controller.onFiltersChanged(attribute, newValue)
                         },
                         textStyle = TextStyle(color = Color.White),
                         label = { Text("Filter", color = Color.White) },
                         singleLine = true,
                         trailingIcon = {
-                            if (controller.attributeFilter[attribute].toString() != "") {
+                            if (controller.attributeFilter[attribute].toString().isNotEmpty()/* != ""*/) {
                                 IconButton(onClick = {
-                                    controller.lastFilteredAttribute = null
-                                    controller.filteredAttributes.remove(attribute)
-                                    appState.filteredList.clear()
-                                    appState.filteredList = ArrayList(Collections.nCopies(40, null))
+//                                    controller.filteredAttributes.remove(attribute)
                                     controller.onFiltersChanged(attribute, "")
                                 }) {
                                     Icon(

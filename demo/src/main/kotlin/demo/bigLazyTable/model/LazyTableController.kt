@@ -31,34 +31,43 @@ class LazyTableController(
 
     var filters = listOf<Filter>()
     var filteredAttributes = mutableSetOf<Attribute<*, *, *>>()
-    var lastFilteredAttribute: Attribute<*, *, *>? = null
+
+    //    var lastFilteredAttribute: Attribute<*, *, *>? = null
     var attributeFilter: MutableMap<Attribute<*, *, *>, String> = mutableStateMapOf()
 
     // TODO: Spinner instead of empty ... Rows when filtering?
     fun onFiltersChanged(attribute: Attribute<*, *, *>, newFilter: String) {
         attributeFilter[attribute] = newFilter
 
-        isFiltering = newFilter != ""
-        if (isFiltering) {
+        when (newFilter) {
+            "" -> filteredAttributes.remove(attribute)
+            else -> filteredAttributes.add(attribute)
+        }
 
+        filters = filteredAttributes.map { a ->
+            Filter(
+                filter = attributeFilter[a] ?: "",
+                dbField = a.databaseField,
+                caseSensitive = false
+            )
+        }
+        println("Filters in onFiltersChanged: $filters")
+
+        isFiltering = /*newFilter != "" && */filters.isNotEmpty()
+        if (isFiltering) {
             filterScheduler.scheduleTask {
-                filters = filteredAttributes.map { attribute ->
-                    Filter(
-                        filter = attributeFilter[attribute] ?: "",
-                        dbField = attribute.databaseField,
-                        caseSensitive = false
-                    )
-                }
                 filteredCount = pagingService.getFilteredCountNew(filters = filters)
                 println("filtered Count = $filteredCount")
                 appState.filteredList = ArrayList(Collections.nCopies(filteredCount, null))
 
                 loadFirstPagesToFillCacheAndAddToAppStateList()
             }
-        } else {
-            lastFilteredAttribute = null
-            filteredAttributes.remove(attribute)
         }
+        // TODO: else getTotalCount()
+//        else { // -> newFilter == ""
+////            lastFilteredAttribute = null
+//            filteredAttributes.remove(attribute)
+//        }
     }
 
     var isFiltering by mutableStateOf(false)
@@ -152,22 +161,22 @@ class LazyTableController(
 
     // TODO: Instead of string more generic
     internal fun loadPageOfPlaylistModels(startIndexOfPage: Int): List<PlaylistModel> {
-        // TODO: Filter Class approach
-        val filters: List<Filter> = filteredAttributes.map { attribute ->
+        // Filter Class approach
+        // TODO: CAn this call be removed? Filters is already set when entering this function
+        filters = filteredAttributes.map { attribute ->
             Filter(
                 filter = attributeFilter[attribute] ?: "",
                 dbField = attribute.databaseField,
                 caseSensitive = false
             )
         }
-        println("Filters: $filters")
-        println("loadPageAndMapToModels index=$startIndexOfPage filter=${filters.forEach { print(it.filter + " ") }}")
+        println("Filters in loadPageOfPlaylistModels: $filters")
 
         val page = pagingService.getPageNew(
             startIndex = startIndexOfPage,
             pageSize = pageSize,
             filters = filters
-        ) // TODO: Fix this
+        )
 
         // TODO: First try with one filter at a time
 //        val filter = attributeFilter[lastFilteredAttribute] ?: ""
@@ -214,6 +223,7 @@ class LazyTableController(
         if (isFiltering) {
             for (i in startIndex until startIndex + pageSize) {
                 if (i in firstPageIndex until filteredCount) {
+                    // TODO: Index 21 out of bounds for length 21 with id=100 & name=new
                     appState.filteredList.set(index = i, element = cache[newPageNr]!![i % pageSize])
                 }
             }

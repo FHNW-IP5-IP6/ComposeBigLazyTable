@@ -223,12 +223,11 @@ abstract class BaseModel<L>(private val title: L,
     }
 
     override fun getCurrentLanguage(): String {
-        val language by lazy { currentLanguage.value } // has no effect - will still be printed million of times
         // TODO: Why is this function called all the time
         //  How to change this behaviour?
-        println("getCurrentLanguage is called & returns ${currentLanguage.value}")
-        println("lazylanguage returns $language")
-        return language
+        //  val language by lazy { currentLanguage.value } has no effect - will still be printed million of times
+        //  println("getCurrentLanguage is called & returns ${currentLanguage.value}")
+        return currentLanguage.value
     }
 
     final override fun getPossibleLanguages(): List<String> {
