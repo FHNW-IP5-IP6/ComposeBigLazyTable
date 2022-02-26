@@ -1,12 +1,6 @@
 package demo.bigLazyTable.ui.theme
 
-import androidx.compose.ui.graphics.Color
+import composeForms.ui.theme.BackgroundColorHeader
 
-val HoverColor by lazy {
-    println("Inside lazy HoverColor")
-    Color.Red.copy(alpha = 0.8f)
-}
-val UnhoverColor by lazy {
-    println("Inside lazy UnhoverColor")
-    Color.Red.copy(alpha = 0.3f)
-}
+val HoverColor      by lazy { BackgroundColorHeader }
+val UnhoverColor    by lazy { BackgroundColorHeader.copy(alpha = 0.7f) }

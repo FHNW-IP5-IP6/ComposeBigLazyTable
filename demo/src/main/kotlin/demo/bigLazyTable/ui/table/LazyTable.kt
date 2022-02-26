@@ -22,55 +22,55 @@ fun LazyTable(
     horizontalScrollState: ScrollState,
     appState: AppState
 ) {
-    val lazyListItems = if (controller.isFiltering) appState.filteredList else appState.lazyModelList
     val verticalLazyListState = rememberLazyListState()
 
     with(controller) {
         val recomposeTrigger = recomposeStateChanger // must be here for recompose! TODO: better solution
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 16.dp)
-            ) {
-                val firstVisibleItemIndex = verticalLazyListState.firstVisibleItemIndex
-                if (isTimeToLoadPage(firstVisibleItemIndex)) {
-                    scheduler.scheduleTask { loadAllNeededPagesForIndex(firstVisibleItemIndex) }
-                }
-//                if (controller.isFiltering) {
-                    LaunchedEffect(key1 = controller.isFiltering) {
-                        verticalLazyListState.scrollToItem(0)
-                    }
-//                }
-
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    state = verticalLazyListState
-                ) {
-                    val lazyListItems = if (controller.isFiltering) appState.filteredList else appState.lazyModelList
-                    items(items = lazyListItems) { playlistModel ->
-                        when (playlistModel) {
-                            null -> PlaylistRowPlaceholder(
-                                horizontalScrollState = horizontalScrollState,
-                                appState = appState
-                            )
-                            else -> PlaylistRow(
-                                controller = controller,
-                                playlistModel = playlistModel,
-                                horizontalScrollState = horizontalScrollState,
-                                appState = appState
-                            )
-                        }
-                    }
-                }
-
-                VerticalScrollbar(
-                    adapter = rememberScrollbarAdapter(verticalLazyListState),
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .fillMaxHeight(),
-                    style = CustomScrollbarStyle
-                )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 14.dp)
+        ) {
+            val firstVisibleItemIndex = verticalLazyListState.firstVisibleItemIndex
+            if (isTimeToLoadPage(firstVisibleItemIndex)) {
+                scheduler.scheduleTask { loadAllNeededPagesForIndex(firstVisibleItemIndex) }
             }
+
+            // Go to the top when start/stop filtering
+            LaunchedEffect(key1 = isFiltering) {
+                verticalLazyListState.scrollToItem(0)
+            }
+
+            LazyColumn(
+                modifier = Modifier.padding(end = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                state = verticalLazyListState
+            ) {
+                val lazyListItems = if (isFiltering) appState.filteredList else appState.lazyModelList
+                items(items = lazyListItems) { playlistModel ->
+                    when (playlistModel) {
+                        null -> PlaylistRowPlaceholder(
+                            horizontalScrollState = horizontalScrollState,
+                            appState = appState
+                        )
+                        else -> PlaylistRow(
+                            controller = controller,
+                            playlistModel = playlistModel,
+                            horizontalScrollState = horizontalScrollState,
+                            appState = appState
+                        )
+                    }
+                }
+            }
+
+            VerticalScrollbar(
+                adapter = rememberScrollbarAdapter(verticalLazyListState),
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .fillMaxHeight(),
+                style = CustomScrollbarStyle
+            )
+        }
     }
 }
