@@ -59,7 +59,7 @@ class BooleanAttribute<L>(
     trueText                : L                                     = Decision.True as L,
 
     canBeFiltered           : Boolean                               = true,
-    databaseField           : Column<*>?                            = null
+    databaseField           : Column<Boolean>?                      = null
 
 ) : DualAttribute<BooleanAttribute<L>, Boolean, L>(
     model = model,

@@ -1,16 +1,17 @@
 package bigLazyTable.paging
 
 import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.SortOrder
 
 data class Filter(
     val filter: String, //Int/usw generisch
-    val dbField: Column<*>?,
-    var caseSensitive: Boolean
+    val dbField: Column<String>?,
+    var caseSensitive: Boolean,
 )
 
 data class Sort(
-    val dbField: Column<*>?,
-    val sorted: String // ENUM/
+    val dbField: Column<String>?,
+    val sorted: SortOrder // ENUM/?
 )
 
 /**
@@ -18,12 +19,12 @@ data class Sort(
  */
 interface IPagingService<T> {
 
-    fun getPage(startIndex: Int, pageSize: Int, filter: String = "", dbField: Column<*>?, caseSensitive: Boolean = false, sorted: String = ""): List<T>
+//    fun getPage(startIndex: Int, pageSize: Int, filter: String = "", dbField: Column<String>?, caseSensitive: Boolean = false, sorted: String = ""): List<T>
 
     // TODO: 1 sort
-    fun getPageNew(startIndex: Int, pageSize: Int, filters: List<Filter>, sorted: String = ""): List<T>
+    fun getPageNew(startIndex: Int, pageSize: Int, filters: List<Filter>, sort: Sort? = null): List<T>
 
-    fun getFilteredCount(filter: String, dbField: Column<*>?, caseSensitive: Boolean = false): Int
+//    fun getFilteredCount(filter: String, dbField: Column<*>?, caseSensitive: Boolean = false): Int
 
     fun getFilteredCountNew(filters: List<Filter>): Int
 

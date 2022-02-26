@@ -70,7 +70,7 @@ class SelectionAttribute<L>(
     },
 
     canBeFiltered       : Boolean                               = true,
-    databaseField       : Column<*>?                            = null
+    databaseField       : Column<Set<L>>?                       = null
 
 ) : Attribute<SelectionAttribute<L>, Set<L>, L>(
     model = model,

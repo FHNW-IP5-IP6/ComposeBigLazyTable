@@ -65,7 +65,7 @@ class DoubleAttribute<L>(
     formatter               : IFormatter<Double>?               = null,
 
     canBeFiltered           : Boolean                           = true,
-    databaseField           : Column<*>?                        = null
+    databaseField           : Column<Double>?                   = null
 
 ) : FloatingPointAttribute<DoubleAttribute<L>, Double, L>(
     model = model,

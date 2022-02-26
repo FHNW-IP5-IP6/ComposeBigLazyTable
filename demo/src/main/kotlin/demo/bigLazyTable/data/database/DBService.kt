@@ -1,8 +1,8 @@
 package demo.bigLazyTable.data.database
 
-import bigLazyTable.paging.Filter
-import bigLazyTable.paging.IPagingService
+import bigLazyTable.paging.*
 import demo.bigLazyTable.model.Playlist
+import demo.bigLazyTable.model.PlaylistDto
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -19,29 +19,28 @@ object DBService : IPagingService<Playlist> {
         totalCount
     }
 
-    override fun getPage(
-        startIndex: Int,
-        pageSize: Int,
-        filter: String,
-        dbField: Column<*>?,
-        caseSensitive: Boolean,
-        sorted: String
-    ): List<Playlist> {
-        // TODO: check if lazy is working correctly without any downside
-        if (startIndex > lastIndex) throw IllegalArgumentException("startIndex must be smaller than/equal to the lastIndex and not $startIndex")
-        if (startIndex < 0) throw IllegalArgumentException("only positive values are allowed for startIndex")
-
-        val start: Long = startIndex.toLong()
-        println("Offset: Start = $start")
-        if (sorted != "ASC" && sorted != "DESC") {
-            return transaction {
-                DatabasePlaylists
-//                    .select { dbField?.let { caseSensitiveFilter(caseSensitive, it as Column<String>, filter) }!! }
-                    .selectWithFilter(caseSensitive, dbField, filter)
-                    .limit(n = pageSize, offset = start)
-                    .map { mapResultRowToPlaylist(it) }
-            }
-        } else return emptyList() // TODO: Remove this & comment below code back in!
+//    override fun getPage(
+//        startIndex: Int,
+//        pageSize: Int,
+//        filter: String,
+//        dbField: Column<String>?,
+//        caseSensitive: Boolean,
+//        sorted: String
+//    ): List<Playlist> {
+//        // TODO: check if lazy is working correctly without any downside
+//        if (startIndex > lastIndex) throw IllegalArgumentException("startIndex must be smaller than/equal to the lastIndex and not $startIndex")
+//        if (startIndex < 0) throw IllegalArgumentException("only positive values are allowed for startIndex")
+//
+//        val start: Long = startIndex.toLong()
+//        println("Offset: Start = $start")
+//        if (sorted != "ASC" && sorted != "DESC") {
+//            return transaction {
+//                DatabasePlaylists
+//                    .selectWithFilter(caseSensitive, dbField, filter)
+//                    .limit(n = pageSize, offset = start)
+//                    .map { mapResultRowToPlaylist(it) }
+//            }
+//        }
 //        else {
 //            val sortOrder = if (sorted == "ASC") SortOrder.ASC else SortOrder.DESC
 //            return transaction {
@@ -52,16 +51,13 @@ object DBService : IPagingService<Playlist> {
 //                    .map { mapResultRowToPlaylist(it) }
 //            }
 //        }
-    }
+//    }
 
     override fun getPageNew(
         startIndex: Int,
         pageSize: Int,
         filters: List<Filter>,
-//        filter: String,
-//        dbFields: List<Column<*>>?,
-//        caseSensitive: Boolean,
-        sorted: String
+        sort: Sort?
     ): List<Playlist> {
         // TODO: check if lazy is working correctly without any downside
         if (startIndex > lastIndex) throw IllegalArgumentException("startIndex must be smaller than/equal to the lastIndex and not $startIndex")
@@ -69,37 +65,57 @@ object DBService : IPagingService<Playlist> {
 
         val start: Long = startIndex.toLong()
         println("Offset: Start = $start")
-        if (sorted != "ASC" && sorted != "DESC") {
+        if (sort == null) {
             return transaction {
                 DatabasePlaylists
                     .selectWithAllFilters(filters)
                     .limit(n = pageSize, offset = start)
-                    .map { mapResultRowToPlaylist(it) }
+                    .map { PlaylistDto(it).toPlaylist() }
             }
-        } else return emptyList() // TODO: Remove this & comment below code back in!
-//        else {
-//            val sortOrder = if (sorted == "ASC") SortOrder.ASC else SortOrder.DESC
-//            return transaction {
-//                DatabasePlaylists
-//                    .select { caseSensitiveFilter(caseSensitive, DatabasePlaylists.name, filter) }
-//                    .orderBy(DatabasePlaylists.name to sortOrder)
-//                    .limit(n = pageSize, offset = start)
-//                    .map { mapResultRowToPlaylist(it) }
-//            }
-//        }
+        }
+        else {
+            return transaction {
+                DatabasePlaylists
+                    .selectWithAllFilters(filters)
+                    .orderBy(sort.dbField as Column<String> to sort.sorted)
+                    .limit(n = pageSize, offset = start)
+                    .map { PlaylistDto(it).toPlaylist() }
+            }
+        }
+    }
+
+    fun Column<String>.toType() {
+        val x = this as? Column<Int> ?: this as? Column<Double>
+    }
+
+    inline fun <reified T> Column<T>.test() {
+        when (T::class) {
+            Int::class -> {
+                println("Int")
+                this as Column<Int>
+            }
+            else -> println("${T::class}")
+        }
     }
 
     private fun Table.selectWithAllFilters(filters: List<Filter>): Query {
         if (filters.isEmpty()) return Query(this, null)
 
+        // TODO: Could this be removed due to the below for loop?
         if (filters.size == 1) {
             val filter = filters.first()
-            return selectWithFilter(filter = filter)
+            return selectWithFilter(filter)
         }
 
         val firstFilter = filters.first()
+//        when (firstFilter.dbField) {
+//            is Column<Int> -> {}
+//            is String -> {}
+//        }
+
+
         var sql: Op<Boolean> = firstFilter.dbField as Column<String> like "%${firstFilter.filter}%"
-        for (i in 1 until filters.size/*filter in filters*/) {
+        for (i in 1 until filters.size) {
             // TODO: as Column<Double/Float/Int/...> equals filter.toDouble()/usw
 //            when (dbField)
             val filter = filters[i]
@@ -138,17 +154,17 @@ object DBService : IPagingService<Playlist> {
         else columnWhichShouldMatch.lowerCase() like "%${filter.lowercase(Locale.getDefault())}%"
     }
 
-    override fun getFilteredCount(filter: String, dbField: Column<*>?, caseSensitive: Boolean): Int {
-        if (filter == "") throw IllegalArgumentException("Filter must be set - empty string is not allowed (leads to java.lang.OutOfMemoryError: Java heap space)")
-        if (dbField == null) return 0
-
-        return transaction {
-            DatabasePlaylists
-                .select { caseSensitiveFilter(caseSensitive, dbField as Column<String>, filter) }
-                .count()
-                .toInt()
-        }
-    }
+//    override fun getFilteredCount(filter: String, dbField: Column<*>?, caseSensitive: Boolean): Int {
+//        if (filter == "") throw IllegalArgumentException("Filter must be set - empty string is not allowed (leads to java.lang.OutOfMemoryError: Java heap space)")
+//        if (dbField == null) return 0
+//
+//        return transaction {
+//            DatabasePlaylists
+//                .select { caseSensitiveFilter(caseSensitive, dbField as Column<String>, filter) }
+//                .count()
+//                .toInt()
+//        }
+//    }
 
     override fun getTotalCount(): Int = transaction {
         println("getTotalCount is called")
@@ -159,7 +175,7 @@ object DBService : IPagingService<Playlist> {
         DatabasePlaylists
             .select { DatabasePlaylists.id eq id }
             .single()
-            .let { mapResultRowToPlaylist(it) }
+            .let { PlaylistDto(it).toPlaylist() }
     }
 
     override fun indexOf(id: Long, filter: String): Int {
@@ -168,49 +184,6 @@ object DBService : IPagingService<Playlist> {
             // TODO: How can we determine what the gui index is of a given index?
         }
         return -1
-    }
-
-    /**
-     * Helper function to map an Exposed [resultRow] into a Playlist
-     * @param resultRow the return type of a query from the Exposed framework
-     * @return a Playlist filled with all the needed attributes from the [resultRow]
-     */
-    // TODO: Playlist in data layer
-    private fun mapResultRowToPlaylist(resultRow: ResultRow): Playlist = resultRow.let {
-        Playlist(
-            it[DatabasePlaylists.id],
-            it[DatabasePlaylists.name],
-            it[DatabasePlaylists.collaborative],
-            it[DatabasePlaylists.modified_at],
-            it[DatabasePlaylists.num_tracks],
-            it[DatabasePlaylists.num_tracks_double],
-            it[DatabasePlaylists.num_tracks_float],
-//            it[DatabasePlaylists.num_albums],
-//            it[DatabasePlaylists.num_followers],
-            it[DatabasePlaylists.num_edits],
-            it[DatabasePlaylists.duration_ms],
-            it[DatabasePlaylists.num_artists],
-            it[DatabasePlaylists.track0_artist_name],
-            it[DatabasePlaylists.track0_track_name],
-            it[DatabasePlaylists.track0_duration_ms],
-            it[DatabasePlaylists.track0_album_name],
-            it[DatabasePlaylists.track1_artist_name],
-            it[DatabasePlaylists.track1_track_name],
-            it[DatabasePlaylists.track1_duration_ms],
-            it[DatabasePlaylists.track1_album_name],
-            it[DatabasePlaylists.track2_artist_name],
-            it[DatabasePlaylists.track2_track_name],
-            it[DatabasePlaylists.track2_duration_ms],
-            it[DatabasePlaylists.track2_album_name],
-            it[DatabasePlaylists.track3_artist_name],
-            it[DatabasePlaylists.track3_track_name],
-            it[DatabasePlaylists.track3_duration_ms],
-            it[DatabasePlaylists.track3_album_name],
-            it[DatabasePlaylists.track4_artist_name],
-            it[DatabasePlaylists.track4_track_name],
-            it[DatabasePlaylists.track4_duration_ms],
-            it[DatabasePlaylists.track4_album_name]
-        )
     }
 
     override fun getFilteredCountNew(filters: List<Filter>): Int {

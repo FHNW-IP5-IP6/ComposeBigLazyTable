@@ -58,7 +58,7 @@ open class DecisionAttribute<L>(
     meaning                             : SemanticMeaning<Any>                  = Default(),
 
     canBeFiltered                       : Boolean                               = true,
-    databaseField                       : Column<*>?                            = null
+    databaseField                       : Column<Any>?                          = null
 
 ) : DualAttribute<DecisionAttribute<L>, Any, L>(
     model = model,

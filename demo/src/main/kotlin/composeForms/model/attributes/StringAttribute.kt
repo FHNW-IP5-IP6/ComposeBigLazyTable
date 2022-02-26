@@ -64,7 +64,7 @@ class StringAttribute<L>(
     formatter               : IFormatter<String>?                   = null,
 
     canBeFiltered           : Boolean                               = true,
-    databaseField           : Column<*>?                            = null
+    databaseField           : Column<String>?                       = null
 
 ) : Attribute<StringAttribute<L>, String, L>(
     model = model,

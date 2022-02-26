@@ -75,7 +75,7 @@ abstract class Attribute <A,T,L> (
     var formatter                           : IFormatter<T>?,
 
     var canBeFiltered                       : Boolean,
-    var databaseField                       : Column<*>?
+    var databaseField                       : Column<T>?
 
 ) where A : Attribute<A, T, L>, T : Any?, L : ILabel, L: Enum<*> {
 

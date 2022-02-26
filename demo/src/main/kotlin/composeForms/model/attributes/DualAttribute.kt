@@ -62,7 +62,7 @@ abstract class DualAttribute<D,T,L>(
     meaning                             : SemanticMeaning<T>,
 
     canBeFiltered                       : Boolean,
-    databaseField                       : Column<*>?
+    databaseField                       : Column<T>?
 
 ) : Attribute<DualAttribute<D, T, L>, T, L>(
     model = model,

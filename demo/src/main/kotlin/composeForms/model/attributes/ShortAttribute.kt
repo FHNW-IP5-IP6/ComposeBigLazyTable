@@ -65,7 +65,7 @@ class ShortAttribute<L>(
     formatter               : IFormatter<Short>?                    = null,
 
     canBeFiltered           : Boolean                               = true,
-    databaseField           : Column<*>?                            = null
+    databaseField           : Column<Short>?                        = null
 
 ) : NumberAttribute<ShortAttribute<L>, Short, L>(
     model = model,

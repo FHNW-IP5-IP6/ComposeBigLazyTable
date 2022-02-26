@@ -65,7 +65,7 @@ class IntegerAttribute<L>(
     formatter                : IFormatter<Int>?                     = null,
 
     canBeFiltered           : Boolean                               = true,
-    databaseField           : Column<*>?                            = null
+    databaseField           : Column<Int>?                          = null
 
 ) : NumberAttribute<IntegerAttribute<L>, Int, L>(
     model = model,

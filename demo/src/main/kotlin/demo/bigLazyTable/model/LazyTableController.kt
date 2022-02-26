@@ -3,13 +3,16 @@ package demo.bigLazyTable.model
 import androidx.compose.runtime.*
 import bigLazyTable.paging.Filter
 import bigLazyTable.paging.IPagingService
+import bigLazyTable.paging.Sort
 import composeForms.model.attributes.Attribute
+import demo.bigLazyTable.data.database.DatabasePlaylists
 import demo.bigLazyTable.utils.PageUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.SortOrder
 import org.junit.platform.commons.util.LruCache
 import java.util.*
 import kotlin.collections.ArrayList
@@ -45,7 +48,7 @@ class LazyTableController(
         filters = filteredAttributes.map { a ->
             Filter(
                 filter = attributeFilter[a] ?: "",
-                dbField = a.databaseField,
+                dbField = a.databaseField as Column<String>,
                 caseSensitive = false
             )
         }
@@ -159,7 +162,13 @@ class LazyTableController(
         val page = pagingService.getPageNew(
             startIndex = startIndexOfPage,
             pageSize = pageSize,
-            filters = filters
+            filters = filters,
+            sort =
+            null
+//            Sort(
+//                dbField = DatabasePlaylists.name,
+//                sorted = SortOrder.DESC
+//            )
         )
 
         return page.toPlaylistModels()

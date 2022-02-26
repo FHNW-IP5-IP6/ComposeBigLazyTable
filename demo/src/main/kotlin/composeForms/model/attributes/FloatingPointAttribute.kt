@@ -63,8 +63,8 @@ abstract class FloatingPointAttribute <F,T,L> (
     meaning                     : SemanticMeaning<T>,
     formatter                   : IFormatter<T>?,
 
-    canBeFiltered                       : Boolean,
-    databaseField                       : Column<*>?
+    canBeFiltered               : Boolean,
+    databaseField               : Column<T>?
 
 ) : NumberAttribute<F, T, L>(
     model = model,

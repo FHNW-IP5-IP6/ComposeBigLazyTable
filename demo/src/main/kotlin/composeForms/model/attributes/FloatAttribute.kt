@@ -66,7 +66,7 @@ class FloatAttribute<L>(
     formatter               : IFormatter<Float>?                    = null,
 
     canBeFiltered           : Boolean                               = true,
-    databaseField           : Column<*>?                            = null
+    databaseField           : Column<Float>?                        = null
 
 ) : FloatingPointAttribute<FloatAttribute<L>, Float, L>(
     model = model,

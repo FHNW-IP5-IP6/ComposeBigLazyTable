@@ -65,7 +65,7 @@ class LongAttribute<L>(
     formatter               : IFormatter<Long>?                     = null,
 
     canBeFiltered           : Boolean                               = true,
-    databaseField           : Column<*>?                            = null
+    databaseField           : Column<Long>?                         = null
 
 ) : NumberAttribute<LongAttribute<L>, Long, L>(
     model = model,

@@ -63,7 +63,7 @@ abstract class NumberAttribute <N,T,L> (
     formatter               : IFormatter<T>?,
 
     canBeFiltered           : Boolean,
-    databaseField           : Column<*>?
+    databaseField           : Column<T>?
 
 ) : Attribute<N, T, L>(
     model = model,

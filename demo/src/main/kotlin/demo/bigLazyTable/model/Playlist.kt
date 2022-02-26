@@ -1,5 +1,8 @@
 package demo.bigLazyTable.model
 
+import demo.bigLazyTable.data.database.DatabasePlaylists
+import org.jetbrains.exposed.sql.ResultRow
+
 /**
  * @author Marco Sprenger, Livio Näf
  */
@@ -41,3 +44,49 @@ data class Playlist(
     val track4DurationMs: Int = loadingPlaceholderNumber,
     val track4AlbumName: String = loadingPlaceholderString
 )
+
+data class PlaylistDto(val resultRow: ResultRow) {
+
+    /**
+     * Helper function to map an Exposed [resultRow] into a Playlist
+     * @param resultRow the return type of a query from the Exposed framework
+     * @return a Playlist filled with all the needed attributes from the [resultRow]
+     */
+    fun toPlaylist(): Playlist = resultRow.let {
+        Playlist(
+            it[DatabasePlaylists.id],
+            it[DatabasePlaylists.name],
+            it[DatabasePlaylists.collaborative],
+            it[DatabasePlaylists.modified_at],
+            it[DatabasePlaylists.num_tracks],
+            it[DatabasePlaylists.num_tracks_double],
+            it[DatabasePlaylists.num_tracks_float],
+//            it[DatabasePlaylists.num_albums],
+//            it[DatabasePlaylists.num_followers],
+            it[DatabasePlaylists.num_edits],
+            it[DatabasePlaylists.duration_ms],
+            it[DatabasePlaylists.num_artists],
+            it[DatabasePlaylists.track0_artist_name],
+            it[DatabasePlaylists.track0_track_name],
+            it[DatabasePlaylists.track0_duration_ms],
+            it[DatabasePlaylists.track0_album_name],
+            it[DatabasePlaylists.track1_artist_name],
+            it[DatabasePlaylists.track1_track_name],
+            it[DatabasePlaylists.track1_duration_ms],
+            it[DatabasePlaylists.track1_album_name],
+            it[DatabasePlaylists.track2_artist_name],
+            it[DatabasePlaylists.track2_track_name],
+            it[DatabasePlaylists.track2_duration_ms],
+            it[DatabasePlaylists.track2_album_name],
+            it[DatabasePlaylists.track3_artist_name],
+            it[DatabasePlaylists.track3_track_name],
+            it[DatabasePlaylists.track3_duration_ms],
+            it[DatabasePlaylists.track3_album_name],
+            it[DatabasePlaylists.track4_artist_name],
+            it[DatabasePlaylists.track4_track_name],
+            it[DatabasePlaylists.track4_duration_ms],
+            it[DatabasePlaylists.track4_album_name]
+        )
+    }
+
+}
