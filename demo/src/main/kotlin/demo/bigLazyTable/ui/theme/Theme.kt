@@ -1,17 +1,13 @@
 package demo.bigLazyTable.ui.theme
 
-import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.foundation.ScrollbarStyle
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.FrameWindowScope
-import androidx.compose.ui.window.WindowPlacement
-import java.awt.Dimension
+import composeForms.ui.theme.*
 
 private val DarkColorPalette = darkColors(
     primary = BackgroundColorGroups,

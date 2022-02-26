@@ -38,16 +38,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.application
 import composeForms.model.IModel
-import composeForms.ui.theme.BackgroundColorHeader
-import composeForms.ui.theme.BodyBackground
-import composeForms.ui.theme.ColorsUtil.get
-import composeForms.ui.theme.FontOnBackground
-//import composeForms.ui.theme.ColorsUtil.Companion.get
-import composeForms.ui.theme.FormColors
+import composeForms.ui.theme.*
 import java.awt.Dimension
 
 /**

@@ -49,8 +49,6 @@ import androidx.compose.ui.window.application
 import composeForms.model.IModel
 import composeForms.server.QRCodeService
 import composeForms.ui.theme.*
-import composeForms.ui.theme.ColorsUtil.get
-//import composeForms.ui.theme.ColorsUtil.Companion.get
 import demo.bigLazyTable.model.AppState
 import java.awt.Dimension
 

@@ -34,30 +34,34 @@ import composeForms.ui.theme.ColorsUtil.getColor
 
 /**
  * Form Lazy Colors - will not be called again and again
+ *
+ * @author Marco Sprenger, Livio Näf
  */
-val ErrorColor by lazy { get(FormColors.ERROR) }
-val ErrorContrastColor by lazy { get(FormColors.ERRORCONTRAST) }
-val ValidColor by lazy { get(FormColors.VALID) }
-val RightTrackColor by lazy { get(FormColors.RIGHTTRACK) }
-val NormalTextColor by lazy { get(FormColors.NORMALTEXT) }
-val BackgroundColorHeader by lazy { get(FormColors.BACKGROUND_COLOR_HEADER) }
-val BackgroundColorGroups by lazy { get(FormColors.BACKGROUND_COLOR_GROUPS) }
-val BackgroundColorLight by lazy { get(FormColors.BACKGROUND_COLOR_LIGHT) }
-val FontOnBackground by lazy { get(FormColors.FONT_ON_BACKGOUND) }
-val DisabledOnBackground by lazy { get(FormColors.DISABLED_ON_BACKGROUND) }
-val BodyBackground by lazy { get(FormColors.BODY_BACKGROUND) }
-val LabelColor by lazy { get(FormColors.LABEL) }
-val SwitchThumb by lazy { get(FormColors.SWITCH_THUMB) }
-val UncheckedTrackColor by lazy { get(FormColors.UNCHECKEDTRACKCOLOR) }
+val ErrorColor              by lazy { get(FormColors.ERROR) }
+val ErrorContrastColor      by lazy { get(FormColors.ERRORCONTRAST) }
+val ValidColor              by lazy { get(FormColors.VALID) }
+val RightTrackColor         by lazy { get(FormColors.RIGHTTRACK) }
+val NormalTextColor         by lazy { get(FormColors.NORMALTEXT) }
+val BackgroundColorHeader   by lazy { get(FormColors.BACKGROUND_COLOR_HEADER) }
+val BackgroundColorGroups   by lazy { get(FormColors.BACKGROUND_COLOR_GROUPS) }
+val BackgroundColorLight    by lazy { get(FormColors.BACKGROUND_COLOR_LIGHT) }
+val FontOnBackground        by lazy { get(FormColors.FONT_ON_BACKGOUND) }
+val DisabledOnBackground    by lazy { get(FormColors.DISABLED_ON_BACKGROUND) }
+val BodyBackground          by lazy { get(FormColors.BODY_BACKGROUND) }
+val LabelColor              by lazy { get(FormColors.LABEL) }
+val SwitchThumb             by lazy { get(FormColors.SWITCH_THUMB) }
+val UncheckedTrackColor     by lazy { get(FormColors.UNCHECKEDTRACKCOLOR) }
 
 /**
  * Dropdown Lazy Colors - will not be called again and again
+ *
+ * @author Marco Sprenger, Livio Näf
  */
-val ButtonBackground by lazy { get(DropdownColors.BUTTON_BACKGROUND) }
-val BackgroundElementSel by lazy { get(DropdownColors.BACKGROUND_ELEMENT_SEL) }
+val ButtonBackground        by lazy { get(DropdownColors.BUTTON_BACKGROUND) }
+val BackgroundElementSel    by lazy { get(DropdownColors.BACKGROUND_ELEMENT_SEL) }
 val BackgroundElementNotSel by lazy { get(DropdownColors.BACKGROUND_ELEMENT_NOT_SEL) }
-val TextElementSel by lazy { get(DropdownColors.TEXT_ELEMENT_SEL) }
-val TextElementNotSel by lazy { get(DropdownColors.TEXT_ELEMENT_NOT_SEL) }
+val TextElementSel          by lazy { get(DropdownColors.TEXT_ELEMENT_SEL) }
+val TextElementNotSel       by lazy { get(DropdownColors.TEXT_ELEMENT_NOT_SEL) }
 
 /**
  * Enum for the colors of the form.
@@ -66,21 +70,21 @@ val TextElementNotSel by lazy { get(DropdownColors.TEXT_ELEMENT_NOT_SEL) }
  * @author Louisa Reinger, Steve Vogel
  */
 enum class FormColors(val color: Color) {
-    ERROR(getColor("9F2C13")),
-    ERRORCONTRAST(Color.White),
-    VALID(getColor("2e7d32")),
-    RIGHTTRACK(Color.Gray),
-    NORMALTEXT(Color.Black),
+    ERROR                   (getColor("9F2C13")),
+    ERRORCONTRAST           (Color.White),
+    VALID                   (getColor("2e7d32")),
+    RIGHTTRACK              (Color.Gray),
+    NORMALTEXT              (Color.Black),
 
-    BACKGROUND_COLOR_HEADER(getColor("0E325E")),
-    BACKGROUND_COLOR_GROUPS(getColor("8698AE")),
-    BACKGROUND_COLOR_LIGHT(getColor("ECEFF2")),
-    FONT_ON_BACKGOUND(getColor("E1E1E1")),
-    DISABLED_ON_BACKGROUND(getColor("787E85")),
-    BODY_BACKGROUND(Color.White),
-    LABEL(Color.DarkGray),
-    SWITCH_THUMB(getColor("0E325E")),
-    UNCHECKEDTRACKCOLOR(Color.LightGray)
+    BACKGROUND_COLOR_HEADER (getColor("0E325E")),
+    BACKGROUND_COLOR_GROUPS (getColor("8698AE")),
+    BACKGROUND_COLOR_LIGHT  (getColor("ECEFF2")),
+    FONT_ON_BACKGOUND       (getColor("E1E1E1")),
+    DISABLED_ON_BACKGROUND  (getColor("787E85")),
+    BODY_BACKGROUND         (Color.White),
+    LABEL                   (Color.DarkGray),
+    SWITCH_THUMB            (getColor("0E325E")),
+    UNCHECKEDTRACKCOLOR     (Color.LightGray)
 
 }
 
@@ -91,11 +95,11 @@ enum class FormColors(val color: Color) {
  * @author Louisa Reinger, Steve Vogel
  */
 enum class DropdownColors(val color: Color) {
-    BUTTON_BACKGROUND(Color.Transparent),
-    BACKGROUND_ELEMENT_SEL(getColor("E8E8E8")),
-    BACKGROUND_ELEMENT_NOT_SEL(getColor("F8F8F8")),
-    TEXT_ELEMENT_SEL(Color.Black),
-    TEXT_ELEMENT_NOT_SEL(Color.Black)
+    BUTTON_BACKGROUND           (Color.Transparent),
+    BACKGROUND_ELEMENT_SEL      (getColor("E8E8E8")),
+    BACKGROUND_ELEMENT_NOT_SEL  (getColor("F8F8F8")),
+    TEXT_ELEMENT_SEL            (Color.Black),
+    TEXT_ELEMENT_NOT_SEL        (Color.Black)
 }
 
 
@@ -106,7 +110,7 @@ enum class DropdownColors(val color: Color) {
  *
  * @author Louisa Reinger, Steve Vogel
  */
-object ColorsUtil {
+private object ColorsUtil {
     /**
      * Extracts the string into a Color object
      * @param colorString: String with the hex values of the color.

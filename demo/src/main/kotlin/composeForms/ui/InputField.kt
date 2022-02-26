@@ -61,8 +61,6 @@ import composeForms.model.attributes.Attribute
 import composeForms.model.attributes.DualAttribute
 import composeForms.model.modelElements.Group
 import composeForms.ui.theme.*
-import composeForms.ui.theme.ColorsUtil.get
-//import composeForms.ui.theme.ColorsUtil.Companion.get
 
 /**
  * Thi file contains the function for specific input field.

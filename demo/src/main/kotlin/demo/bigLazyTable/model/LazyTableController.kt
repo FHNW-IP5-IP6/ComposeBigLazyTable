@@ -31,8 +31,6 @@ class LazyTableController(
 
     var filters = listOf<Filter>()
     var filteredAttributes = mutableSetOf<Attribute<*, *, *>>()
-
-    //    var lastFilteredAttribute: Attribute<*, *, *>? = null
     var attributeFilter: MutableMap<Attribute<*, *, *>, String> = mutableStateMapOf()
 
     // TODO: Spinner instead of empty ... Rows when filtering?
@@ -53,7 +51,7 @@ class LazyTableController(
         }
         println("Filters in onFiltersChanged: $filters")
 
-        isFiltering = /*newFilter != "" && */filters.isNotEmpty()
+        isFiltering = filters.isNotEmpty()
         if (isFiltering) {
             filterScheduler.scheduleTask {
                 filteredCount = pagingService.getFilteredCountNew(filters = filters)
@@ -63,11 +61,6 @@ class LazyTableController(
                 loadFirstPagesToFillCacheAndAddToAppStateList()
             }
         }
-        // TODO: else getTotalCount()
-//        else { // -> newFilter == ""
-////            lastFilteredAttribute = null
-//            filteredAttributes.remove(attribute)
-//        }
     }
 
     var isFiltering by mutableStateOf(false)
@@ -161,15 +154,6 @@ class LazyTableController(
 
     // TODO: Instead of string more generic
     internal fun loadPageOfPlaylistModels(startIndexOfPage: Int): List<PlaylistModel> {
-        // Filter Class approach
-        // TODO: CAn this call be removed? Filters is already set when entering this function
-        filters = filteredAttributes.map { attribute ->
-            Filter(
-                filter = attributeFilter[attribute] ?: "",
-                dbField = attribute.databaseField,
-                caseSensitive = false
-            )
-        }
         println("Filters in loadPageOfPlaylistModels: $filters")
 
         val page = pagingService.getPageNew(
@@ -177,17 +161,6 @@ class LazyTableController(
             pageSize = pageSize,
             filters = filters
         )
-
-        // TODO: First try with one filter at a time
-//        val filter = attributeFilter[lastFilteredAttribute] ?: ""
-//        val dbField = lastFilteredAttribute?.databaseField
-//
-//        val page = pagingService.getPage(
-//            startIndex = startIndexOfPage,
-//            pageSize = pageSize,
-//            filter = filter,
-//            dbField = dbField
-//        )
 
         return page.toPlaylistModels()
     }
@@ -224,6 +197,7 @@ class LazyTableController(
             for (i in startIndex until startIndex + pageSize) {
                 if (i in firstPageIndex until filteredCount) {
                     // TODO: Index 21 out of bounds for length 21 with id=100 & name=new
+                    //  Index 30 out of bounds for length 30 with id=200, name=new
                     appState.filteredList.set(index = i, element = cache[newPageNr]!![i % pageSize])
                 }
             }

@@ -12,11 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import composeForms.ui.theme.*
 import demo.bigLazyTable.model.AppState
 import demo.bigLazyTable.model.LazyTableController
 import demo.bigLazyTable.model.PlaylistModel
-import demo.bigLazyTable.ui.theme.BackgroundColorGroups
-import demo.bigLazyTable.ui.theme.BackgroundColorLight
 
 @Composable
 fun PlaylistRow(

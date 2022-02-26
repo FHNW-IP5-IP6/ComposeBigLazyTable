@@ -43,12 +43,7 @@ import composeForms.model.modelElements.Field
 import composeForms.model.modelElements.FieldSize
 import composeForms.model.modelElements.Group
 import composeForms.model.modelElements.HeaderGroup
-import composeForms.ui.theme.BackgroundColorGroups
-import composeForms.ui.theme.BackgroundColorHeader
-import composeForms.ui.theme.ColorsUtil.get
-import composeForms.ui.theme.FontOnBackground
-//import composeForms.ui.theme.ColorsUtil.Companion.get
-import composeForms.ui.theme.FormColors
+import composeForms.ui.theme.*
 
 /**
  * Creating the UI for a [Group].
