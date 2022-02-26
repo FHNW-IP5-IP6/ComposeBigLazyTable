@@ -5,7 +5,6 @@ import bigLazyTable.paging.Filter
 import bigLazyTable.paging.IPagingService
 import bigLazyTable.paging.Sort
 import composeForms.model.attributes.Attribute
-import demo.bigLazyTable.data.database.DatabasePlaylists
 import demo.bigLazyTable.utils.PageUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +19,18 @@ import kotlin.properties.Delegates
 
 private val Log = KotlinLogging.logger {}
 
+enum class SortStateEnum(sortOrder: SortOrder?) {
+    ASC(SortOrder.ASC),
+    DESC(SortOrder.DESC),
+    NONE(null)
+}
+
+sealed class SortState(val sortOrder: SortOrder?) {
+    object Asc : SortState(SortOrder.ASC)
+    object Desc: SortState(SortOrder.DESC)
+    object None: SortState(null)
+}
+
 /**
  * TODO: Short description what this class is used for
  * @author Marco Sprenger, Livio Näf
@@ -31,6 +42,13 @@ class LazyTableController(
 ) {
     private val firstPageNr = 0 // TODO: Use Nr everywhere!
     private val firstPageIndex = 0
+
+    var sortState: SortOrder? by mutableStateOf(null)
+//        private set
+    var sort: Sort? by mutableStateOf(null)
+//        private set
+
+    var isSorting by mutableStateOf(false)
 
     var filters = listOf<Filter>()
     var filteredAttributes = mutableSetOf<Attribute<*, *, *>>()
@@ -163,12 +181,8 @@ class LazyTableController(
             startIndex = startIndexOfPage,
             pageSize = pageSize,
             filters = filters,
-            sort =
-            null
-//            Sort(
-//                dbField = DatabasePlaylists.name,
-//                sorted = SortOrder.DESC
-//            )
+            sort = sort
+//            null
         )
 
         return page.toPlaylistModels()

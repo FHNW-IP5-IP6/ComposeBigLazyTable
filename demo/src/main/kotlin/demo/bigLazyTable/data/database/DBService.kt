@@ -88,6 +88,7 @@ object DBService : IPagingService<Playlist> {
         val x = this as? Column<Int> ?: this as? Column<Double>
     }
 
+    // https://discuss.kotlinlang.org/t/checking-type-in-generic/3100/2
     inline fun <reified T> Column<T>.test() {
         when (T::class) {
             Int::class -> {
