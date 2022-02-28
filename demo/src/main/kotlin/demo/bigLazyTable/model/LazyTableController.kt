@@ -212,9 +212,9 @@ class LazyTableController(
 
         println("Before getPageNew")
         val start1 = System.currentTimeMillis()
-        // getPageNew needed 745 ms (normal max with filters)
-        // getPageNew needed 24837 ms (max with sort)
-        // getPageNew needed 75882 ms (sort modified_at)
+        // getPage needed 745 ms (normal max with filters)
+        // getPage needed 24837 ms (max with sort)
+        // getPage needed 75882 ms (sort modified_at)
         val page = pagingService.getPage(
             startIndex = startIndexOfPage,
             pageSize = pageSize,
@@ -222,7 +222,7 @@ class LazyTableController(
             sort = sort
         )
         val end1 = System.currentTimeMillis()
-        println("getPageNew needed ${end1 - start1} ms")
+        println("getPage needed ${end1 - start1} ms")
 
         val end = System.currentTimeMillis()
         println("loadPageOfPlaylistModels needed ${end - start} ms")

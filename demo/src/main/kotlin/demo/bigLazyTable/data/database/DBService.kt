@@ -32,21 +32,46 @@ object DBService : IPagingService<Playlist> {
         val start: Long = startIndex.toLong()
         println("Offset: Start = $start")
         if (sort == null) {
-            return transaction {
+            println("Inside getPage transaction without sort")
+            val start1 = System.currentTimeMillis()
+            val rv = transaction {
                 DatabasePlaylists
                     .selectWithAllFilters(filters)
                     .limit(n = pageSize, offset = start)
-                    .map { PlaylistDto(it).toPlaylist() }
+                    .map {
+                        println("Inside map of getPage without sort")
+                        val start2 = System.currentTimeMillis()
+                        val rv = PlaylistDto(it).toPlaylist()
+                        val end = System.currentTimeMillis()
+                        println("map of getPage without sort needed ${end - start2} ms")
+                        rv
+                    }
             }
+            val end = System.currentTimeMillis()
+            println("getPage transaction without sort needed ${end - start1} ms")
+            return rv
         }
         else {
-            return transaction {
+            println("Inside getPage transaction with sort")
+            val start1 = System.currentTimeMillis()
+            val rv = transaction {
                 DatabasePlaylists
                     .selectWithAllFilters(filters)
                     .orderBy(sort.dbField as Column<String> to sort.sortOrder)
                     .limit(n = pageSize, offset = start)
-                    .map { PlaylistDto(it).toPlaylist() }
+                    .map {
+                        println("Inside map of getPage with sort")
+                        val start2 = System.currentTimeMillis()
+                        val rv = PlaylistDto(it).toPlaylist()
+                        val end = System.currentTimeMillis()
+                        println("map of getPage with sort needed ${end - start2} ms")
+                        rv
+                    }
             }
+
+            val end = System.currentTimeMillis()
+            println("getPage transaction without sort needed ${end - start1} ms")
+            return rv
         }
     }
 
@@ -66,6 +91,8 @@ object DBService : IPagingService<Playlist> {
     }
 
     private fun Table.selectWithAllFilters(filters: List<Filter>): Query {
+        println("Inside selectWithAllFilters")
+        val start = System.currentTimeMillis()
         if (filters.isEmpty()) return Query(this, null)
 
         // TODO: Could this be removed due to the below for loop?
@@ -88,17 +115,25 @@ object DBService : IPagingService<Playlist> {
             val filter = filters[i]
             sql = sql and (filter.dbField as Column<String> like "%${filter.filter}%")
         }
+        val end = System.currentTimeMillis()
+        println("Just before return: selectWithAllFilters needed ${end - start} ms")
         return this.select { sql }
     }
 
     private fun Table.selectWithFilter(filter: Filter): Query {
+        println("Inside selectWithFilter")
+        val start = System.currentTimeMillis()
         if (filter.dbField == null) return Query(this, null)
 
-        return selectWithFilter(
+        val rv = selectWithFilter(
             caseSensitive = filter.caseSensitive,
             dbField = filter.dbField,
             filter = filter.filter
         )
+
+        val end = System.currentTimeMillis()
+        println("selectWithFilter needed ${end -start} ms")
+        return rv
     }
 
     private fun Table.selectWithFilter(caseSensitive: Boolean, dbField: Column<*>?, filter: String): Query {
@@ -117,13 +152,30 @@ object DBService : IPagingService<Playlist> {
         columnWhichShouldMatch: Column<String>,
         filter: String
     ): Op<Boolean> {
-        return if (caseSensitive) columnWhichShouldMatch like "%$filter%"
+        println("Inside caseSensitiveFilter")
+        val start = System.currentTimeMillis()
+        val rv = if (caseSensitive) columnWhichShouldMatch like "%$filter%"
         else columnWhichShouldMatch.lowerCase() like "%${filter.lowercase(Locale.getDefault())}%"
+
+        val end = System.currentTimeMillis()
+        println("caseSensitiveFilter needed ${end - start} ms")
+        return rv
     }
 
     override fun getTotalCount(): Int = transaction {
         println("getTotalCount is called")
         DatabasePlaylists.selectAll().count().toInt()
+    }
+
+    override fun getFilteredCount(filters: List<Filter>): Int {
+        if (filters.isEmpty()) throw IllegalArgumentException("A Filter must be set - Passed an empty filter list to getFilteredCountNew")
+
+        return transaction {
+            DatabasePlaylists
+                .selectWithAllFilters(filters = filters)
+                .count()
+                .toInt()
+        }
     }
 
     override fun get(id: Long): Playlist = transaction {
@@ -139,16 +191,5 @@ object DBService : IPagingService<Playlist> {
             // TODO: How can we determine what the gui index is of a given index?
         }
         return -1
-    }
-
-    override fun getFilteredCount(filters: List<Filter>): Int {
-        if (filters.isEmpty()) throw IllegalArgumentException("A Filter must be set - Passed an empty filter list to getFilteredCountNew")
-
-        return transaction {
-            DatabasePlaylists
-                .selectWithAllFilters(filters = filters)
-                .count()
-                .toInt()
-        }
     }
 }
