@@ -33,15 +33,12 @@ class LazyTableController(
     var lastSortedAttribute: Attribute<*, *, *>? = null
     var attributeSort = mutableStateMapOf<Attribute<*, *, *>, BLTSortOrder>()
     var sort: Sort? by mutableStateOf(null)
-    var isSorting by mutableStateOf(false)
 
     fun onSortChanged(attribute: Attribute<*, *, *>, newSortOrder: BLTSortOrder) {
         resetPreviousSortedAttribute(newAttribute = attribute)
 
         lastSortedAttribute = attribute
         attributeSort[attribute] = newSortOrder
-
-        isSorting = newSortOrder.isSorting
         sort = newSortOrder.sortAttribute(attribute)
 
         scheduler.scheduleTask { loadFirstPagesToFillCacheAndAddToAppStateList() }

@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import composeForms.model.attributes.Attribute
 import composeForms.ui.theme.BackgroundColorHeader
 import demo.bigLazyTable.model.*
 import demo.bigLazyTable.ui.table.TableCell
@@ -44,22 +45,11 @@ fun HeaderRow(
                         backgroundColor = BackgroundColorHeader,
                         fontWeight = FontWeight.Bold
                     )
-                    val sortOrder = controller.attributeSort[attribute]
-                    IconButton(
+                    SortButton(
                         modifier = Modifier.align(Alignment.CenterEnd),
-                        onClick = {
-                            controller.onSortChanged(
-                                attribute = attribute,
-                                newSortOrder = sortOrder?.nextSortState() ?: BLTSortOrder.None
-                            )
-                        }
-                    ) {
-                        Icon(
-                            imageVector = sortOrder?.nextSortIcon() ?: BLTSortOrder.None.icon,
-                            contentDescription = "Sortieren",
-                            tint = Color.White
-                        )
-                    }
+                        attribute = attribute,
+                        controller = controller
+                    )
                 }
             }
         }
