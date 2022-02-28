@@ -44,18 +44,18 @@ fun HeaderRow(
                         backgroundColor = BackgroundColorHeader,
                         fontWeight = FontWeight.Bold
                     )
+                    val sortOrder = controller.attributeSort[attribute]
                     IconButton(
                         modifier = Modifier.align(Alignment.CenterEnd),
                         onClick = {
-                            val sort = controller.attributeSort[attribute]
                             controller.onSortChanged(
-                                attribute = attribute,
-                                newSort = sort?.nextSortState() ?: BLTSort.None
+                                newSortAttribute = attribute,
+                                newSortOrder = sortOrder?.nextSortState() ?: BLTSortOrder.None
                             )
                         }
                     ) {
                         Icon(
-                            imageVector = controller.attributeSort[attribute]?.nextSortIcon() ?: BLTSort.None.icon,
+                            imageVector = sortOrder?.nextSortIcon() ?: BLTSortOrder.None.icon,
                             contentDescription = "Sortieren",
                             tint = Color.White
                         )

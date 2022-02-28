@@ -30,18 +30,26 @@ class LazyTableController(
     private val firstPageNr = 0 // TODO: Use Nr everywhere!
     private val firstPageIndex = 0
 
-    var attributeSort = mutableMapOf<Attribute<*, *, *>, BLTSort>()
+    var lastSortedAttribute: Attribute<*, *, *>? = null
+    var attributeSort = mutableMapOf<Attribute<*, *, *>, BLTSortOrder>()
     var sort: Sort? by mutableStateOf(null)
+//    private var isSorting by mutableStateOf(false)
 
-    //        private set
-    private var isSorting by mutableStateOf(false)
+    fun onSortChanged(newSortAttribute: Attribute<*, *, *>, newSortOrder: BLTSortOrder) {
+        resetPreviousSortedAttribute(newSortAttribute = newSortAttribute)
 
-    fun onSortChanged(attribute: Attribute<*, *, *>, newSort: BLTSort) {
-        isSorting = newSort.isSorting
-        sort = newSort.sortAttribute(attribute)
-        attributeSort[attribute] = newSort
+        lastSortedAttribute = newSortAttribute
+//        isSorting = newSort.isSorting
+        sort = newSortOrder.sortAttribute(newSortAttribute)
+        attributeSort[newSortAttribute] = newSortOrder
 
         loadFirstPagesToFillCacheAndAddToAppStateList()
+    }
+
+    private fun resetPreviousSortedAttribute(newSortAttribute: Attribute<*,*,*>) {
+        if (lastSortedAttribute != null && lastSortedAttribute != newSortAttribute) {
+            attributeSort[lastSortedAttribute!!] = BLTSortOrder.None
+        }
     }
 
     var filters = listOf<Filter>()
@@ -54,10 +62,8 @@ class LazyTableController(
         val start = System.currentTimeMillis()
         attributeFilter[attribute] = newFilter
 
-        when (newFilter) {
-            "" -> filteredAttributes.remove(attribute)
-            else -> filteredAttributes.add(attribute)
-        }
+        if (newFilter == "") filteredAttributes.remove(attribute)
+        else filteredAttributes.add(attribute)
 
         filters = filteredAttributes.map { a ->
             Filter(
@@ -110,7 +116,7 @@ class LazyTableController(
             if (attribute.canBeFiltered) {
                 attributeFilter[attribute] = ""
             }
-            attributeSort[attribute] = BLTSort.None
+            attributeSort[attribute] = BLTSortOrder.None
         }
         println("attributeFilter: ${attributeFilter.size}")
         println("attributeSort: ${attributeSort.size}")

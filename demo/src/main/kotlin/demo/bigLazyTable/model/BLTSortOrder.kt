@@ -10,17 +10,17 @@ import composeForms.model.attributes.Attribute
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.SortOrder
 
-sealed class BLTSort(
+sealed class BLTSortOrder(
     var sortOrder: SortOrder?,
     var isSorting: Boolean,
     var icon: ImageVector
 ) {
-    abstract fun nextSortState(): BLTSort
+    abstract fun nextSortState(): BLTSortOrder
     abstract fun nextSortIcon(): ImageVector
     abstract fun sortAttribute(attribute: Attribute<*, *, *>): Sort?
 
-    object Asc : BLTSort(sortOrder = SortOrder.ASC, isSorting = true, icon = Icons.Default.KeyboardArrowUp) {
-        override fun nextSortState(): BLTSort = Desc
+    object Asc : BLTSortOrder(sortOrder = SortOrder.ASC, isSorting = true, icon = Icons.Default.KeyboardArrowUp) {
+        override fun nextSortState(): BLTSortOrder = Desc
         override fun nextSortIcon(): ImageVector = nextSortState().icon
         override fun sortAttribute(attribute: Attribute<*, *, *>): Sort = Sort(
             dbField = attribute.databaseField as Column<String>,
@@ -28,8 +28,8 @@ sealed class BLTSort(
         )
     }
 
-    object Desc : BLTSort(sortOrder = SortOrder.DESC, isSorting = true, icon = Icons.Default.KeyboardArrowDown) {
-        override fun nextSortState(): BLTSort = None
+    object Desc : BLTSortOrder(sortOrder = SortOrder.DESC, isSorting = true, icon = Icons.Default.KeyboardArrowDown) {
+        override fun nextSortState(): BLTSortOrder = None
         override fun nextSortIcon(): ImageVector = nextSortState().icon
         override fun sortAttribute(attribute: Attribute<*, *, *>): Sort = Sort(
             dbField = attribute.databaseField as Column<String>,
@@ -37,8 +37,8 @@ sealed class BLTSort(
         )
     }
 
-    object None : BLTSort(sortOrder = null, isSorting = false, icon = Icons.Default.Close) {
-        override fun nextSortState(): BLTSort = Asc
+    object None : BLTSortOrder(sortOrder = null, isSorting = false, icon = Icons.Default.Close) {
+        override fun nextSortState(): BLTSortOrder = Asc
         override fun nextSortIcon(): ImageVector = nextSortState().icon
         override fun sortAttribute(attribute: Attribute<*, *, *>): Sort? = null
     }
