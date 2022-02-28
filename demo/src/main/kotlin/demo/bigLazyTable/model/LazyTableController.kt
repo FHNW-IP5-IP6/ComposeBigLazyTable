@@ -37,17 +37,8 @@ class LazyTableController(
     private var isSorting by mutableStateOf(false)
 
     fun onSortChanged(attribute: Attribute<*, *, *>, newSort: BLTSort) {
-        // TODO: Remove if-else & just say sort = newSort.sort
-        if (newSort == BLTSort.None) {
-            sort = null
-            isSorting = newSort.isSorting
-        } else {
-            sort = Sort(
-                dbField = attribute.databaseField as Column<String>,
-                sortOrder = newSort.sortOrder!!
-            )
-            isSorting = newSort.isSorting
-        }
+        isSorting = newSort.isSorting
+        sort = newSort.sortAttribute(attribute)
         attributeSort[attribute] = newSort
 
         loadFirstPagesToFillCacheAndAddToAppStateList()
