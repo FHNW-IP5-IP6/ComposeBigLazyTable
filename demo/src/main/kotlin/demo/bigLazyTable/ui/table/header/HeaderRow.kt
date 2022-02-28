@@ -6,8 +6,6 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import composeForms.ui.theme.BackgroundColorHeader
 import demo.bigLazyTable.model.*
 import demo.bigLazyTable.ui.table.TableCell
-import org.jetbrains.exposed.sql.SortOrder
 
 @Composable
 fun HeaderRow(
@@ -53,12 +50,12 @@ fun HeaderRow(
                             val sort = controller.attributeSort[attribute]
                             controller.onSortChanged(
                                 attribute = attribute,
-                                newSort = sort?.nextSortState() ?: None()
+                                newSort = sort?.nextSortState() ?: BLTSort.None
                             )
                         }
                     ) {
                         Icon(
-                            imageVector = controller.attributeSort[attribute]?.nextSortIcon() ?: Icons.Default.Error,
+                            imageVector = controller.attributeSort[attribute]?.nextSortIcon() ?: BLTSort.None.icon,
                             contentDescription = "Sortieren",
                             tint = Color.White
                         )

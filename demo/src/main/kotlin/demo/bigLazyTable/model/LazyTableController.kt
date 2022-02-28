@@ -37,15 +37,16 @@ class LazyTableController(
     private var isSorting by mutableStateOf(false)
 
     fun onSortChanged(attribute: Attribute<*, *, *>, newSort: BLTSort) {
-        if (newSort == None()) {
+        // TODO: Remove if-else & just say sort = newSort.sort
+        if (newSort == BLTSort.None) {
             sort = null
-            isSorting = false
+            isSorting = newSort.isSorting
         } else {
             sort = Sort(
                 dbField = attribute.databaseField as Column<String>,
                 sortOrder = newSort.sortOrder!!
             )
-            isSorting = true
+            isSorting = newSort.isSorting
         }
         attributeSort[attribute] = newSort
 
@@ -118,7 +119,7 @@ class LazyTableController(
             if (attribute.canBeFiltered) {
                 attributeFilter[attribute] = ""
             }
-            attributeSort[attribute] = None()
+            attributeSort[attribute] = BLTSort.None
         }
         println("attributeFilter: ${attributeFilter.size}")
         println("attributeSort: ${attributeSort.size}")

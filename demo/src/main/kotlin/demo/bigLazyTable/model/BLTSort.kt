@@ -7,37 +7,27 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.ui.graphics.vector.ImageVector
 import org.jetbrains.exposed.sql.SortOrder
 
-abstract class BLTSort {
-    abstract var sortOrder: SortOrder?
-    abstract var isSorting: Boolean
-    abstract var icon: ImageVector
+sealed class BLTSort(
+    // TODO: Add sort
+    var sortOrder: SortOrder?,
+    var isSorting: Boolean,
+    var icon: ImageVector
+) {
     abstract fun nextSortState(): BLTSort
     abstract fun nextSortIcon(): ImageVector
-}
 
-data class Asc(
-    override var sortOrder: SortOrder? = SortOrder.ASC,
-    override var isSorting: Boolean = true,
-    override var icon: ImageVector = Icons.Default.KeyboardArrowUp
-) : BLTSort() {
-    override fun nextSortState(): BLTSort = Desc()
-    override fun nextSortIcon(): ImageVector = nextSortState().icon
-}
+    object Asc : BLTSort(sortOrder = SortOrder.ASC, isSorting = true, icon = Icons.Default.KeyboardArrowUp) {
+        override fun nextSortState(): BLTSort = Desc
+        override fun nextSortIcon(): ImageVector = nextSortState().icon
+    }
 
-data class Desc(
-    override var sortOrder: SortOrder? = SortOrder.DESC,
-    override var isSorting: Boolean = true,
-    override var icon: ImageVector = Icons.Default.KeyboardArrowDown
-) : BLTSort() {
-    override fun nextSortState(): BLTSort = None()
-    override fun nextSortIcon(): ImageVector = nextSortState().icon
-}
+    object Desc : BLTSort(sortOrder = SortOrder.DESC, isSorting = true, icon = Icons.Default.KeyboardArrowDown) {
+        override fun nextSortState(): BLTSort = None
+        override fun nextSortIcon(): ImageVector = nextSortState().icon
+    }
 
-data class None(
-    override var sortOrder: SortOrder? = null,
-    override var isSorting: Boolean = false,
-    override var icon: ImageVector = Icons.Default.Close
-) : BLTSort() {
-    override fun nextSortState(): BLTSort = Asc()
-    override fun nextSortIcon(): ImageVector = nextSortState().icon
+    object None : BLTSort(sortOrder = null, isSorting = false, icon = Icons.Default.Close) {
+        override fun nextSortState(): BLTSort = Asc
+        override fun nextSortIcon(): ImageVector = nextSortState().icon
+    }
 }
