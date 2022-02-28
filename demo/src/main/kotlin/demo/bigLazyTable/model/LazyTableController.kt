@@ -31,7 +31,7 @@ class LazyTableController(
     private val firstPageIndex = 0
 
     var lastSortedAttribute: Attribute<*, *, *>? = null
-    var attributeSort = mutableMapOf<Attribute<*, *, *>, BLTSortOrder>()
+    var attributeSort = mutableStateMapOf<Attribute<*, *, *>, BLTSortOrder>()
     var sort: Sort? by mutableStateOf(null)
 //    private var isSorting by mutableStateOf(false)
 
@@ -43,7 +43,7 @@ class LazyTableController(
         sort = newSortOrder.sortAttribute(newSortAttribute)
         attributeSort[newSortAttribute] = newSortOrder
 
-        loadFirstPagesToFillCacheAndAddToAppStateList()
+        scheduler.scheduleTask { loadFirstPagesToFillCacheAndAddToAppStateList() }
     }
 
     private fun resetPreviousSortedAttribute(newSortAttribute: Attribute<*,*,*>) {
@@ -148,6 +148,7 @@ class LazyTableController(
         fullList.first()?.let { firstPlaylist -> selectPlaylistModel(firstPlaylist) }
     }
 
+    // sort: loadAllNeededPagesForIndex needed 23552 ms
     fun loadAllNeededPagesForIndex(firstVisibleItemIndex: Int) {
         println("Inside loadAllNeededPagesForIndex with firstVisibleItemIndex=$firstVisibleItemIndex")
         val start = System.currentTimeMillis()
@@ -176,6 +177,7 @@ class LazyTableController(
         println("loadAllNeededPagesForIndex needed ${end - start} ms")
     }
 
+    // sort: loadPage needed 6112 ms
     internal fun loadPage(pageNr: Int, scrolledDown: Boolean) {
         println("Inside loadPage with pageNr=$pageNr, scrolledDown=$scrolledDown")
         val start = System.currentTimeMillis()
@@ -211,6 +213,7 @@ class LazyTableController(
         val start1 = System.currentTimeMillis()
         // getPageNew needed 745 ms (normal max with filters)
         // getPageNew needed 24837 ms (max with sort)
+        // getPageNew needed 75882 ms (sort modified_at)
         val page = pagingService.getPageNew(
             startIndex = startIndexOfPage,
             pageSize = pageSize,

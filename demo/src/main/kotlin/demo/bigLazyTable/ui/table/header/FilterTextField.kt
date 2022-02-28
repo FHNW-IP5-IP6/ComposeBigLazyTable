@@ -59,6 +59,7 @@ fun FilterEnabledTextField(
     )
 }
 
+// TODO: Should we write something when a field can not be filtered?
 @Composable
 fun FilterDisabledTextField() {
     TextField(
