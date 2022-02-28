@@ -11,7 +11,7 @@ data class Filter(
 
 data class Sort(
     val dbField: Column<String>?,
-    val sortOrder: SortOrder // ENUM/?
+    val sortOrder: SortOrder
 )
 
 /**
@@ -19,14 +19,9 @@ data class Sort(
  */
 interface IPagingService<T> {
 
-//    fun getPage(startIndex: Int, pageSize: Int, filter: String = "", dbField: Column<String>?, caseSensitive: Boolean = false, sorted: String = ""): List<T>
+    fun getPage(startIndex: Int, pageSize: Int, filters: List<Filter>, sort: Sort? = null): List<T>
 
-    // TODO: 1 sort
-    fun getPageNew(startIndex: Int, pageSize: Int, filters: List<Filter>, sort: Sort? = null): List<T>
-
-//    fun getFilteredCount(filter: String, dbField: Column<*>?, caseSensitive: Boolean = false): Int
-
-    fun getFilteredCountNew(filters: List<Filter>): Int
+    fun getFilteredCount(filters: List<Filter>): Int
 
     fun getTotalCount(): Int
 

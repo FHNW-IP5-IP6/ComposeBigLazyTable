@@ -19,41 +19,7 @@ object DBService : IPagingService<Playlist> {
         totalCount
     }
 
-//    override fun getPage(
-//        startIndex: Int,
-//        pageSize: Int,
-//        filter: String,
-//        dbField: Column<String>?,
-//        caseSensitive: Boolean,
-//        sorted: String
-//    ): List<Playlist> {
-//        // TODO: check if lazy is working correctly without any downside
-//        if (startIndex > lastIndex) throw IllegalArgumentException("startIndex must be smaller than/equal to the lastIndex and not $startIndex")
-//        if (startIndex < 0) throw IllegalArgumentException("only positive values are allowed for startIndex")
-//
-//        val start: Long = startIndex.toLong()
-//        println("Offset: Start = $start")
-//        if (sorted != "ASC" && sorted != "DESC") {
-//            return transaction {
-//                DatabasePlaylists
-//                    .selectWithFilter(caseSensitive, dbField, filter)
-//                    .limit(n = pageSize, offset = start)
-//                    .map { mapResultRowToPlaylist(it) }
-//            }
-//        }
-//        else {
-//            val sortOrder = if (sorted == "ASC") SortOrder.ASC else SortOrder.DESC
-//            return transaction {
-//                DatabasePlaylists
-//                    .select { caseSensitiveFilter(caseSensitive, DatabasePlaylists.name, filter) }
-//                    .orderBy(DatabasePlaylists.name to sortOrder)
-//                    .limit(n = pageSize, offset = start)
-//                    .map { mapResultRowToPlaylist(it) }
-//            }
-//        }
-//    }
-
-    override fun getPageNew(
+    override fun getPage(
         startIndex: Int,
         pageSize: Int,
         filters: List<Filter>,
@@ -155,18 +121,6 @@ object DBService : IPagingService<Playlist> {
         else columnWhichShouldMatch.lowerCase() like "%${filter.lowercase(Locale.getDefault())}%"
     }
 
-//    override fun getFilteredCount(filter: String, dbField: Column<*>?, caseSensitive: Boolean): Int {
-//        if (filter == "") throw IllegalArgumentException("Filter must be set - empty string is not allowed (leads to java.lang.OutOfMemoryError: Java heap space)")
-//        if (dbField == null) return 0
-//
-//        return transaction {
-//            DatabasePlaylists
-//                .select { caseSensitiveFilter(caseSensitive, dbField as Column<String>, filter) }
-//                .count()
-//                .toInt()
-//        }
-//    }
-
     override fun getTotalCount(): Int = transaction {
         println("getTotalCount is called")
         DatabasePlaylists.selectAll().count().toInt()
@@ -187,7 +141,7 @@ object DBService : IPagingService<Playlist> {
         return -1
     }
 
-    override fun getFilteredCountNew(filters: List<Filter>): Int {
+    override fun getFilteredCount(filters: List<Filter>): Int {
         if (filters.isEmpty()) throw IllegalArgumentException("A Filter must be set - Passed an empty filter list to getFilteredCountNew")
 
         return transaction {

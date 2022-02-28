@@ -81,7 +81,7 @@ class LazyTableController(
                 println("Before getFilteredCountNew")
                 val start1 = System.currentTimeMillis()
                 // getFilteredCountNew needed 617 ms
-                filteredCount = pagingService.getFilteredCountNew(filters = filters)
+                filteredCount = pagingService.getFilteredCount(filters = filters)
                 val end1 = System.currentTimeMillis()
                 println("getFilteredCountNew needed ${end1 - start1} ms")
 
@@ -215,7 +215,7 @@ class LazyTableController(
         // getPageNew needed 745 ms (normal max with filters)
         // getPageNew needed 24837 ms (max with sort)
         // getPageNew needed 75882 ms (sort modified_at)
-        val page = pagingService.getPageNew(
+        val page = pagingService.getPage(
             startIndex = startIndexOfPage,
             pageSize = pageSize,
             filters = filters,
