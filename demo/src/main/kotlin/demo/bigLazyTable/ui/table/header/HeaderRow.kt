@@ -49,7 +49,7 @@ fun HeaderRow(
                         modifier = Modifier.align(Alignment.CenterEnd),
                         onClick = {
                             controller.onSortChanged(
-                                newSortAttribute = attribute,
+                                attribute = attribute,
                                 newSortOrder = sortOrder?.nextSortState() ?: BLTSortOrder.None
                             )
                         }

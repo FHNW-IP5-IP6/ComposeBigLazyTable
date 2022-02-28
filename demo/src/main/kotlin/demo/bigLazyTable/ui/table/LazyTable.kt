@@ -38,7 +38,7 @@ fun LazyTable(
             }
 
             // Go to the top when start/stop filtering
-            LaunchedEffect(key1 = isFiltering) {
+            LaunchedEffect(key1 = isFiltering, key2 = isSorting) {
                 verticalLazyListState.scrollToItem(0)
             }
 
