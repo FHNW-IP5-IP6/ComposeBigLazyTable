@@ -4,6 +4,7 @@ import bigLazyTable.paging.*
 import demo.bigLazyTable.model.Playlist
 import demo.bigLazyTable.model.PlaylistDto
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
@@ -50,8 +51,7 @@ object DBService : IPagingService<Playlist> {
             val end = System.currentTimeMillis()
             println("getPage transaction without sort needed ${end - start1} ms")
             return rv
-        }
-        else {
+        } else {
             println("Inside getPage transaction with sort")
             val start1 = System.currentTimeMillis()
             val rv = transaction {
@@ -80,13 +80,12 @@ object DBService : IPagingService<Playlist> {
     }
 
     // https://discuss.kotlinlang.org/t/checking-type-in-generic/3100/2
-    inline fun <reified T> Column<T>.test() {
-        when (T::class) {
-            Int::class -> {
-                println("Int")
-                this as Column<Int>
-            }
-            else -> println("${T::class}")
+    inline fun <reified T> test(): String {
+        println("Reified test()")
+        return when (T::class) {
+            Int::class -> "Int"
+            String::class -> "String"
+            else -> "${T::class}"
         }
     }
 
@@ -101,19 +100,27 @@ object DBService : IPagingService<Playlist> {
             return selectWithFilter(filter)
         }
 
-        val firstFilter = filters.first()
-//        when (firstFilter.dbField) {
-//            is Column<Int> -> {}
-//            is String -> {}
-//        }
-
-
-        var sql: Op<Boolean> = firstFilter.dbField as Column<String> like "%${firstFilter.filter}%"
+        // TODO: Better way than this ugly code?
+        var sql: Op<Boolean> = when (val firstFilter = filters.first()) {
+            is LongFilter -> firstFilter.dbField eq firstFilter.filter
+            is IntFilter -> firstFilter.dbField eq firstFilter.filter
+            is DoubleFilter -> firstFilter.dbField eq firstFilter.filter
+            is FloatFilter -> firstFilter.dbField eq firstFilter.filter
+            is BooleanFilter -> firstFilter.dbField eq firstFilter.filter
+            is StringFilter -> firstFilter.dbField like "%${firstFilter.filter}%"
+        }
+//        var sql: Op<Boolean> = firstFilter.dbField like "%${firstFilter.filter}%"
         for (i in 1 until filters.size) {
             // TODO: as Column<Double/Float/Int/...> equals filter.toDouble()/usw
-//            when (dbField)
-            val filter = filters[i]
-            sql = sql and (filter.dbField as Column<String> like "%${filter.filter}%")
+            val sql2: Op<Boolean> = when (val filter = filters[i]) {
+                is LongFilter -> filter.dbField eq filter.filter
+                is IntFilter -> filter.dbField eq filter.filter
+                is DoubleFilter -> filter.dbField eq filter.filter
+                is FloatFilter -> filter.dbField eq filter.filter
+                is BooleanFilter -> filter.dbField eq filter.filter
+                is StringFilter -> filter.dbField like "%${filter.filter}%"
+            }
+            sql = sql and sql2
         }
         val end = System.currentTimeMillis()
         println("Just before return: selectWithAllFilters needed ${end - start} ms")
@@ -123,22 +130,43 @@ object DBService : IPagingService<Playlist> {
     private fun Table.selectWithFilter(filter: Filter): Query {
         println("Inside selectWithFilter")
         val start = System.currentTimeMillis()
-        if (filter.dbField == null) return Query(this, null)
 
-        val rv = selectWithFilter(
-            caseSensitive = filter.caseSensitive,
-            dbField = filter.dbField,
-            filter = filter.filter
-        )
+        // TODO: Better way than this ugly code?
+        val rv: Query
+        when (filter) {
+            is LongFilter    -> {
+                rv = select { filter.dbField eq filter.filter }
+            }
+            is IntFilter     -> {
+                rv = select { filter.dbField eq filter.filter }
+            }
+            is DoubleFilter  -> {
+                rv = select { filter.dbField eq filter.filter }
+            }
+            is FloatFilter   -> {
+                rv = select { filter.dbField eq filter.filter }
+            }
+            is BooleanFilter -> {
+                rv = select { filter.dbField eq filter.filter }
+            }
+            is StringFilter  -> {
+                rv = selectWithStringFilter(
+                    caseSensitive = filter.caseSensitive,
+                    dbField = filter.dbField,
+                    filter = filter.filter
+                )
+            }
+        }
+        //if (filter.dbField == null) return Query(this, null) // TODO: Can this ever happen?
 
         val end = System.currentTimeMillis()
-        println("selectWithFilter needed ${end -start} ms")
+        println("selectWithFilter needed ${end - start} ms")
         return rv
     }
 
-    private fun Table.selectWithFilter(caseSensitive: Boolean, dbField: Column<*>?, filter: String): Query {
+    private fun Table.selectWithStringFilter(caseSensitive: Boolean, dbField: Column<String>?, filter: String): Query {
         if (dbField == null) return Query(this, null)
-        return this.select { caseSensitiveFilter(caseSensitive, dbField as Column<String>, filter) }
+        return this.select { caseSensitiveFilter(caseSensitive, dbField, filter) }
     }
 
     // TODO: Move this knowledge into documentation
@@ -153,6 +181,7 @@ object DBService : IPagingService<Playlist> {
         filter: String
     ): Op<Boolean> {
         println("Inside caseSensitiveFilter")
+
         val start = System.currentTimeMillis()
         val rv = if (caseSensitive) columnWhichShouldMatch like "%$filter%"
         else columnWhichShouldMatch.lowerCase() like "%${filter.lowercase(Locale.getDefault())}%"
@@ -172,7 +201,7 @@ object DBService : IPagingService<Playlist> {
 
         return transaction {
             DatabasePlaylists
-                .selectWithAllFilters(filters = filters)
+                .selectWithAllFilters(filters)
                 .count()
                 .toInt()
         }

@@ -1,10 +1,8 @@
 package demo.bigLazyTable.model
 
 import androidx.compose.runtime.*
-import bigLazyTable.paging.Filter
-import bigLazyTable.paging.IPagingService
-import bigLazyTable.paging.Sort
-import composeForms.model.attributes.Attribute
+import bigLazyTable.paging.*
+import composeForms.model.attributes.*
 import demo.bigLazyTable.utils.PageUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +13,7 @@ import org.junit.platform.commons.util.LruCache
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.properties.Delegates
+import kotlin.reflect.KClass
 
 private val Log = KotlinLogging.logger {}
 
@@ -64,11 +63,39 @@ class LazyTableController(
         else filteredAttributes.add(attribute)
 
         filters = filteredAttributes.map { a ->
-            Filter(
-                filter = attributeFilter[a] ?: "",
-                dbField = a.databaseField as Column<String>,
-                caseSensitive = false
-            )
+            // TODO: Better way than this ugly code?
+            when (a) {
+                is IntegerAttribute -> IntFilter(
+                    filter = attributeFilter[a]!!.toInt(),
+                    dbField = a.databaseField as Column<Int>,
+                    caseSensitive = false
+                )
+                is FloatAttribute -> FloatFilter(
+                    filter = attributeFilter[a]!!.toFloat(),
+                    dbField = a.databaseField as Column<Float>,
+                    caseSensitive = false
+                )
+                is DoubleAttribute -> DoubleFilter(
+                    filter = attributeFilter[a]!!.toDouble(),
+                    dbField = a.databaseField as Column<Double>,
+                    caseSensitive = false
+                )
+                is LongAttribute -> LongFilter(
+                    filter = attributeFilter[a]!!.toLong(),
+                    dbField = a.databaseField as Column<Long>,
+                    caseSensitive = false
+                )
+                is BooleanAttribute -> BooleanFilter(
+                    filter = attributeFilter[a]!!.toBoolean(),
+                    dbField = a.databaseField as Column<Boolean>,
+                    caseSensitive = false
+                )
+                else -> StringFilter(
+                    filter = attributeFilter[a] ?: "",
+                    dbField = a.databaseField as Column<String>,
+                    caseSensitive = false
+                )
+            }
         }
         println("Filters in onFiltersChanged: $filters")
 
@@ -79,6 +106,7 @@ class LazyTableController(
                 val start1 = System.currentTimeMillis()
                 // getFilteredCountNew needed 617 ms
                 filteredCount = pagingService.getFilteredCount(filters = filters)
+                println("filtered count = $filteredCount")
                 val end1 = System.currentTimeMillis()
                 println("getFilteredCountNew needed ${end1 - start1} ms")
 

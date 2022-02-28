@@ -1,13 +1,8 @@
 package bigLazyTable.paging
 
+//import composeForms.model.attributes.Attribute
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.SortOrder
-
-data class Filter(
-    val filter: String, //Int/usw generisch
-    val dbField: Column<String>?,
-    var caseSensitive: Boolean,
-)
 
 data class Sort(
     val dbField: Column<String>?,
