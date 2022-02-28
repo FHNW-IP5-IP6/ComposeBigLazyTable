@@ -77,7 +77,7 @@ object DBService : IPagingService<Playlist> {
             return transaction {
                 DatabasePlaylists
                     .selectWithAllFilters(filters)
-                    .orderBy(sort.dbField as Column<String> to sort.sorted)
+                    .orderBy(sort.dbField as Column<String> to sort.sortOrder)
                     .limit(n = pageSize, offset = start)
                     .map { PlaylistDto(it).toPlaylist() }
             }

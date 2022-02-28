@@ -11,7 +11,7 @@ data class Filter(
 
 data class Sort(
     val dbField: Column<String>?,
-    val sorted: SortOrder // ENUM/?
+    val sortOrder: SortOrder // ENUM/?
 )
 
 /**
