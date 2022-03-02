@@ -18,12 +18,6 @@ sonarqube {
 group = "ch.fhnw"
 version = "1.0"
 
-repositories {
-    google()
-    mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-}
-
 kotlin {
     sourceSets {
         named("main") {
@@ -31,40 +25,42 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation(project(":common"))
 
-                // Is this for Forms?
+                // Icons for Compose forms header
                 implementation("org.jetbrains.compose.material:material-icons-extended-desktop:0.4.0")
 
-                // Coroutines
+                // Kotlin Coroutines
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
 
-                // CSV
+                // CSV Library
                 implementation("com.opencsv:opencsv:5.5.2")
 
-                // Database
+                // SQLite Database & Exposed Library
                 implementation("org.xerial:sqlite-jdbc:3.30.1")
                 implementation("org.jetbrains.exposed:exposed-core:0.35.3")
                 implementation("org.jetbrains.exposed:exposed-dao:0.35.3")
                 implementation("org.jetbrains.exposed:exposed-jdbc:0.35.3")
 
-                // Logging
+                // Logging Library
                 implementation("io.github.microutils:kotlin-logging:1.12.5")
 
-                // Forms
+                // MQTT Library for Compose Forms
                 implementation("com.hivemq:hivemq-community-edition-embedded:2021.1")
-
-                implementation(getSkiaDependency()) // WORKAROUND
             }
         }
         named("test") {
             dependencies {
-                implementation(compose.desktop.currentOs)
 
-                // Mock
+                // Mock Library
                 implementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
                 implementation("io.mockk:mockk:1.11.0")
 
+                // Used in FakePagingService for tests
+                implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.10")
+
+                /*
+                TODO: REMOVE ALL DEPENDENCIES IF UI TESTS DON'T WORK
                 // UI Testing
-                //implementation("androidx.compose.ui:ui-test-desktop:1.0.0-beta06")
+                implementation("androidx.compose.ui:ui-test-desktop:1.0.0-beta06")
                 implementation("org.jetbrains.compose.ui:ui-test-junit4-desktop:1.0.1")
                 implementation(getSkiaDependency()) // WORKAROUND
 
@@ -76,11 +72,14 @@ kotlin {
 
                 // needed so that JUnit4/3 tests can also run in the same project with JUnit5 Tests
                 implementation("org.junit.vintage:junit-vintage-engine:5.8.2")
+                 */
             }
         }
     }
 }
 
+/*
+TODO: REMOVE THIS IF UI TESTS DON'T WORK
 fun getSkiaDependency(): String {
     val target = getTarget()
     val version = "0.6.7"
@@ -104,6 +103,7 @@ fun getTarget(): String {
 
     return "${targetOs}-${targetArch}"
 }
+*/
 
 tasks.apply {
     withType<Test> {

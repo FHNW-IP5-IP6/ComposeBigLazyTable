@@ -1,9 +1,11 @@
 package demo.bigLazyTable.data.database
 
+import bigLazyTable.paging.Filter
 import bigLazyTable.paging.IPagingService
+import bigLazyTable.paging.Sort
 import demo.bigLazyTable.model.Playlist
 import demo.bigLazyTable.utils.PageUtils
-import org.jetbrains.exposed.sql.Column
+import kotlin.reflect.full.memberProperties
 
 class FakePagingService(val numberOfPlaylists: Int, val pageSize: Int) : IPagingService<Playlist> {
 
@@ -24,25 +26,63 @@ class FakePagingService(val numberOfPlaylists: Int, val pageSize: Int) : IPaging
         }
     }
 
-    // TODO: Fix for new getPage Method signature
     override fun getPage(
         startIndex: Int,
         pageSize: Int,
-//        filter: Filter,
-        filter: String,
-        dbField: Column<*>?,
-        caseSensitive: Boolean,
-        sorted: String
+        filters: List<Filter>,
+        sort: Sort?
     ): List<Playlist> {
-        val pageNrOfStartIndex = startIndex / pageSize
-        return allData[pageNrOfStartIndex]?.filter { it.name == filter } ?: emptyList()
+        val adjustedFilters = mutableListOf<Filter>()
+        filters.forEach {
+            val filterString = it.filter
+            if (!it.caseSensitive) {
+                filterString.lowercase()
+            }
+            adjustedFilters.add(Filter(
+                filter = filterString,
+                dbField =  it.dbField,
+                caseSensitive = it.caseSensitive
+            ))
+        }
+
+        val allDataFiltered = mutableListOf<Playlist>()
+        allData.values.forEach { playlists ->
+            var filteredData = playlists
+            adjustedFilters.forEach { filter ->
+                filteredData = filteredData.filter { it.getField<String>(filter.dbField?.name ?: "") == filter.filter }
+            }
+            allDataFiltered.addAll(filteredData)
+        }
+        allDataFiltered.sortByDescending { it.getField<String>(sort?.dbField?.name ?: "") }
+        if (sort?.sortOrder?.name == "ASC") { allDataFiltered.reverse() }
+
+        return allDataFiltered.subList(startIndex, startIndex+pageSize)
     }
 
-    override fun getFilteredCount(filter: String, caseSensitive: Boolean): Int {
+    override fun getFilteredCount(filters: List<Filter>): Int {
         var count = 0
-        allData.values.forEach { playlists ->
-            count += playlists.filter { playlist -> playlist.name == filter }.size
+
+        val adjustedFilters = mutableListOf<Filter>()
+        filters.forEach {
+            val filterString = it.filter
+            if (!it.caseSensitive) {
+                filterString.lowercase()
+            }
+            adjustedFilters.add(Filter(
+                filter = filterString,
+                dbField =  it.dbField,
+                caseSensitive = it.caseSensitive
+            ))
         }
+
+        allData.values.forEach { playlists ->
+            var filteredData = playlists
+            adjustedFilters.forEach { filter ->
+                filteredData = filteredData.filter { it.getField<String>(filter.dbField?.name ?: "") == filter.filter }
+            }
+            count += filteredData.size
+        }
+
         return count
     }
 
@@ -59,4 +99,15 @@ class FakePagingService(val numberOfPlaylists: Int, val pageSize: Int) : IPaging
     override fun indexOf(id: Long, filter: String): Int {
         TODO("Not yet implemented -> first implement the real method!")
     }
+
+    @Throws(IllegalAccessException::class, ClassCastException::class)
+    inline fun <reified T> Any.getField(fieldName: String): T? {
+        this::class.memberProperties.forEach { kCallable ->
+            if (fieldName == kCallable.name) {
+                return kCallable.getter.call(this) as T?
+            }
+        }
+        return null
+    }
+
 }
