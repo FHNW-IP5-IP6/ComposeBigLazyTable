@@ -102,23 +102,23 @@ object DBService : IPagingService<Playlist> {
 
         // TODO: Better way than this ugly code?
         var sql: Op<Boolean> = when (val firstFilter = filters.first()) {
-            is LongFilter -> firstFilter.dbField eq firstFilter.filter // nur id rest ist mit like
-            is IntFilter -> firstFilter.dbField as Column<String> like firstFilter.filter.toString()
-            is DoubleFilter -> firstFilter.dbField as Column<String> like firstFilter.filter.toString()
-            is FloatFilter -> firstFilter.dbField as Column<String> like firstFilter.filter.toString()
-            is BooleanFilter -> firstFilter.dbField as Column<String> like "${firstFilter.filter}"
-            is StringFilter -> firstFilter.dbField like "%${firstFilter.filter}%"
+            is LongFilter -> firstFilter.dbField as Column<String> eq firstFilter.filter.toString()
+            is IntFilter -> firstFilter.dbField as Column<String> eq firstFilter.filter.toString()
+            is DoubleFilter -> firstFilter.dbField as Column<String> eq firstFilter.filter.toString()
+            is FloatFilter -> firstFilter.dbField as Column<String> eq firstFilter.filter.toString()
+            is BooleanFilter -> firstFilter.dbField as Column<String> eq firstFilter.filter.toString()
+            is StringFilter -> caseSensitiveFilter(firstFilter.caseSensitive, firstFilter.dbField, firstFilter.filter)
         }
 //        var sql: Op<Boolean> = firstFilter.dbField like "%${firstFilter.filter}%"
         for (i in 1 until filters.size) {
             // TODO: as Column<Double/Float/Int/...> equals filter.toDouble()/usw
             val sql2: Op<Boolean> = when (val filter = filters[i]) {
-                is LongFilter -> filter.dbField eq filter.filter // nur id rest ist mit like
-                is IntFilter -> filter.dbField as Column<Int> eq filter.filter
-                is DoubleFilter -> filter.dbField as Column<Double> eq filter.filter
-                is FloatFilter -> filter.dbField as Column<Float> eq filter.filter
-                is BooleanFilter -> filter.dbField as Column<String> like "${filter.filter}"
-                is StringFilter -> filter.dbField like "%${filter.filter}%"
+                is LongFilter -> filter.dbField as Column<String> eq filter.filter.toString()
+                is IntFilter -> filter.dbField as Column<String> eq filter.filter.toString()
+                is DoubleFilter -> filter.dbField as Column<String> eq filter.filter.toString()
+                is FloatFilter -> filter.dbField as Column<String> eq filter.filter.toString()
+                is BooleanFilter -> filter.dbField as Column<String> eq filter.filter.toString()
+                is StringFilter -> caseSensitiveFilter(filter.caseSensitive, filter.dbField, filter.filter)
             }
             sql = sql and sql2
         }
@@ -177,7 +177,7 @@ object DBService : IPagingService<Playlist> {
 // PostgreSQL is a case-sensitive database by default
 // Text comparison in MySQL is case insensitive by default, while in H2 it is case sensitive
 // From MariaDB docs, it depends on OS. For Windows, it's not case-sensitive.
-    private fun SqlExpressionBuilder.caseSensitiveFilter(
+    private fun caseSensitiveFilter(
         caseSensitive: Boolean,
         columnWhichShouldMatch: Column<String>,
         filter: String

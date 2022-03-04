@@ -7,6 +7,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cases
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -35,20 +36,14 @@ fun FilterEnabledTextField(
     attribute: Attribute<*, *, *>,
     controller: LazyTableController
 ) {
-    // TODO: Has no effect - can be deleted
-    val keyboardOptions = when (attribute) {
-        is NumberAttribute -> KeyboardOptions(keyboardType = KeyboardType.Number)
-        else -> KeyboardOptions.Default
-    }
-
     TextField(
         modifier = Modifier.width(180.dp),
-        keyboardOptions = keyboardOptions,
         value = controller.attributeFilter[attribute].toString(),
         onValueChange = { newValue ->
             when (attribute) {
                 is NumberAttribute -> {
-                    val newNumberValue = newValue.filter { it.isDigit() /*|| (it == '>') || (it == '<') || (it == '=')*/ }
+                    val newNumberValue =
+                        newValue.filter { it.isDigit() }
                     controller.onFiltersChanged(attribute, newNumberValue)
                 }
                 else -> controller.onFiltersChanged(attribute, newValue)
@@ -58,6 +53,22 @@ fun FilterEnabledTextField(
         // TODO: Hardcoded strings oke oder .properties file oder sonst was?
         label = { Text("Filter", color = Color.White) },
         singleLine = true,
+        leadingIcon = {
+            if (attribute is StringAttribute) {
+                IconButton(
+                    onClick = {
+                        controller.attributeCaseSensitive[attribute] = !controller.attributeCaseSensitive[attribute]!!
+                        controller.onFiltersChanged(attribute, controller.attributeFilter[attribute]!!)
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Cases,
+                        contentDescription = "Match Case",
+                        tint = if (controller.attributeCaseSensitive[attribute]!!) Color.White else Color.Gray
+                    )
+                }
+            }
+        },
         trailingIcon = {
             if (controller.attributeFilter[attribute].toString().isNotEmpty()) {
                 IconButton(

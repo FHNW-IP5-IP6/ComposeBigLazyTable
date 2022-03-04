@@ -29,6 +29,8 @@ class LazyTableController(
     private val firstPageNr = 0 // TODO: Use Nr everywhere!
     private val firstPageIndex = 0
 
+    var attributeCaseSensitive = mutableStateMapOf<Attribute<*, *, *>, Boolean>()
+
     var lastSortedAttribute: Attribute<*, *, *>? = null
     var attributeSort = mutableStateMapOf<Attribute<*, *, *>, BLTSortOrder>()
     var sort: Sort? by mutableStateOf(null)
@@ -43,7 +45,7 @@ class LazyTableController(
         scheduler.scheduleTask { loadFirstPagesToFillCacheAndAddToAppStateList() }
     }
 
-    private fun resetPreviousSortedAttribute(newAttribute: Attribute<*,*,*>) {
+    private fun resetPreviousSortedAttribute(newAttribute: Attribute<*, *, *>) {
         if (lastSortedAttribute != null && lastSortedAttribute != newAttribute) {
             attributeSort[lastSortedAttribute!!] = BLTSortOrder.None
         }
@@ -68,33 +70,33 @@ class LazyTableController(
                 is IntegerAttribute -> IntFilter(
                     filter = attributeFilter[a]!!.toInt(),
                     dbField = a.databaseField as Column<Int>,
-                    caseSensitive = false
+                    caseSensitive = attributeCaseSensitive[attribute]!!
                 )
                 is FloatAttribute -> FloatFilter(
                     filter = attributeFilter[a]!!.toFloat(),
                     dbField = a.databaseField as Column<Float>,
-                    caseSensitive = false
+                    caseSensitive = attributeCaseSensitive[attribute]!!
                 )
                 is DoubleAttribute -> DoubleFilter(
                     filter = attributeFilter[a]!!.toDouble(),
                     dbField = a.databaseField as Column<Double>,
-                    caseSensitive = false
+                    caseSensitive = attributeCaseSensitive[attribute]!!
                 )
                 is LongAttribute ->
                     LongFilter(
-                    filter = attributeFilter[a]!!.toLong(),
-                    dbField = a.databaseField as Column<Long>,
-                    caseSensitive = false
-                )
+                        filter = attributeFilter[a]!!.toLong(),
+                        dbField = a.databaseField as Column<Long>,
+                        caseSensitive = attributeCaseSensitive[attribute]!!
+                    )
                 is BooleanAttribute -> BooleanFilter(
                     filter = attributeFilter[a]!!.toBoolean(),
                     dbField = a.databaseField as Column<Boolean>,
-                    caseSensitive = false
+                    caseSensitive = attributeCaseSensitive[attribute]!!
                 )
                 else -> StringFilter(
                     filter = attributeFilter[a] ?: "",
                     dbField = a.databaseField as Column<String>,
-                    caseSensitive = false
+                    caseSensitive = attributeCaseSensitive[attribute]!!
                 )
             }
         }
@@ -140,10 +142,11 @@ class LazyTableController(
 
     init {
         appState.defaultPlaylistModel.displayedAttributesInTable.forEach { attribute ->
-            if (attribute.canBeFiltered) {
+            if (attribute.canBeFiltered)
                 attributeFilter[attribute] = ""
-            }
+
             attributeSort[attribute] = BLTSortOrder.None
+            attributeCaseSensitive[attribute] = false
         }
         println("attributeFilter: ${attributeFilter.size}")
         println("attributeSort: ${attributeSort.size}")
