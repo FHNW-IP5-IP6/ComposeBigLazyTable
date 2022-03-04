@@ -34,7 +34,7 @@ class CSVService {
                     ind,
                     nextLine[0],
                     nextLine[1].toBoolean(),
-                    nextLine[2],
+                    nextLine[2].toInt(),
                     /*nextLine[3],
                     nextLine[4],
                     nextLine[5],

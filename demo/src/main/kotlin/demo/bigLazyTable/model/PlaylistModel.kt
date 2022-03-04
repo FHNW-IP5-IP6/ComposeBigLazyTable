@@ -35,7 +35,7 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         databaseField = DatabasePlaylists.name
     )
 
-    private val modifiedAt = StringAttribute(
+    private val modifiedAt = IntegerAttribute(
         model = this,
         label = BLTLabels.MODIFIED_AT,
         required = true,
@@ -105,18 +105,6 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         numTracksDouble,
         numTracksFloat
     )
-
-//    private val numAlbums = IntegerAttribute(
-//        model = this,
-//        label = BLTLabels.NUM_ALBUMS,
-//        value = playlist.numAlbums
-//    )
-//
-//    private val numFollowers = IntegerAttribute(
-//        model = this,
-//        label = BLTLabels.NUM_FOLLOWERS,
-//        value = playlist.numFollowers
-//    )
 
     private val durationMs = IntegerAttribute(
         model = this,
@@ -258,8 +246,6 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         Field(collaborative, FieldSize.SMALL),
         Field(modifiedAt, FieldSize.SMALL),
         Field(numTracks, FieldSize.SMALL),
-//        Field(numAlbums, FieldSize.SMALL),
-//        Field(numFollowers, FieldSize.SMALL),
         Field(numEdits, FieldSize.SMALL),
         Field(numArtists, FieldSize.SMALL),
         Field(durationMs, FieldSize.SMALL),
