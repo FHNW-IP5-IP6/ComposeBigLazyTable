@@ -2,13 +2,17 @@ https://github.com/FHNW-IP5-IP6/ComposeBigLazyTable/actions/workflows/sonarqube.
 
 = Compose BigLazyTable (Compose BLT)
 Author M. Sprenger, L. Näf
-v0.1, 2021-09-29
-:toc: left
+v1.0, 2022-03-04
 
 == Demo Applications
 * *ComposeForms* _(demo > src > main > kotlin > demo > composeForms)_ +
 Demo project for a sample of compose Forms
 
-
 * *BigLazyTable* _(demo > src > main > kotlin > demo > bigLazyTable)_ +
 Demo project for a sample of a bigLazyTable combined with a compose form
+
+The BigLazyTable demo is implemented with a local sqlite database. To start the project you first need to download the database file. Use git LFS for this. To install and use git LFS, you have to do the following points:
+
+* First install git LFS from the official site (https://git-lfs.github.com/).
+* After installation, you have to initialize git LFS. Type in your terminal: _git lfs install_
+* Now you can pull the database file from the repository. Type in your terminal: _git lfs pull --include="spotify_playlist_dataset.db"_
