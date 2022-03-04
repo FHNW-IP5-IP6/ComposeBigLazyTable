@@ -35,10 +35,10 @@ kotlin {
                 implementation("com.opencsv:opencsv:5.5.2")
 
                 // SQLite Database & Exposed Library
-                implementation("org.xerial:sqlite-jdbc:3.30.1")
-                implementation("org.jetbrains.exposed:exposed-core:0.35.3")
-                implementation("org.jetbrains.exposed:exposed-dao:0.35.3")
-                implementation("org.jetbrains.exposed:exposed-jdbc:0.35.3")
+                implementation("org.xerial:sqlite-jdbc:3.36.0.3")
+                implementation("org.jetbrains.exposed:exposed-core:0.37.3")
+                implementation("org.jetbrains.exposed:exposed-dao:0.37.3")
+                implementation("org.jetbrains.exposed:exposed-jdbc:0.37.3")
 
                 // Logging Library
                 implementation("io.github.microutils:kotlin-logging:1.12.5")
