@@ -2,12 +2,24 @@ package bigLazyTable.paging
 
 import org.jetbrains.exposed.sql.Column
 
+enum class NumberFilterType {
+    EQUALS,
+    NOT_EQUALS,
+    GREATER,
+    GREATER_EQUALS,
+    LESS,
+    LESS_EQUALS,
+    BETWEEN,
+    // TODO: Also add From included, usw states?
+}
+
 sealed class Filter
 
 data class LongFilter(
     val filter: Long,
     val dbField: Column<Long>,
     val caseSensitive: Boolean,
+    val filterType: NumberFilterType = NumberFilterType.EQUALS,
     val between: Between<Long>? = null
 ) : Filter()
 
@@ -15,6 +27,7 @@ data class DoubleFilter(
     val filter: Double,
     val dbField: Column<Double>,
     val caseSensitive: Boolean,
+    val filterType: NumberFilterType = NumberFilterType.EQUALS,
     val between: Between<Double>? = null
 ) : Filter()
 
@@ -22,6 +35,7 @@ data class IntFilter(
     val filter: Int,
     val dbField: Column<Int>,
     val caseSensitive: Boolean,
+    val filterType: NumberFilterType = NumberFilterType.EQUALS,
     val between: Between<Int>? = null
 ) : Filter()
 
@@ -29,6 +43,7 @@ data class FloatFilter(
     val filter: Float,
     val dbField: Column<Float>,
     val caseSensitive: Boolean,
+    val filterType: NumberFilterType = NumberFilterType.EQUALS,
     val between: Between<Float>? = null
 ) : Filter()
 

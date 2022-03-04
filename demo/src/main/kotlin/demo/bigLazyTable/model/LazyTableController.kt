@@ -55,6 +55,16 @@ class LazyTableController(
     private var filteredAttributes = mutableSetOf<Attribute<*, *, *>>()
     var attributeFilter: MutableMap<Attribute<*, *, *>, String> = mutableStateMapOf()
 
+    // TODO: Implement
+    fun onNumberFilterChanged(attribute: Attribute<*, *, *>, newFilter: String, filterType: NumberFilterType) {
+        // take the value & convert it to the correct number value & pass it down to the db
+        println("newFilter = $newFilter")
+        println("filterType = $filterType")
+
+        // call standard function with normalized value
+//        onFiltersChanged(attribute, newFilter)
+    }
+
     // TODO: Spinner instead of empty ... Rows when filtering?
     fun onFiltersChanged(attribute: Attribute<*, *, *>, newFilter: String) {
         println("Inside onFiltersChanged with attribute=${attribute.databaseField}, newFilter=$newFilter")
