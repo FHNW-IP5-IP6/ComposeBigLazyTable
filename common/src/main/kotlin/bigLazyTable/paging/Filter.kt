@@ -2,47 +2,44 @@ package bigLazyTable.paging
 
 import org.jetbrains.exposed.sql.Column
 
-//abstract class Filter<T>(
-//    open val filter: T,
-//    open val dbField: Column<T>,
-//    open var caseSensitive: Boolean,
-//)
-
 sealed class Filter
 
 data class LongFilter(
     val filter: Long,
     val dbField: Column<Long>,
-    val caseSensitive: Boolean
-) : Filter()//<Long>(filter, dbField, caseSensitive)
+    val caseSensitive: Boolean,
+    val between: Between<Long>? = null
+) : Filter()
 
 data class DoubleFilter(
     val filter: Double,
     val dbField: Column<Double>,
-    val caseSensitive: Boolean
-) : Filter()//<Double>(filter, dbField, caseSensitive)
+    val caseSensitive: Boolean,
+    val between: Between<Double>? = null
+) : Filter()
 
 data class IntFilter(
     val filter: Int,
     val dbField: Column<Int>,
-    val caseSensitive: Boolean
-) : Filter()//<Int>(filter, dbField, caseSensitive)
-
+    val caseSensitive: Boolean,
+    val between: Between<Int>? = null
+) : Filter()
 
 data class FloatFilter(
     val filter: Float,
     val dbField: Column<Float>,
-    val caseSensitive: Boolean
-) : Filter()//<Float>(filter, dbField, caseSensitive)
+    val caseSensitive: Boolean,
+    val between: Between<Float>? = null
+) : Filter()
 
 data class BooleanFilter(
     val filter: Boolean,
     val dbField: Column<Boolean>,
     val caseSensitive: Boolean
-) : Filter()//<Boolean>(filter, dbField, caseSensitive)
+) : Filter()
 
 data class StringFilter(
-    /*override*/ val filter: String,
-    /*override*/ val dbField: Column<String>,
-    /*override*/ var caseSensitive: Boolean
-) : Filter()//<String>(filter, dbField, caseSensitive)
+    val filter: String,
+    val dbField: Column<String>,
+    var caseSensitive: Boolean
+) : Filter()

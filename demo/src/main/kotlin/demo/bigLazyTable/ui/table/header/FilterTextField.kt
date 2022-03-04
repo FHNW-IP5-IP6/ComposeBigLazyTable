@@ -6,11 +6,14 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cases
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -62,6 +65,12 @@ fun FilterEnabledTextField(
                     is NumberAttribute -> {
                         val allowedNonNumberChars = listOf('=', '>', '<', '[', ',', ']')
                         val newNumberValue = newValue.filter { it.isDigit() || allowedNonNumberChars.contains(it) }
+                        println("newNumberValue: $newNumberValue")
+                        when (newNumberValue[0]) {
+                            '=' -> {
+                                // normal
+                            }
+                        }
                         controller.onFiltersChanged(attribute, newNumberValue)
                     }
                     else -> controller.onFiltersChanged(attribute, newValue)
@@ -80,8 +89,8 @@ fun FilterEnabledTextField(
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.Cases,
-                            contentDescription = "Match Case",
+                            imageVector = Icons.Filled.FormatSize,
+                            contentDescription = "Case Sensitive Filtering",
                             tint = if (controller.attributeCaseSensitive[attribute]!!) Color.White else Color.Gray
                         )
                     }
