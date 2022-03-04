@@ -4,9 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm")
     id("org.jetbrains.compose") version "1.1.0"
-
     kotlin("plugin.serialization") version("1.4.32")
-    id("jacoco")
     id("org.sonarqube") version "3.3"
 }
 
@@ -31,11 +29,9 @@ sourceSets {
             api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
             testImplementation("io.mockk:mockk:1.11.0")
 
-            implementation("org.jetbrains.exposed:exposed-core:0.35.3")
-            implementation("org.jetbrains.exposed:exposed-dao:0.35.3")
-            implementation("org.jetbrains.exposed:exposed-jdbc:0.35.3")
-
-            implementation(compose.desktop.currentOs)
+            implementation("org.jetbrains.exposed:exposed-core:0.37.3")
+            implementation("org.jetbrains.exposed:exposed-dao:0.37.3")
+            implementation("org.jetbrains.exposed:exposed-jdbc:0.37.3")
         }
     }
 }
@@ -49,14 +45,4 @@ tasks {
 
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "11"
-}
-
-tasks{
-    jacocoTestReport {
-        reports {
-            xml.isEnabled = true
-            csv.isEnabled = false
-            html.destination = file("${buildDir}/jacocoHtml")
-        }
-    }
 }

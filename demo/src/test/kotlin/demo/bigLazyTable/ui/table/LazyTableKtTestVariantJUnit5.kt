@@ -1,5 +1,5 @@
 package demo.bigLazyTable.ui.table
-
+/*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import demo.bigLazyTable.utils.printTestMethodName
@@ -459,3 +459,4 @@ class LazyTableKtTestVariantJUnit5 {
 //        content = content
 //    )
 }
+ */

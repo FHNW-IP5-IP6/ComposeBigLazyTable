@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import java.sql.Connection
 import java.util.NoSuchElementException
-
+/*
 private val Log = KotlinLogging.logger {}
 
 @Disabled
@@ -428,3 +428,4 @@ internal class DBServiceTest {
     }
 
 }
+ */

@@ -207,7 +207,7 @@ internal class LazyTableControllerTest {
         runBlocking {
             // TODO: Why do both return an empty list???
             val playlistModels = viewModel.loadPageOfPlaylistModels(startIndexOfPage = 5665)
-            val x = pagingService.getPage(startIndex = 0, pageSize = pageSize)
+            val x = pagingService.getPage(startIndex = 0, pageSize = pageSize, filters = emptyList())
             println(x)
             assertEquals(0, x.first())
         }
