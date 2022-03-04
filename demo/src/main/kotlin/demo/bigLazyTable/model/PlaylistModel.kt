@@ -94,8 +94,6 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         track0ArtistName,
         collaborative,
         numTracks,
-        numTracksDouble,
-        numTracksFloat,
         durationMs
     )
 
