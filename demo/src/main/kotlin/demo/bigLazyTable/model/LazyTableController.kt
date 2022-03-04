@@ -80,7 +80,8 @@ class LazyTableController(
                     dbField = a.databaseField as Column<Double>,
                     caseSensitive = false
                 )
-                is LongAttribute -> LongFilter(
+                is LongAttribute ->
+                    LongFilter(
                     filter = attributeFilter[a]!!.toLong(),
                     dbField = a.databaseField as Column<Long>,
                     caseSensitive = false

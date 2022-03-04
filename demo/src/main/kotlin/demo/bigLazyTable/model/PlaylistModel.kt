@@ -27,6 +27,14 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         databaseField = DatabasePlaylists.id
     )
 
+    private val numEdits = IntegerAttribute(
+        model = this,
+        label = BLTLabels.NUM_EDITS,
+        value = playlist.numEdits,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.num_edits
+    )
+
     private val name = StringAttribute(
         model = this,
         label = BLTLabels.NAME,
@@ -70,28 +78,12 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         databaseField = DatabasePlaylists.num_tracks
     )
 
-    private val numTracksDouble = DoubleAttribute(
+    private val durationMs = IntegerAttribute(
         model = this,
-        label = BLTLabels.NUM_TRACKS_DOUBLE,
-        value = playlist.numTracksDouble,
+        label = BLTLabels.DURATION_MS,
+        value = playlist.durationMs,
         canBeFiltered = true,
-        databaseField = DatabasePlaylists.num_tracks_double
-    )
-
-    private val numTracksFloat = FloatAttribute(
-        model = this,
-        label = BLTLabels.NUM_TRACKS_FLOAT,
-        value = playlist.numTracksFloat,
-        canBeFiltered = true,
-        databaseField = DatabasePlaylists.num_tracks_float
-    )
-
-    private val numEdits = IntegerAttribute(
-        model = this,
-        label = BLTLabels.NUM_EDITS,
-        value = playlist.numEdits,
-        canBeFiltered = false,
-        databaseField = DatabasePlaylists.num_edits
+        databaseField = DatabasePlaylists.duration_ms
     )
 
     val displayedAttributesInTable = listOf(
@@ -102,26 +94,19 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         track0ArtistName,
         collaborative,
         numTracks,
-        numTracksDouble,
-        numTracksFloat
+        durationMs
     )
 
-//    private val numAlbums = IntegerAttribute(
-//        model = this,
-//        label = BLTLabels.NUM_ALBUMS,
-//        value = playlist.numAlbums
-//    )
-//
-//    private val numFollowers = IntegerAttribute(
-//        model = this,
-//        label = BLTLabels.NUM_FOLLOWERS,
-//        value = playlist.numFollowers
-//    )
-
-    private val durationMs = IntegerAttribute(
+    private val numAlbums = IntegerAttribute(
         model = this,
-        label = BLTLabels.DURATION_MS,
-        value = playlist.durationMs
+        label = BLTLabels.NUM_ALBUMS,
+        value = playlist.numAlbums
+    )
+
+    private val numFollowers = IntegerAttribute(
+        model = this,
+        label = BLTLabels.NUM_FOLLOWERS,
+        value = playlist.numFollowers
     )
 
     private val numArtists = IntegerAttribute(

@@ -102,22 +102,22 @@ object DBService : IPagingService<Playlist> {
 
         // TODO: Better way than this ugly code?
         var sql: Op<Boolean> = when (val firstFilter = filters.first()) {
-            is LongFilter -> firstFilter.dbField eq firstFilter.filter
-            is IntFilter -> firstFilter.dbField eq firstFilter.filter
-            is DoubleFilter -> firstFilter.dbField eq firstFilter.filter
-            is FloatFilter -> firstFilter.dbField eq firstFilter.filter
-            is BooleanFilter -> firstFilter.dbField eq firstFilter.filter
+            is LongFilter -> firstFilter.dbField eq firstFilter.filter // nur id rest ist mit like
+            is IntFilter -> firstFilter.dbField as Column<String> like firstFilter.filter.toString()
+            is DoubleFilter -> firstFilter.dbField as Column<String> like firstFilter.filter.toString()
+            is FloatFilter -> firstFilter.dbField as Column<String> like firstFilter.filter.toString()
+            is BooleanFilter -> firstFilter.dbField as Column<String> like "${firstFilter.filter}"
             is StringFilter -> firstFilter.dbField like "%${firstFilter.filter}%"
         }
 //        var sql: Op<Boolean> = firstFilter.dbField like "%${firstFilter.filter}%"
         for (i in 1 until filters.size) {
             // TODO: as Column<Double/Float/Int/...> equals filter.toDouble()/usw
             val sql2: Op<Boolean> = when (val filter = filters[i]) {
-                is LongFilter -> filter.dbField eq filter.filter
-                is IntFilter -> filter.dbField eq filter.filter
-                is DoubleFilter -> filter.dbField eq filter.filter
-                is FloatFilter -> filter.dbField eq filter.filter
-                is BooleanFilter -> filter.dbField eq filter.filter
+                is LongFilter -> filter.dbField eq filter.filter // nur id rest ist mit like
+                is IntFilter -> filter.dbField as Column<Int> eq filter.filter
+                is DoubleFilter -> filter.dbField as Column<Double> eq filter.filter
+                is FloatFilter -> filter.dbField as Column<Float> eq filter.filter
+                is BooleanFilter -> filter.dbField as Column<String> like "${filter.filter}"
                 is StringFilter -> filter.dbField like "%${filter.filter}%"
             }
             sql = sql and sql2
@@ -135,19 +135,21 @@ object DBService : IPagingService<Playlist> {
         val rv: Query
         when (filter) {
             is LongFilter    -> {
-                rv = select { filter.dbField eq filter.filter }
+                rv = select { filter.dbField as Column<String> eq filter.filter.toString() } // eq works only for id
             }
             is IntFilter     -> {
-                rv = select { filter.dbField eq filter.filter }
+                rv = select { filter.dbField as Column<String> eq filter.filter.toString() }
             }
             is DoubleFilter  -> {
-                rv = select { filter.dbField eq filter.filter }
+                // TODO: CHeck with Double values (like, eq, match)
+                rv = select { filter.dbField as Column<String> like "${filter.filter}%" }
             }
             is FloatFilter   -> {
-                rv = select { filter.dbField eq filter.filter }
+                // TODO: Check with Float values (like, eq, match)
+                rv = select { filter.dbField as Column<String> like "${filter.filter}%" }
             }
             is BooleanFilter -> {
-                rv = select { filter.dbField eq filter.filter }
+                rv = select { filter.dbField as Column<String> eq filter.filter.toString() }
             }
             is StringFilter  -> {
                 rv = selectWithStringFilter(
