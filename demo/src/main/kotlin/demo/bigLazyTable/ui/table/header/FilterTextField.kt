@@ -60,8 +60,8 @@ fun FilterEnabledTextField(
             onValueChange = { newValue ->
                 when (attribute) {
                     is NumberAttribute -> {
-                        val newNumberValue =
-                            newValue.filter { it.isDigit() }
+                        val allowedNonNumberChars = listOf('=', '>', '<', '[', ',', ']')
+                        val newNumberValue = newValue.filter { it.isDigit() || allowedNonNumberChars.contains(it) }
                         controller.onFiltersChanged(attribute, newNumberValue)
                     }
                     else -> controller.onFiltersChanged(attribute, newValue)
