@@ -86,3 +86,4 @@ local.properties
 # Datasets
 */src/main/resources/spotify_playlist_dataset.csv
 demo/src/main/resources/spotify_playlist_dataset.db
+*.db
