@@ -13,6 +13,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import bigLazyTable.paging.Between
+import bigLazyTable.paging.IntFilter
 import bigLazyTable.paging.NumberFilterType
 import composeForms.model.attributes.*
 import demo.bigLazyTable.model.LazyTableController
@@ -59,7 +61,7 @@ fun FilterEnabledTextField(
             value = controller.attributeFilter[attribute].toString(),
             onValueChange = { newValue ->
                 when (attribute) {
-                    is NumberAttribute -> {
+                    is IntegerAttribute -> {
                         val allowedNonNumberChars = listOf('=', '!', '>', '<', '[', ',', ']')
                         val newRestrictedValue = newValue.filter { it.isDigit() || allowedNonNumberChars.contains(it) }
                         controller.attributeFilter[attribute] = newRestrictedValue
@@ -69,24 +71,102 @@ fun FilterEnabledTextField(
                                 '!' -> {
                                     if (newRestrictedValue[1] == '=') {
                                         // not equals
-                                        controller.onNumberFilterChanged(attribute, newRestrictedValue, NumberFilterType.NOT_EQUALS)
+                                        if (newRestrictedValue.length > 2) {
+                                            val value = newRestrictedValue.substring(2).trim()
+                                            if (value != "") {
+                                                controller.attributeFilterNew[attribute] = IntFilter(
+                                                    filter = value.toInt(),
+                                                    dbField = attribute.databaseField!!,
+                                                    filterType = NumberFilterType.NOT_EQUALS
+                                                )
+                                                controller.onNumberFilterChanged(
+                                                    attribute,
+                                                    value,
+                                                    null,
+                                                    NumberFilterType.NOT_EQUALS
+                                                )
+                                            }
+                                        }
                                     } else {
                                         // invalid
                                     }
                                 }
                                 '=' -> {
-                                    // equals
-                                    controller.onNumberFilterChanged(attribute, newRestrictedValue, NumberFilterType.EQUALS)
+                                    if (newRestrictedValue[1] == '!') {
+                                        // not equals
+                                        if (newRestrictedValue.length > 2) {
+                                            val value = newRestrictedValue.substring(2).trim()
+                                            if (value != "") {
+                                                controller.attributeFilterNew[attribute] = IntFilter(
+                                                    filter = value.toInt(),
+                                                    dbField = attribute.databaseField!!,
+                                                    filterType = NumberFilterType.NOT_EQUALS
+                                                )
+                                                controller.onNumberFilterChanged(
+                                                    attribute,
+                                                    value,
+                                                    null,
+                                                    NumberFilterType.NOT_EQUALS
+                                                )
+                                            }
+                                        }
+                                    } else if (newRestrictedValue[1].isDigit()) {
+                                        // equals
+                                        val value = newRestrictedValue.substring(1).trim()
+                                        if (value != "") {
+                                            controller.attributeFilterNew[attribute] = IntFilter(
+                                                filter = value.toInt(),
+                                                dbField = attribute.databaseField!!,
+                                                filterType = NumberFilterType.EQUALS
+                                            )
+                                            controller.onNumberFilterChanged(
+                                                attribute,
+                                                value,
+                                                null,
+                                                NumberFilterType.EQUALS
+                                            )
+                                        }
+                                    } else {
+                                        // invalid
+                                    }
                                 }
                                 '>' -> {
                                     when {
                                         newRestrictedValue[1] == '=' -> {
                                             // greaterEquals
-                                            controller.onNumberFilterChanged(attribute, newRestrictedValue, NumberFilterType.GREATER_EQUALS)
+                                            if (newRestrictedValue.length > 2) {
+                                                val value = newRestrictedValue.substring(2).trim()
+                                                if (value != "") {
+                                                    controller.attributeFilterNew[attribute] = IntFilter(
+                                                        filter = value.toInt(),
+                                                        dbField = attribute.databaseField!!,
+                                                        filterType = NumberFilterType.GREATER_EQUALS
+                                                    )
+                                                    controller.onNumberFilterChanged(
+                                                        attribute,
+                                                        value,
+                                                        null,
+                                                        NumberFilterType.GREATER_EQUALS
+                                                    )
+                                                }
+                                            }
                                         }
                                         newRestrictedValue[1].isDigit() -> {
                                             // greater
-                                            controller.onNumberFilterChanged(attribute, newRestrictedValue, NumberFilterType.GREATER)
+                                            val value = newRestrictedValue.substring(1).trim()
+                                            if (value != "") {
+                                                controller.attributeFilterNew[attribute] = IntFilter(
+                                                    filter = value.toInt(),
+                                                    dbField = attribute.databaseField!!,
+                                                    filterType = NumberFilterType.GREATER
+                                                )
+                                                controller.onNumberFilterChanged(
+                                                    attribute,
+                                                    value,
+                                                    null,
+                                                    NumberFilterType.GREATER
+                                                )
+                                            }
                                         }
                                         else -> {
                                             // invalid input
@@ -97,11 +177,39 @@ fun FilterEnabledTextField(
                                     when {
                                         newRestrictedValue[1] == '=' -> {
                                             // lessEquals
-                                            controller.onNumberFilterChanged(attribute, newRestrictedValue, NumberFilterType.LESS_EQUALS)
+                                            if (newRestrictedValue.length > 2) {
+                                                val value = newRestrictedValue.substring(2).trim()
+                                                if (value != "") {
+                                                    controller.attributeFilterNew[attribute] = IntFilter(
+                                                        filter = value.toInt(),
+                                                        dbField = attribute.databaseField!!,
+                                                        filterType = NumberFilterType.LESS_EQUALS
+                                                    )
+                                                    controller.onNumberFilterChanged(
+                                                        attribute,
+                                                        value,
+                                                        null,
+                                                        NumberFilterType.LESS_EQUALS
+                                                    )
+                                                }
+                                            }
                                         }
                                         newRestrictedValue[1].isDigit() -> {
                                             // less
-                                            controller.onNumberFilterChanged(attribute, newRestrictedValue, NumberFilterType.LESS)
+                                            val value = newRestrictedValue.substring(1).trim()
+                                            if (value != "") {
+                                                controller.attributeFilterNew[attribute] = IntFilter(
+                                                    filter = value.toInt(),
+                                                    dbField = attribute.databaseField!!,
+                                                    filterType = NumberFilterType.LESS
+                                                )
+                                                controller.onNumberFilterChanged(
+                                                    attribute,
+                                                    value,
+                                                    null,
+                                                    NumberFilterType.LESS
+                                                )
+                                            }
                                         }
                                         else -> {
                                             // invalid input
@@ -112,25 +220,70 @@ fun FilterEnabledTextField(
                                     val lastChar = newRestrictedValue.trim().last()
                                     if (newRestrictedValue.contains(',') && ((lastChar == ']') || lastChar == '[')) {
                                         try {
-                                            val fromString = newRestrictedValue.substringBefore(',').trim()
+                                            val fromString = newRestrictedValue.substringAfter('[').substringBefore(',').trim()
                                             if (fromString.isNotBlank()) {
-                                                val from = fromString.toInt()
+                                                val from = fromString//.toInt()
                                                 println("from $from")
-                                            } else {
-                                                // invalid input
-                                            }
 
-                                            val toString = newRestrictedValue.substringBefore(lastChar).trim()
-                                            if (toString.isNotBlank()) {
-                                                val to = toString.toInt()
-                                                println("to $to")
-                                                if (lastChar == ']') {
-                                                    // from (included) between to (included)
-                                                    controller.onNumberFilterChanged(attribute, newRestrictedValue, NumberFilterType.BETWEEN)
+                                                val toString = newRestrictedValue.substringAfter(',').substringBefore(lastChar).trim()
+                                                if (toString.isNotBlank()) {
+                                                    val to = toString//.toInt()
+                                                    println("to $to")
+                                                    if (lastChar == ']') {
+                                                        // from (included) between to (included)
+                                                        controller.attributeFilterNew[attribute] = IntFilter(
+                                                            filter = -1,
+                                                            dbField = attribute.databaseField!!,
+                                                            filterType = NumberFilterType.BETWEEN_BOTH_INCLUDED,
+                                                            between = Between(
+                                                                fromFilter = IntFilter(
+                                                                    filter = from.toInt(),
+                                                                    dbField = attribute.databaseField!!,
+                                                                    filterType = NumberFilterType.BETWEEN_BOTH_INCLUDED
+                                                                ),
+                                                                toFilter = IntFilter(
+                                                                    filter = to.toInt(),
+                                                                    dbField = attribute.databaseField!!,
+                                                                    filterType = NumberFilterType.BETWEEN_BOTH_INCLUDED
+                                                                )
+                                                            )
+                                                        )
+                                                        controller.onNumberFilterChanged(
+                                                            attribute,
+                                                            from,
+                                                            to,
+                                                            NumberFilterType.BETWEEN_BOTH_INCLUDED
+                                                        )
+                                                    } else {
+                                                        // from (included) between to (not included)
+                                                        controller.attributeFilterNew[attribute] = IntFilter(
+                                                            filter = -1,
+                                                            dbField = attribute.databaseField!!,
+                                                            filterType = NumberFilterType.BETWEEN_FROM_INCLUDED,
+                                                            between = Between(
+                                                                fromFilter = IntFilter(
+                                                                    filter = from.toInt(),
+                                                                    dbField = attribute.databaseField!!,
+                                                                    filterType = NumberFilterType.BETWEEN_FROM_INCLUDED
+                                                                ),
+                                                                toFilter = IntFilter(
+                                                                    filter = to.toInt(),
+                                                                    dbField = attribute.databaseField!!,
+                                                                    filterType = NumberFilterType.BETWEEN_FROM_INCLUDED
+                                                                )
+                                                            )
+                                                        )
+                                                        controller.onNumberFilterChanged(
+                                                            attribute,
+                                                            from,
+                                                            to,
+                                                            NumberFilterType.BETWEEN_FROM_INCLUDED
+                                                        )
+                                                    }
                                                 } else {
-                                                    // from (included) between to (not included)
-                                                    controller.onNumberFilterChanged(attribute, newRestrictedValue, NumberFilterType.BETWEEN)
+                                                    // invalid input
                                                 }
+
                                             } else {
                                                 // invalid input
                                             }
@@ -146,25 +299,70 @@ fun FilterEnabledTextField(
                                     val lastChar = newRestrictedValue.trim().last()
                                     if (newRestrictedValue.contains(',') && ((lastChar == ']') || lastChar == '[')) {
                                         try {
-                                            val fromString = newRestrictedValue.substringBefore(',').trim()
+                                            val fromString = newRestrictedValue.substringAfter(']').substringBefore(',').trim()
                                             if (fromString.isNotBlank()) {
-                                                val from = fromString.toInt()
+                                                val from = fromString//.toInt()
                                                 println("from $from")
-                                            } else {
-                                                // invalid input
-                                            }
 
-                                            val toString = newRestrictedValue.substringBefore(lastChar).trim()
-                                            if (toString.isNotBlank()) {
-                                                val to = toString.toInt()
-                                                println("to $to")
-                                                if (lastChar == ']') {
-                                                    // from (not included) between to (included)
-                                                    controller.onNumberFilterChanged(attribute, newRestrictedValue, NumberFilterType.BETWEEN)
+                                                val toString = newRestrictedValue.substringAfter(',').substringBefore(lastChar).trim()
+                                                if (toString.isNotBlank()) {
+                                                    val to = toString//.toInt()
+                                                    println("to $to")
+                                                    if (lastChar == ']') {
+                                                        // from (not included) between to (included)
+                                                        controller.attributeFilterNew[attribute] = IntFilter(
+                                                            filter = -1,
+                                                            dbField = attribute.databaseField!!,
+                                                            filterType = NumberFilterType.BETWEEN_TO_INCLUDED,
+                                                            between = Between(
+                                                                fromFilter = IntFilter(
+                                                                    filter = from.toInt(),
+                                                                    dbField = attribute.databaseField!!,
+                                                                    filterType = NumberFilterType.BETWEEN_TO_INCLUDED
+                                                                ),
+                                                                toFilter = IntFilter(
+                                                                    filter = to.toInt(),
+                                                                    dbField = attribute.databaseField!!,
+                                                                    filterType = NumberFilterType.BETWEEN_TO_INCLUDED
+                                                                )
+                                                            )
+                                                        )
+                                                        controller.onNumberFilterChanged(
+                                                            attribute,
+                                                            from,
+                                                            to,
+                                                            NumberFilterType.BETWEEN_TO_INCLUDED
+                                                        )
+                                                    } else {
+                                                        // from (not included) between to (not included)
+                                                        controller.attributeFilterNew[attribute] = IntFilter(
+                                                            filter = -1,
+                                                            dbField = attribute.databaseField!!,
+                                                            filterType = NumberFilterType.BETWEEN_BOTH_NOT_INCLUDED,
+                                                            between = Between(
+                                                                fromFilter = IntFilter(
+                                                                    filter = from.toInt(),
+                                                                    dbField = attribute.databaseField!!,
+                                                                    filterType = NumberFilterType.BETWEEN_BOTH_NOT_INCLUDED
+                                                                ),
+                                                                toFilter = IntFilter(
+                                                                    filter = to.toInt(),
+                                                                    dbField = attribute.databaseField!!,
+                                                                    filterType = NumberFilterType.BETWEEN_BOTH_NOT_INCLUDED
+                                                                )
+                                                            )
+                                                        )
+                                                        controller.onNumberFilterChanged(
+                                                            attribute,
+                                                            from,
+                                                            to,
+                                                            NumberFilterType.BETWEEN_BOTH_NOT_INCLUDED
+                                                        )
+                                                    }
                                                 } else {
-                                                    // from (not included) between to (not included)
-                                                    controller.onNumberFilterChanged(attribute, newRestrictedValue, NumberFilterType.BETWEEN)
+                                                    // invalid input
                                                 }
+
                                             } else {
                                                 // invalid input
                                             }
@@ -193,7 +391,8 @@ fun FilterEnabledTextField(
                 if (attribute is StringAttribute) {
                     IconButton(
                         onClick = {
-                            controller.attributeCaseSensitive[attribute] = !controller.attributeCaseSensitive[attribute]!!
+                            controller.attributeCaseSensitive[attribute] =
+                                !controller.attributeCaseSensitive[attribute]!!
                             controller.onFiltersChanged(attribute, controller.attributeFilter[attribute]!!)
                         }
                     ) {

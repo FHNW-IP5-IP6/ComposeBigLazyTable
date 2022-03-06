@@ -9,8 +9,10 @@ enum class NumberFilterType {
     GREATER_EQUALS,
     LESS,
     LESS_EQUALS,
-    BETWEEN,
-    // TODO: Also add From included, usw states?
+    BETWEEN_BOTH_INCLUDED,
+    BETWEEN_BOTH_NOT_INCLUDED,
+    BETWEEN_FROM_INCLUDED,
+    BETWEEN_TO_INCLUDED
 }
 
 sealed class Filter
@@ -18,7 +20,7 @@ sealed class Filter
 data class LongFilter(
     val filter: Long,
     val dbField: Column<Long>,
-    val caseSensitive: Boolean,
+//    val caseSensitive: Boolean,
     val filterType: NumberFilterType = NumberFilterType.EQUALS,
     val between: Between<Long>? = null
 ) : Filter()
@@ -26,7 +28,7 @@ data class LongFilter(
 data class DoubleFilter(
     val filter: Double,
     val dbField: Column<Double>,
-    val caseSensitive: Boolean,
+//    val caseSensitive: Boolean,
     val filterType: NumberFilterType = NumberFilterType.EQUALS,
     val between: Between<Double>? = null
 ) : Filter()
@@ -34,7 +36,7 @@ data class DoubleFilter(
 data class IntFilter(
     val filter: Int,
     val dbField: Column<Int>,
-    val caseSensitive: Boolean,
+//    val caseSensitive: Boolean,
     val filterType: NumberFilterType = NumberFilterType.EQUALS,
     val between: Between<Int>? = null
 ) : Filter()
@@ -42,7 +44,7 @@ data class IntFilter(
 data class FloatFilter(
     val filter: Float,
     val dbField: Column<Float>,
-    val caseSensitive: Boolean,
+//    val caseSensitive: Boolean,
     val filterType: NumberFilterType = NumberFilterType.EQUALS,
     val between: Between<Float>? = null
 ) : Filter()
@@ -50,7 +52,7 @@ data class FloatFilter(
 data class BooleanFilter(
     val filter: Boolean,
     val dbField: Column<Boolean>,
-    val caseSensitive: Boolean
+//    val caseSensitive: Boolean
 ) : Filter()
 
 data class StringFilter(
