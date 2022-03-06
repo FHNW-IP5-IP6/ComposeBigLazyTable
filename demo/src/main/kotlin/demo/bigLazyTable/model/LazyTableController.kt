@@ -8,12 +8,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
-import org.jetbrains.exposed.sql.Column
 import org.junit.platform.commons.util.LruCache
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.properties.Delegates
-import kotlin.reflect.KClass
 
 private val Log = KotlinLogging.logger {}
 
@@ -52,23 +50,15 @@ class LazyTableController(
     }
 
     var filters = listOf<Filter>()
-    private var filteredAttributes = mutableSetOf<Attribute<*, *, *>>()
-    var attributeFilter: MutableMap<Attribute<*, *, *>, String> = mutableStateMapOf()
+//    private var filteredAttributes = mutableSetOf<Attribute<*, *, *>>()
+    var displayedFilterStrings: MutableMap<Attribute<*, *, *>, String> = mutableStateMapOf()
 
     var attributeFilterNew: MutableMap<Attribute<*, *, *>, Filter?> = mutableStateMapOf()
-    // TODO: Implement
-    fun onNumberFilterChanged(attribute: Attribute<*, *, *>, value1: String, value2: String? = null, filterType: NumberFilterType) {
-//        // take the value & convert it to the correct number value & pass it down to the db
-//        println("value1 = $value1")
-//        println("value2 = $value2")
-//        println("filterType = $filterType")
-//
-//        // call standard function with normalized value
-//        if (filterType != NumberFilterType.BETWEEN_BOTH_NOT_INCLUDED || filterType != NumberFilterType.BETWEEN_TO_INCLUDED || filterType != NumberFilterType.BETWEEN_FROM_INCLUDED || filterType != NumberFilterType.BETWEEN_BOTH_INCLUDED) {
-//            onFiltersChangedNew(attribute, value1)
-//        } else {
-//            onBetweenFiltersChanged(attribute, value1, value2)
-//        }
+
+    // TODO: Spinner?
+    fun onFilterChanged() {
+        println("Inside onFiltersChanged")
+        val start = System.currentTimeMillis()
 
         filters = attributeFilterNew.values.filterNotNull()
         println("Filters in onNumberFilterChanged: $filters")
@@ -90,74 +80,9 @@ class LazyTableController(
                 loadFirstPagesToFillCacheAndAddToAppStateList()
             }
         }
-    }
 
-    // TODO: Spinner instead of empty ... Rows when filtering?
-    fun onFiltersChanged(attribute: Attribute<*, *, *>, newFilter: String) {
-//        println("Inside onFiltersChanged with attribute=${attribute.databaseField}, newFilter=$newFilter")
-//        val start = System.currentTimeMillis()
-//        attributeFilter[attribute] = newFilter
-//
-//        if (newFilter == "") filteredAttributes.remove(attribute)
-//        else filteredAttributes.add(attribute)
-//
-//        filters = filteredAttributes.map { a ->
-//            // TODO: Better way than this ugly code?
-//            when (a) {
-//                is IntegerAttribute -> IntFilter(
-//                    filter = attributeFilter[a]!!.toInt(),
-//                    dbField = a.databaseField as Column<Int>,
-//                    caseSensitive = attributeCaseSensitive[attribute]!!
-//                )
-//                is FloatAttribute -> FloatFilter(
-//                    filter = attributeFilter[a]!!.toFloat(),
-//                    dbField = a.databaseField as Column<Float>,
-//                    caseSensitive = attributeCaseSensitive[attribute]!!
-//                )
-//                is DoubleAttribute -> DoubleFilter(
-//                    filter = attributeFilter[a]!!.toDouble(),
-//                    dbField = a.databaseField as Column<Double>,
-//                    caseSensitive = attributeCaseSensitive[attribute]!!
-//                )
-//                is LongAttribute ->
-//                    LongFilter(
-//                        filter = attributeFilter[a]!!.toLong(),
-//                        dbField = a.databaseField as Column<Long>,
-//                        caseSensitive = attributeCaseSensitive[attribute]!!
-//                    )
-//                is BooleanAttribute -> BooleanFilter(
-//                    filter = attributeFilter[a]!!.toBoolean(),
-//                    dbField = a.databaseField as Column<Boolean>,
-//                    caseSensitive = attributeCaseSensitive[attribute]!!
-//                )
-//                else -> StringFilter(
-//                    filter = attributeFilter[a] ?: "",
-//                    dbField = a.databaseField as Column<String>,
-//                    caseSensitive = attributeCaseSensitive[attribute]!!
-//                )
-//            }
-//        }
-//        println("Filters in onFiltersChanged: $filters")
-//
-//        isFiltering = filters.isNotEmpty()
-//        if (isFiltering) {
-//            filterScheduler.scheduleTask {
-//                println("Before getFilteredCountNew")
-//                val start1 = System.currentTimeMillis()
-//                // getFilteredCountNew needed 617 ms
-//                filteredCount = pagingService.getFilteredCount(filters = filters)
-//                println("filtered count = $filteredCount")
-//                val end1 = System.currentTimeMillis()
-//                println("getFilteredCountNew needed ${end1 - start1} ms")
-//
-//                println("filtered Count = $filteredCount")
-//                appState.filteredList = ArrayList(Collections.nCopies(filteredCount, null))
-//
-//                loadFirstPagesToFillCacheAndAddToAppStateList()
-//            }
-//        }
-//        val end = System.currentTimeMillis()
-//        println("onFiltersChanged needed ${end - start} ms")
+        val end = System.currentTimeMillis()
+        println("onFiltersChanged needed ${end - start} ms")
     }
 
     var isFiltering by mutableStateOf(false)
@@ -179,13 +104,12 @@ class LazyTableController(
 
     init {
         appState.defaultPlaylistModel.displayedAttributesInTable.forEach { attribute ->
-            if (attribute.canBeFiltered)
-                attributeFilter[attribute] = ""
+            if (attribute.canBeFiltered) displayedFilterStrings[attribute] = ""
 
             attributeSort[attribute] = BLTSortOrder.None
             attributeCaseSensitive[attribute] = false
         }
-        println("attributeFilter: ${attributeFilter.size}")
+        println("attributeFilter: ${displayedFilterStrings.size}")
         println("attributeSort: ${attributeSort.size}")
         // Get first cacheSize=4 pages on app initialization, to select one for the forms
         CoroutineScope(Dispatchers.Main).launch {

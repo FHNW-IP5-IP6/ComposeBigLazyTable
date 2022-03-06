@@ -81,8 +81,12 @@ object FilterUtil {
         is IntFilter     -> filter.dbField eq filter.filter
         is DoubleFilter  -> filter.dbField eq filter.filter
         is FloatFilter   -> filter.dbField eq filter.filter
-        is BooleanFilter -> filter.dbField eq filter.filter // TODO: check -> in db == true/false doesnt work yet
+        is BooleanFilter -> like(filter.dbField as Column<String>, filter.filter.toString())//filter.dbField eq filter.filter // TODO: check -> in db == true/false doesnt work yet
         is StringFilter  -> caseSensitiveLike(filter.caseSensitive, filter.dbField, filter.filter)
+    }
+
+    fun like(dbField: Column<String>, filter: String): Op<Boolean> {
+        return dbField like filter
     }
 
     /**
@@ -97,8 +101,8 @@ object FilterUtil {
         is IntFilter     -> filter.dbField neq filter.filter
         is DoubleFilter  -> filter.dbField neq filter.filter
         is FloatFilter   -> filter.dbField neq filter.filter
-        is BooleanFilter -> filter.dbField neq filter.filter // TODO: check -> in db == true/false doesnt work yet
         is StringFilter  -> caseSensitiveLike(filter.caseSensitive, filter.dbField, filter.filter)
+        else -> throw IllegalArgumentException("Only number & string filters can be called with this function, but received $filter")
     }
 
     fun filterGreater(filter: Filter): Op<Boolean> = when (filter) {
