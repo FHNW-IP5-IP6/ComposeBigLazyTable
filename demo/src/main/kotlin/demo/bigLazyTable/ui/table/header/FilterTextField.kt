@@ -369,7 +369,8 @@ fun FilterEnabledTextField(
                         controller.attributeFilterNew[attribute] = StringFilter(
                             filter = newValue,
                             dbField = attribute.databaseField as Column<String>,
-                            // TODO: Case sensitive is always false - why?
+                            // Case sensitive is not set again after first time! -> Workaround is that we create a new
+                            // StringFilter everytime CaseSensitive icon is clicked [see below]
                             caseSensitive = controller.attributeCaseSensitive[attribute]!!
                         )
                         controller.onFilterChanged()
@@ -383,9 +384,12 @@ fun FilterEnabledTextField(
             leadingIcon = {
                 if (attribute is StringAttribute) {
                     IconButton(
+                        enabled = controller.attributeFilterNew[attribute] != null,
                         onClick = {
                             controller.attributeCaseSensitive[attribute] =
                                 !controller.attributeCaseSensitive[attribute]!!
+
+                            // Here we create a new StringFilter that caseSensitive changes are reflected
                             controller.attributeFilterNew[attribute] = StringFilter(
                                 filter = controller.displayedFilterStrings[attribute]!!,
                                 dbField = attribute.databaseField as Column<String>,
@@ -397,7 +401,7 @@ fun FilterEnabledTextField(
                         Icon(
                             imageVector = Icons.Filled.FormatSize,
                             contentDescription = "Case Sensitive Filtering",
-                            tint = if (controller.attributeCaseSensitive[attribute]!!) Color.White else Color.Gray
+                            tint = if (controller.attributeCaseSensitive[attribute] == true) Color.White else Color.Gray
                         )
                     }
                 }
