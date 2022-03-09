@@ -58,7 +58,7 @@ internal class LazyTableControllerTest {
 
         // when
         assertEquals(true, viewModel.isTimeToLoadPage(firstVisibleItemIndex = firstVisibleItemIndex))
-        viewModel.loadAllNeededPagesForIndex(firstVisibleItemIndex = firstVisibleItemIndex)
+        viewModel.loadNewPages(firstVisibleItemIndex = firstVisibleItemIndex)
 
         // then
         assertEquals(false, viewModel.isTimeToLoadPage(firstVisibleItemIndex = firstVisibleItemIndex))
@@ -100,7 +100,7 @@ internal class LazyTableControllerTest {
     fun `throws IllegalArgumentException after loadAllNeededPagesForIndex 1_000_000`() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
         assertThrows<IllegalArgumentException> {
-            viewModel.loadAllNeededPagesForIndex(1_000_000)
+            viewModel.loadNewPages(1_000_000)
         }
     }
 
@@ -206,7 +206,7 @@ internal class LazyTableControllerTest {
 //        assertTrue(returnValue is List<*>)
         runBlocking {
             // TODO: Why do both return an empty list???
-            val playlistModels = viewModel.loadPageOfPlaylistModels(startIndexOfPage = 5665)
+            val playlistModels = viewModel.getPageFromService(startIndex = 5665)
             val x = pagingService.getPage(startIndex = 0, pageSize = pageSize, filters = emptyList())
             println(x)
             assertEquals(0, x.first())
@@ -248,7 +248,7 @@ internal class LazyTableControllerTest {
     @Test
     fun `loadPage works with pageNrToLoad 0 & scrolledDown = false`() {
         assertDoesNotThrow {
-            viewModel.loadPage(pageNr = 0, scrolledDown = false)
+            viewModel.loadSinglePage(pageNrToLoad = 0, scrolledDown = false)
         }
     }
 
@@ -257,7 +257,7 @@ internal class LazyTableControllerTest {
     @Test
     fun `loadPage works with pageNrToLoad 0 & scrolledDown = true`() {
         assertDoesNotThrow {
-            viewModel.loadPage(pageNr = 0, scrolledDown = true)
+            viewModel.loadSinglePage(pageNrToLoad = 0, scrolledDown = true)
         }
     }
 
@@ -266,7 +266,7 @@ internal class LazyTableControllerTest {
     @Test
     fun `loadPage works with pageNrToLoad 100 & scrolledDown = true`() {
         assertDoesNotThrow {
-            viewModel.loadPage(pageNr = 100, scrolledDown = true)
+            viewModel.loadSinglePage(pageNrToLoad = 100, scrolledDown = true)
         }
     }
 
@@ -276,7 +276,7 @@ internal class LazyTableControllerTest {
     fun `updateAppStateList works with pageStartIndexToLoad=0, pageToLoad=0, isEnd=false`() {
         assertDoesNotThrow {
             viewModel.updateAppStateList(
-                pageStartIndexToLoad = 0,
+                currentVisiblePageNr = 0,
                 pageToLoad = 0,
                 isEnd = false
             )
@@ -289,7 +289,7 @@ internal class LazyTableControllerTest {
     fun `updateAppStateList works with pageStartIndexToLoad=0, pageToLoad=0, isEnd=true`() {
         assertDoesNotThrow {
             viewModel.updateAppStateList(
-                pageStartIndexToLoad = 0,
+                currentVisiblePageNr = 0,
                 pageToLoad = 0,
                 isEnd = true
             )
@@ -301,7 +301,7 @@ internal class LazyTableControllerTest {
     @Test
     fun `addToAppStateList works with startIndex=0 & newPageNr=1`() {
         assertDoesNotThrow {
-            viewModel.addToAppStateList(
+            viewModel.addNewModelsToAppState(
                 startIndex = 0,
                 newPageNr = 1
             )
@@ -313,7 +313,7 @@ internal class LazyTableControllerTest {
     @Test
     fun `addToAppStateList works with startIndex=4355 & newPageNr=45345`() {
         assertDoesNotThrow {
-            viewModel.addToAppStateList(
+            viewModel.addNewModelsToAppState(
                 startIndex = 4355,
                 newPageNr = 45345
             )
@@ -324,8 +324,8 @@ internal class LazyTableControllerTest {
     @Test
     fun `removeFromAppStateList works with index=0, isEnd=false`() {
         assertDoesNotThrow {
-            viewModel.removeFromAppStateList(
-                index = 0,
+            viewModel.removeOldModelsFromAppState(
+                pageNr = 0,
                 isEnd = false
             )
         }
@@ -335,8 +335,8 @@ internal class LazyTableControllerTest {
     @Test
     fun `removeFromAppStateList works with index=24960, isEnd=true`() {
         assertDoesNotThrow {
-            viewModel.removeFromAppStateList(
-                index = 24960,
+            viewModel.removeOldModelsFromAppState(
+                pageNr = 24960,
                 isEnd = true
             )
         }
@@ -346,8 +346,8 @@ internal class LazyTableControllerTest {
     @Disabled("expected: <0> but was: <160>")
     @Test
     fun `calculateStartIndexOfOldPage works with index 0 & isEnd=false`() {
-        val oldStartIndex = viewModel.calculateStartIndexOfOldPage(
-            index = 0,
+        val oldStartIndex = viewModel.calculateStartIndexToRemove(
+            pageNr = 0,
             isEnd = false
         )
         assertEquals(0, oldStartIndex)
@@ -357,8 +357,8 @@ internal class LazyTableControllerTest {
     @Disabled("expected: <24960> but was: <998240>")
     @Test
     fun `calculateStartIndexOfOldPage works with index 25000 & isEnd=true`() {
-        val oldStartIndex = viewModel.calculateStartIndexOfOldPage(
-            index = 24960,
+        val oldStartIndex = viewModel.calculateStartIndexToRemove(
+            pageNr = 24960,
             isEnd = true
         )
         assertEquals(24960, oldStartIndex)
@@ -368,14 +368,14 @@ internal class LazyTableControllerTest {
     @Test
     fun `removeOldPageFromList works with startIndexOldPage=0`() {
         assertDoesNotThrow {
-            viewModel.removeOldPageFromList(startIndexOldPage = 0)
+            viewModel.removeOldPagesFromList(startIndexToRemove = 0)
         }
     }
 
     @Test
     fun `removeOldPageFromList doesnt work with startIndexOldPage=-1`() {
         assertThrows<AssertionError> {
-            viewModel.removeOldPageFromList(startIndexOldPage = -1)
+            viewModel.removeOldPagesFromList(startIndexToRemove = -1)
         }
     }
 

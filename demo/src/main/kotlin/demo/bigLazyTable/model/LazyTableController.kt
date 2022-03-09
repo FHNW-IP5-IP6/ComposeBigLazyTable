@@ -19,7 +19,11 @@ import kotlin.properties.Delegates
 private val Log = KotlinLogging.logger {}
 
 /**
- * TODO: Short description what this class is used for
+ * TODO: Add class documentation
+ * @param pagingService TODO: Add description for param
+ * @param pageSize TODO: Add description for param
+ * @param appState TODO: Add description for param
+ *
  * @author Marco Sprenger, Livio Näf
  */
 class LazyTableController(
@@ -27,8 +31,7 @@ class LazyTableController(
     val pageSize: Int = 40, // TODO: make dynamic
     private val appState: AppState
 ) {
-    private val firstPageNr = 0 // TODO: Use Nr everywhere!
-    private val firstPageIndex = 0
+    private val firstPageNr = 0
 
     var lastSortedAttribute: Attribute<*, *, *>? = null
     var attributeSort = mutableStateMapOf<Attribute<*, *, *>, BLTSortOrder>()
@@ -44,7 +47,7 @@ class LazyTableController(
         isSorting = newSortOrder.isSorting
         sort = newSortOrder.sortAttribute(attribute)
 
-        scheduler.scheduleTask { loadFirstPagesToFillCacheAndAddToAppStateList() }
+        scheduler.scheduleTask { initialDataLoading() }
     }
 
     private fun resetPreviousSortedAttribute(newAttribute: Attribute<*,*,*>) {
@@ -84,12 +87,14 @@ class LazyTableController(
                 filteredCount = pagingService.getFilteredCount(filters = filters)
                 val end1 = System.currentTimeMillis()
                 println("getFilteredCountNew needed ${end1 - start1} ms")
-
+                totalPages = PageUtils.getTotalPages(totalCount = filteredCount, pageSize = pageSize)
                 println("filtered Count = $filteredCount")
                 appState.filteredTableModelList = ArrayList(Collections.nCopies(filteredCount, null))
 
-                loadFirstPagesToFillCacheAndAddToAppStateList()
+                initialDataLoading()
             }
+        } else {
+            totalPages = PageUtils.getTotalPages(totalCount = totalCount, pageSize = pageSize)
         }
         val end = System.currentTimeMillis()
         println("onFiltersChanged needed ${end - start} ms")
@@ -103,15 +108,16 @@ class LazyTableController(
 
     private val totalCount by lazy { pagingService.getTotalCount() }
     private var filteredCount by Delegates.notNull<Int>()
-    val totalPages = PageUtils.getTotalPages(totalCount = totalCount, pageSize = pageSize)
+    var totalPages = PageUtils.getTotalPages(totalCount = totalCount, pageSize = pageSize)
 
-    private var oldFirstVisibleItemIndex = firstPageIndex
-
-    private val cacheSize = 4
+    private val cacheSize = 5
     private val cache: LruCache<Int, List<PlaylistModel>> = LruCache(cacheSize)
 
     var recomposeStateChanger by mutableStateOf(false)
 
+    /**
+     * TODO: Add description
+     */
     init {
         appState.defaultTableModel.displayedAttributesInTable.forEach { attribute ->
             if (attribute.canBeFiltered) {
@@ -119,203 +125,246 @@ class LazyTableController(
             }
             attributeSort[attribute] = BLTSortOrder.None
         }
-        println("attributeFilter: ${attributeFilter.size}")
-        println("attributeSort: ${attributeSort.size}")
-        // Get first cacheSize=4 pages on app initialization, to select one for the forms
+
         CoroutineScope(Dispatchers.Main).launch {
-            loadFirstPagesToFillCacheAndAddToAppStateList()
-            selectFirstPlaylist()
+            initialDataLoading()
+            selectFirstModel()
         }
     }
 
-    // loadFirstPagesToFillCacheAndAddToAppStateList needed 220 ms
-    private fun loadFirstPagesToFillCacheAndAddToAppStateList() {
-        println("Inside loadFirstPagesToFillCacheAndAddToAppStateList")
-        val start = System.currentTimeMillis()
+    /**
+     * TODO: Add description
+     */
+    private fun initialDataLoading() {
         for (pageNr in firstPageNr until cacheSize) {
             val startIndexOfPage = pageNr * pageSize
-            val models = loadPageOfPlaylistModels(startIndexOfPage = startIndexOfPage)
+            val models = getPageFromService(startIndex = startIndexOfPage)
             addPageToCache(pageNr = pageNr, pageOfModels = models)
-            addToAppStateList(startIndex = startIndexOfPage, newPageNr = pageNr)
         }
+
+        addNewModelsToAppState()
+
         forceRecompose()
-        val end = System.currentTimeMillis()
-        println("loadFirstPagesToFillCacheAndAddToAppStateList needed ${end - start} ms")
     }
 
-    private fun selectFirstPlaylist() {
+    /**
+     * TODO: Add description
+     */
+    private fun selectFirstModel() {
         val fullList = if (isFiltering) appState.filteredTableModelList else appState.tableModelList
-        println("loadFirstPagesAndFillCacheAndSelectFirstPlaylist: appState.list size = ${fullList.size}")
-        fullList.first()?.let { firstPlaylist -> selectModel(firstPlaylist) }
+        fullList.first()?.let { firstModel -> selectModel(firstModel) }
     }
 
-    // sort: loadAllNeededPagesForIndex needed 23552 ms
-    fun loadAllNeededPagesForIndex(firstVisibleItemIndex: Int) {
-        println("Inside loadAllNeededPagesForIndex with firstVisibleItemIndex=$firstVisibleItemIndex")
-        val start = System.currentTimeMillis()
-        val currentPageNr = getVisiblePageNr(firstVisibleItemIndex = firstVisibleItemIndex)
 
-        // If firstVisibleItemIndex > oldFirstVisibleItemIndex --> scrolled down
-        // If firstVisibleItemIndex < oldFirstVisibleItemIndex --> scrolled up
-        val scrolledDown = firstVisibleItemIndex > oldFirstVisibleItemIndex
+    /**
+     * Loads new pages from the service for a given index. The cache is filled with the current visible page and two before and after.
+     * If all data is loaded, a recomposition in the table is forced.
+     * @param firstVisibleItemIndex Index of the first visible item in the UI table
+     */
+    fun loadNewPages(firstVisibleItemIndex: Int) {
+        // Calculate page number for the given index
+        val currentVisiblePageNr = getVisiblePageNr(firstVisibleItemIndex = firstVisibleItemIndex)
 
-        // Update oldFirstVisibleItemIndex with the new value passed by the UI Table
-        oldFirstVisibleItemIndex = firstVisibleItemIndex
+        var loopStartIndex = -2
+        var loopEndIndex = 2
 
-        // Load cache size pages
-        for (i in -1 until cacheSize - 1) {
-            val pageNr = currentPageNr + i
+        if (currentVisiblePageNr >= totalPages - 1) {
+            loopStartIndex = -4
+            loopEndIndex = 4
+        } else if (currentVisiblePageNr >= totalPages - 2) {
+            loopStartIndex = -3
+            loopEndIndex = 3
+        } else if (currentVisiblePageNr <= firstPageNr) {
+            loopStartIndex = 0
+            loopEndIndex = 0
+        } else if (currentVisiblePageNr <= firstPageNr + 1) {
+            loopStartIndex = -1
+            loopEndIndex = 1
+        }
 
-            // TODO: TotalPages is always with total count
-            //  Must this be set again but with filteredCount like below?
-//              totalPages = PageUtils.getTotalPages(totalCount = filteredCount, pageSize = pageSize)
-            if (pageNr in firstPageNr until totalPages) {
-                loadPage(pageNr = pageNr, scrolledDown = scrolledDown)
+        // Load cache size pages and add them to the cache
+        for (i in loopStartIndex until cacheSize - loopEndIndex) {
+            val pageNrToLoad = currentVisiblePageNr + i
+
+            // Only load page if page number is a valid number and page is not already in cache
+            if (pageNrToLoad in firstPageNr until totalPages && !isPageInCache(pageNr = pageNrToLoad)) {
+                loadSinglePage(pageNrToLoad = pageNrToLoad)
             }
         }
+
+        println(cache.keys.toString())
+
+        // Add new data to the app state and remove data no longer needed
+        updateAppStateList(currentVisiblePageNr = currentVisiblePageNr)
+
+        // Force a recomposition in the table
         forceRecompose()
-        val end = System.currentTimeMillis()
-        println("loadAllNeededPagesForIndex needed ${end - start} ms")
     }
 
-    // sort: loadPage needed 6112 ms
-    internal fun loadPage(pageNr: Int, scrolledDown: Boolean) {
-        println("Inside loadPage with pageNr=$pageNr, scrolledDown=$scrolledDown")
-        val start = System.currentTimeMillis()
-        if (!isPageInCache(pageNr)) {
-            // Calculate start index for page to load
-            val pageStartIndexToLoad = getFirstIndexOfPage(pageNr = pageNr)
+    /**
+     * Loads a single page of models.
+     * - The page is requested from the paging service.
+     * - The response data is added to the cache.
+     * @param pageNrToLoad Number of the page to load
+     */
+    internal fun loadSinglePage(pageNrToLoad: Int) {
+        // Calculate first index of page to load
+        val firstIndexOfPageToLoad = getFirstIndexOfPage(pageNr = pageNrToLoad)
 
-            //val playlistModels = requestDataAsync(scope = pagingScope, startIndexOfPage = pageStartIndexToLoad)
-            val playlistModels = loadPageOfPlaylistModels(pageStartIndexToLoad)
-            //addPageToCache(pageNr = pageNrToLoad, pageOfModels = playlistModels.await())
-            addPageToCache(pageNr = pageNr, pageOfModels = playlistModels)
+        // Get page of models from paging service
+        val tableModels = getPageFromService(startIndex = firstIndexOfPageToLoad)
 
-            updateAppStateList(
-                pageStartIndexToLoad = pageStartIndexToLoad,
-                pageToLoad = pageNr,
-                isEnd = scrolledDown
-            )
-        }
-        val end = System.currentTimeMillis()
-        println("loadPage needed ${end - start} ms")
+        // Add page of models to cache
+        addPageToCache(pageNr = pageNrToLoad, pageOfModels = tableModels)
     }
 
-    // TODO: Instead of string more generic
-    // takes as much time as getPageNew call
-    internal fun loadPageOfPlaylistModels(startIndexOfPage: Int): List<PlaylistModel> {
-        println("Inside loadPageOfPlaylistModels")
+    /**
+     * Requests one page from the paging service, starting with the given index.
+     * - Does log filters and sort settings set before request.
+     * - Does log the time in milliseconds, the request took.
+     * @param startIndex Index to start requesting [pageSize] page
+     */
+    internal fun getPageFromService(startIndex: Int): List<PlaylistModel> {
+        Log.info("Requesting data from paging service with startIndex $startIndex")
+        Log.info("Filter set for request: $filters")
+        Log.info("Sorting set for request: $sort")
+
         val start = System.currentTimeMillis()
-        println("Filters in loadPageOfPlaylistModels: $filters")
 
-        println("Sort = $sort")
-
-        println("Before getPageNew")
-        val start1 = System.currentTimeMillis()
-        // getPage needed 745 ms (normal max with filters)
-        // getPage needed 24837 ms (max with sort)
-        // getPage needed 75882 ms (sort modified_at)
         val page = pagingService.getPage(
-            startIndex = startIndexOfPage,
+            startIndex = startIndex,
             pageSize = pageSize,
             filters = filters,
             sort = sort
         )
-        val end1 = System.currentTimeMillis()
-        println("getPage needed ${end1 - start1} ms")
 
         val end = System.currentTimeMillis()
-        println("loadPageOfPlaylistModels needed ${end - start} ms")
+        Log.info("The request took ${end - start} milliseconds.")
+
         return page.toPlaylistModels()
     }
 
+    // Helper function to map a list of Any to a list of playlistModels
     private fun List<Any?>.toPlaylistModels(): List<PlaylistModel> {
         return map { PlaylistModel(it as Playlist, appState) }
     }
 
-    // TODO: Split up function -> too complicated
+    /**
+     * TODO: Add description
+     * @param pageNr Number of the given page
+     * @param pageOfModels List of models
+     */
     internal fun addPageToCache(pageNr: Int, pageOfModels: List<PlaylistModel>) {
-        println("Inside addPageToCache with pageNr=$pageNr")
-        val start = System.currentTimeMillis()
-        val elements = pageOfModels.toMutableList()
+        // Create a mutable list from the given models
+        var modelListForCache = pageOfModels.toMutableList()
+
+        // Check if app state containing changed models
         if (appState.changedTableModels.size > 0) {
-            for (i in firstPageIndex until pageSize) {
-                if (appState.changedTableModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() } != null) {
-                    elements[i] =
-                        appState.changedTableModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() }!!
-                    appState.changedTableModels.remove(elements[i])
-                }
+            modelListForCache = mergeModels(pageOfModels = modelListForCache)
+        }
+
+        // Add list of models to cache at given page number
+        cache[pageNr] = modelListForCache
+    }
+
+    /**
+     * TODO: Add description
+     * @param pageOfModels TODO: ADD param description
+     * @return TODO: Add return
+     */
+    internal fun mergeModels(pageOfModels: MutableList<PlaylistModel>): MutableList<PlaylistModel> {
+        for (i in firstPageNr until pageSize) {
+            // Check if a changed model is existing for the current iteration model
+            val tableModel = appState.changedTableModels.find { tableModel -> tableModel.id.getValue() == pageOfModels[i].id.getValue() }
+
+            // If tableModel is not null, the same model with changes exists
+            if (tableModel != null) {
+                // Replace the current model with the model containing changes
+                pageOfModels[i] = tableModel
+                // Remove the model with changes from the changedModels list
+                appState.changedTableModels.remove(tableModel)
             }
         }
-        cache[pageNr] = elements
-        val end = System.currentTimeMillis()
-        println("addPageToCache needed ${end - start} ms")
+
+        return pageOfModels
     }
 
-    // TODO: Add below function
-    internal fun mergeModels() {}
 
-    internal fun updateAppStateList(pageStartIndexToLoad: Int, pageToLoad: Int, isEnd: Boolean) {
-        println("Inside updateAppStateList with pageStartIndexToLoad=$pageStartIndexToLoad, pageToLoad=$pageToLoad, isEnd=$isEnd")
-        val start = System.currentTimeMillis()
-        addToAppStateList(startIndex = pageStartIndexToLoad, newPageNr = pageToLoad)
-        removeFromAppStateList(index = pageStartIndexToLoad, isEnd = isEnd)
-        val end = System.currentTimeMillis()
-        println("updateAppStateList needed ${end - start} ms")
+    /**
+     * TODO: Add description
+     * @param currentVisiblePageNr Page number of current visible page in table
+     */
+    internal fun updateAppStateList(currentVisiblePageNr: Int) {
+        removeOldModelsFromAppState(pageNr = currentVisiblePageNr)
+        addNewModelsToAppState()
     }
 
-    internal fun addToAppStateList(startIndex: Int, newPageNr: Int) {
-        println("Inside addToAppStateList")
-        val start = System.currentTimeMillis()
-        if (isFiltering) {
-            for (i in startIndex until startIndex + pageSize) {
-                if (i in firstPageIndex until filteredCount) {
-                    // TODO: Index 21 out of bounds for length 21 with id=100 & name=new
-                    //  Index 30 out of bounds for length 30 with id=200, name=new
-                    appState.filteredTableModelList.set(index = i, element = cache[newPageNr]!![i % pageSize])
-                }
-            }
-        } else {
-            // Add new page to list
-            for (i in startIndex until startIndex + pageSize) {
-                if (i in firstPageIndex until totalCount) {
-                    appState.tableModelList.set(index = i, element = cache[newPageNr]!![i % pageSize])
-                }
-            }
+    /**
+     * TODO: Add description
+     * @param pageNr Page number for start index to remove calculation
+     */
+    internal fun removeOldModelsFromAppState(pageNr: Int) {
+        val startIndexToRemove = calculateStartIndexToRemove(pageNr = pageNr)
+        removeOldPagesFromList(startIndexToRemove = startIndexToRemove)
+    }
+
+    /**
+     * TODO: Add description
+     * @param pageNr Page number for start index to remove calculation
+     */
+    internal fun calculateStartIndexToRemove(pageNr: Int): Int {
+        var calcPageNr = pageNr - 2
+
+        if (calcPageNr < 0) {
+            calcPageNr = 0
+        } else if (calcPageNr >= totalPages) {
+            calcPageNr = totalPages - 1
         }
-        val end = System.currentTimeMillis()
-        println("addToAppStateList needed ${end - start} ms")
+
+        return getFirstIndexOfPage(calcPageNr)
     }
 
-    internal fun removeFromAppStateList(index: Int, isEnd: Boolean) {
-        println("Inside removeFromAppStateList")
-        val start = System.currentTimeMillis()
-        val startIndexOldPage = calculateStartIndexOfOldPage(index, isEnd)
-        removeOldPageFromList(startIndexOldPage)
-        val end = System.currentTimeMillis()
-        println("removeFromAppStateList needed ${end - start} ms")
-    }
-
-    // Calculates the start index of an "old" page, which has to be removed from the AppStateList
-    // TODO: isEnd? index? previousOrNextPage? index +- cacheSize?
-    internal fun calculateStartIndexOfOldPage(index: Int, isEnd: Boolean): Int {
-        val previousOrNextPage = if (isEnd) index - cacheSize else index + cacheSize
-        return previousOrNextPage * pageSize
-    }
-
-    internal fun removeOldPageFromList(startIndexOldPage: Int) {
-        assert(startIndexOldPage >= firstPageIndex)
-
+    /**
+     * TODO: Add description
+     * @param startIndexToRemove Index in list to start removing models
+     */
+    internal fun removeOldPagesFromList(startIndexToRemove: Int) {
         if (isFiltering) {
-            for (i in startIndexOldPage until startIndexOldPage + pageSize) {
-                if (i in firstPageIndex until filteredCount) {
+            for (i in startIndexToRemove until startIndexToRemove + (cacheSize * pageSize)) {
+                if (i in firstPageNr until filteredCount) {
                     appState.filteredTableModelList.set(index = i, element = null)
                 }
             }
         } else {
-            for (i in startIndexOldPage until startIndexOldPage + pageSize) {
-                if (i in firstPageIndex until totalCount) {
+            for (i in startIndexToRemove until startIndexToRemove + (cacheSize * pageSize)) {
+                if (i in firstPageNr until totalCount) {
                     appState.tableModelList.set(index = i, element = null)
+                }
+            }
+        }
+    }
+
+    /**
+     * TODO: Add description
+     */
+    internal fun addNewModelsToAppState() {
+        val smallestPageNrInCache = cache.keys.first()
+
+        for (key in smallestPageNrInCache until smallestPageNrInCache + cacheSize) {
+            if (key < totalPages) {
+                val startIndexOfKey = getFirstIndexOfPage(key)
+                for (i in startIndexOfKey until startIndexOfKey + pageSize) {
+                    if (cache[key]?.get(i % pageSize) != null) {
+                        if (isFiltering) {
+                            if (i in firstPageNr until filteredCount) {
+                                appState.filteredTableModelList.set(index = i, element = cache[key]!![i % pageSize])
+                            }
+                        } else {
+                            if (i in firstPageNr until totalCount) {
+                                appState.tableModelList.set(index = i, element = cache[key]!![i % pageSize])
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -347,24 +396,37 @@ class LazyTableController(
      * @throws IllegalArgumentException If the passed index is negative or bigger than total count
      */
     fun isTimeToLoadPage(firstVisibleItemIndex: Int): Boolean {
-        if (firstVisibleItemIndex < firstPageIndex) throw IllegalArgumentException("param firstVisibleItemIndex should be positive")
+        if (firstVisibleItemIndex < firstPageNr) throw IllegalArgumentException("param firstVisibleItemIndex should be positive")
         if (firstVisibleItemIndex >= totalCount) throw IllegalArgumentException("param firstVisibleItemIndex should be smaller than total count")
 
         // Calculate page number for the given index
         val visiblePageNr = getVisiblePageNr(firstVisibleItemIndex)
 
         // Catch all edge cases, to load only data if necessarily
-        return if (visiblePageNr == firstPageIndex) {
+        return if (visiblePageNr <= firstPageNr) {
             (!isPageInCache(pageNr = visiblePageNr)
                     || !isPageInCache(pageNr = 1)
-                    || !isPageInCache(pageNr = 2))
-        } else if (visiblePageNr > totalPages) {
+                    || !isPageInCache(pageNr = 2)
+                    || !isPageInCache(pageNr = 3)
+                    || !isPageInCache(pageNr = 4))
+        } else if (visiblePageNr <= firstPageNr + 1) {
             (!isPageInCache(pageNr = visiblePageNr)
                     || !isPageInCache(pageNr = visiblePageNr - 1)
-                    || !isPageInCache(pageNr = visiblePageNr + 1))
-        } else if (visiblePageNr > totalPages - 1) {
+                    || !isPageInCache(pageNr = 1)
+                    || !isPageInCache(pageNr = 2)
+                    || !isPageInCache(pageNr = 3))
+        } else if (visiblePageNr >= totalPages - 1) {
             (!isPageInCache(pageNr = visiblePageNr)
-                    || !isPageInCache(pageNr = visiblePageNr - 1))
+                    || !isPageInCache(pageNr = visiblePageNr - 1)
+                    || !isPageInCache(pageNr = visiblePageNr - 2)
+                    || !isPageInCache(pageNr = visiblePageNr - 3)
+                    || !isPageInCache(pageNr = visiblePageNr - 4))
+        } else if (visiblePageNr >= totalPages - 2) {
+            (!isPageInCache(pageNr = visiblePageNr)
+                    || !isPageInCache(pageNr = visiblePageNr + 1)
+                    || !isPageInCache(pageNr = visiblePageNr - 1)
+                    || !isPageInCache(pageNr = visiblePageNr - 2)
+                    || !isPageInCache(pageNr = visiblePageNr - 3))
         } else areNextAndPreviousPagesNotInCache(visiblePageNr = visiblePageNr)
     }
 
@@ -376,6 +438,7 @@ class LazyTableController(
     private fun areNextAndPreviousPagesNotInCache(visiblePageNr: Int): Boolean {
         return !isPageInCache(visiblePageNr)
                 || !isPageInCache(pageNr = visiblePageNr - 1)
+                || !isPageInCache(pageNr = visiblePageNr - 2)
                 || !isPageInCache(pageNr = visiblePageNr + 1)
                 || !isPageInCache(pageNr = visiblePageNr + 2)
     }

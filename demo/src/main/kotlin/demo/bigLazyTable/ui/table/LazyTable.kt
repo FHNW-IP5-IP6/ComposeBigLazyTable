@@ -34,7 +34,7 @@ fun LazyTable(
         ) {
             val firstVisibleItemIndex = verticalLazyListState.firstVisibleItemIndex
             if (isTimeToLoadPage(firstVisibleItemIndex)) {
-                scheduler.scheduleTask { loadAllNeededPagesForIndex(firstVisibleItemIndex) }
+                scheduler.scheduleTask { loadNewPages(firstVisibleItemIndex) }
             }
 
             // Go to the top when start/stop filtering
