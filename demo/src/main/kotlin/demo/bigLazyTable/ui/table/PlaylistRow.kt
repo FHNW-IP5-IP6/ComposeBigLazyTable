@@ -24,7 +24,7 @@ fun PlaylistRow(
     horizontalScrollState: ScrollState,
     appState: AppState
 ) {
-    val isSelected = appState.selectedPlaylistModel.id.getValue() == playlistModel.id.getValue()
+    val isSelected = appState.selectedTableModel.id.getValue() == playlistModel.id.getValue()
     val backgroundColor = if (isSelected) BackgroundColorGroups else BackgroundColorLight
 
     Row(
@@ -34,7 +34,7 @@ fun PlaylistRow(
             .padding(horizontal = 5.dp)
             .selectable(
                 selected = isSelected,
-                onClick = { controller.selectPlaylistModel(playlistModel) }
+                onClick = { controller.selectModel(playlistModel) }
             )
             .horizontalScroll(horizontalScrollState),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -55,7 +55,7 @@ fun PlaylistRowPlaceholder(
     horizontalScrollState: ScrollState,
     appState: AppState
 ) {
-    val lazyListAttributes = appState.defaultPlaylistModel.displayedAttributesInTable
+    val lazyListAttributes = appState.defaultTableModel.displayedAttributesInTable
 
     Row(
         modifier = Modifier

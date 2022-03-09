@@ -47,7 +47,7 @@ fun LazyTable(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 state = verticalLazyListState
             ) {
-                val lazyListItems = if (isFiltering) appState.filteredList else appState.lazyModelList
+                val lazyListItems = if (isFiltering) appState.filteredTableModelList else appState.tableModelList
                 items(items = lazyListItems) { playlistModel ->
                     when (playlistModel) {
                         null -> PlaylistRowPlaceholder(

@@ -24,7 +24,7 @@ private val Log = KotlinLogging.logger {}
  */
 class LazyTableController(
     private val pagingService: IPagingService<*>,
-    val pageSize: Int = 40, // TODO: If enough time - make dynamic
+    val pageSize: Int = 40, // TODO: make dynamic
     private val appState: AppState
 ) {
     private val firstPageNr = 0 // TODO: Use Nr everywhere!
@@ -86,7 +86,7 @@ class LazyTableController(
                 println("getFilteredCountNew needed ${end1 - start1} ms")
 
                 println("filtered Count = $filteredCount")
-                appState.filteredList = ArrayList(Collections.nCopies(filteredCount, null))
+                appState.filteredTableModelList = ArrayList(Collections.nCopies(filteredCount, null))
 
                 loadFirstPagesToFillCacheAndAddToAppStateList()
             }
@@ -113,7 +113,7 @@ class LazyTableController(
     var recomposeStateChanger by mutableStateOf(false)
 
     init {
-        appState.defaultPlaylistModel.displayedAttributesInTable.forEach { attribute ->
+        appState.defaultTableModel.displayedAttributesInTable.forEach { attribute ->
             if (attribute.canBeFiltered) {
                 attributeFilter[attribute] = ""
             }
@@ -144,9 +144,9 @@ class LazyTableController(
     }
 
     private fun selectFirstPlaylist() {
-        val fullList = if (isFiltering) appState.filteredList else appState.lazyModelList
+        val fullList = if (isFiltering) appState.filteredTableModelList else appState.tableModelList
         println("loadFirstPagesAndFillCacheAndSelectFirstPlaylist: appState.list size = ${fullList.size}")
-        fullList.first()?.let { firstPlaylist -> selectPlaylistModel(firstPlaylist) }
+        fullList.first()?.let { firstPlaylist -> selectModel(firstPlaylist) }
     }
 
     // sort: loadAllNeededPagesForIndex needed 23552 ms
@@ -238,12 +238,12 @@ class LazyTableController(
         println("Inside addPageToCache with pageNr=$pageNr")
         val start = System.currentTimeMillis()
         val elements = pageOfModels.toMutableList()
-        if (appState.changedPlaylistModels.size > 0) {
+        if (appState.changedTableModels.size > 0) {
             for (i in firstPageIndex until pageSize) {
-                if (appState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() } != null) {
+                if (appState.changedTableModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() } != null) {
                     elements[i] =
-                        appState.changedPlaylistModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() }!!
-                    appState.changedPlaylistModels.remove(elements[i])
+                        appState.changedTableModels.find { playlistModel -> playlistModel.id.getValue() == elements[i].id.getValue() }!!
+                    appState.changedTableModels.remove(elements[i])
                 }
             }
         }
@@ -272,14 +272,14 @@ class LazyTableController(
                 if (i in firstPageIndex until filteredCount) {
                     // TODO: Index 21 out of bounds for length 21 with id=100 & name=new
                     //  Index 30 out of bounds for length 30 with id=200, name=new
-                    appState.filteredList.set(index = i, element = cache[newPageNr]!![i % pageSize])
+                    appState.filteredTableModelList.set(index = i, element = cache[newPageNr]!![i % pageSize])
                 }
             }
         } else {
             // Add new page to list
             for (i in startIndex until startIndex + pageSize) {
                 if (i in firstPageIndex until totalCount) {
-                    appState.lazyModelList.set(index = i, element = cache[newPageNr]!![i % pageSize])
+                    appState.tableModelList.set(index = i, element = cache[newPageNr]!![i % pageSize])
                 }
             }
         }
@@ -304,77 +304,80 @@ class LazyTableController(
     }
 
     internal fun removeOldPageFromList(startIndexOldPage: Int) {
-        println("Inside removeOldPageFromList")
-        val start = System.currentTimeMillis()
         assert(startIndexOldPage >= firstPageIndex)
 
         if (isFiltering) {
             for (i in startIndexOldPage until startIndexOldPage + pageSize) {
                 if (i in firstPageIndex until filteredCount) {
-                    appState.filteredList.set(index = i, element = null)
+                    appState.filteredTableModelList.set(index = i, element = null)
                 }
             }
         } else {
             for (i in startIndexOldPage until startIndexOldPage + pageSize) {
                 if (i in firstPageIndex until totalCount) {
-                    appState.lazyModelList.set(index = i, element = null)
+                    appState.tableModelList.set(index = i, element = null)
                 }
             }
         }
-
-        val end = System.currentTimeMillis()
-        println("removeOldPageFromList needed ${end - start} ms")
     }
 
-    fun selectPlaylistModel(playlistModel: PlaylistModel) {
-        println("Inside selectPlaylistModel")
-        val start = System.currentTimeMillis()
-        setCurrentLanguage(playlistModel = playlistModel)
-        appState.selectedPlaylistModel = playlistModel
-        val end = System.currentTimeMillis()
-        println("selectPlaylistModel needed ${end - start} ms")
+    /**
+     * Select a model from the table.
+     * Side effects: Sets the global language on the passed model.
+     * @param tableModel model to select
+     */
+    fun selectModel(tableModel: PlaylistModel) {
+        setCurrentLanguage(tableModel = tableModel)
+        appState.selectedTableModel = tableModel
     }
 
-    private fun setCurrentLanguage(playlistModel: PlaylistModel) {
-        val currentLanguage = appState.defaultPlaylistModel.getCurrentLanguage()
-        playlistModel.setCurrentLanguage(currentLanguage)
+    /**
+     * Sets the global language saved in app state to a model
+     * @param tableModel model to set the global language
+     */
+    private fun setCurrentLanguage(tableModel: PlaylistModel) {
+        val currentLanguage = appState.defaultTableModel.getCurrentLanguage()
+        tableModel.setCurrentLanguage(lang = currentLanguage)
     }
 
-    // Checks with the passed firstVisibleItemIndex from the UI, if it's time to load new pages
+    /**
+     * Checks with the passed index, if it's time to load new pages.
+     * @param firstVisibleItemIndex Index of the first visible item in the UI table
+     * @return It's time to load new pages
+     * @throws IllegalArgumentException If the passed index is negative or bigger than total count
+     */
     fun isTimeToLoadPage(firstVisibleItemIndex: Int): Boolean {
-        println("Inside isTimeToLoadPage")
-        val start = System.currentTimeMillis()
-        if (firstVisibleItemIndex < firstPageIndex) throw IllegalArgumentException("firstVisibleItemIndex should be positive")
-        if (firstVisibleItemIndex >= totalCount) throw IllegalArgumentException("firstVisibleItemIndex should be smaller than total count")
+        if (firstVisibleItemIndex < firstPageIndex) throw IllegalArgumentException("param firstVisibleItemIndex should be positive")
+        if (firstVisibleItemIndex >= totalCount) throw IllegalArgumentException("param firstVisibleItemIndex should be smaller than total count")
 
+        // Calculate page number for the given index
         val visiblePageNr = getVisiblePageNr(firstVisibleItemIndex)
 
         // Catch all edge cases, to load only data if necessarily
-        var rv = false
-        /*return */if (visiblePageNr == firstPageIndex) {
-            rv = (!isPageInCache(visiblePageNr)
-                    || !isPageInCache(1)
-                    || !isPageInCache(2))
+        return if (visiblePageNr == firstPageIndex) {
+            (!isPageInCache(pageNr = visiblePageNr)
+                    || !isPageInCache(pageNr = 1)
+                    || !isPageInCache(pageNr = 2))
         } else if (visiblePageNr > totalPages) {
-            rv = (!isPageInCache(visiblePageNr)
-                    || !isPageInCache(visiblePageNr - 1)
-                    || !isPageInCache(visiblePageNr + 1))
+            (!isPageInCache(pageNr = visiblePageNr)
+                    || !isPageInCache(pageNr = visiblePageNr - 1)
+                    || !isPageInCache(pageNr = visiblePageNr + 1))
         } else if (visiblePageNr > totalPages - 1) {
-            rv = (!isPageInCache(visiblePageNr)
-                    || !isPageInCache(visiblePageNr - 1))
-        } else rv = areNextAndPreviousPagesNotInCache(visiblePageNr)
-
-        val end = System.currentTimeMillis()
-        println("selectPlaylistModel needed ${end - start} ms")
-
-        return rv
+            (!isPageInCache(pageNr = visiblePageNr)
+                    || !isPageInCache(pageNr = visiblePageNr - 1))
+        } else areNextAndPreviousPagesNotInCache(visiblePageNr = visiblePageNr)
     }
 
+    /**
+     * Checks if a given page number and his previous/next pages are in the cache
+     * @param visiblePageNr page number to check
+     * @return Previous, current or next pages are not in cache
+     */
     private fun areNextAndPreviousPagesNotInCache(visiblePageNr: Int): Boolean {
         return !isPageInCache(visiblePageNr)
-                || !isPageInCache(visiblePageNr - 1)
-                || !isPageInCache(visiblePageNr + 1)
-                || !isPageInCache(visiblePageNr + 2)
+                || !isPageInCache(pageNr = visiblePageNr - 1)
+                || !isPageInCache(pageNr = visiblePageNr + 1)
+                || !isPageInCache(pageNr = visiblePageNr + 2)
     }
 
     internal fun getVisiblePageNr(firstVisibleItemIndex: Int): Int =

@@ -297,8 +297,8 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
     )
 
     override fun updateChanges() {
-        if (!appState.changedPlaylistModels.contains(this)) {
-            appState.changedPlaylistModels.add(this)
+        if (!appState.changedTableModels.contains(this)) {
+            appState.changedTableModels.add(this)
         }
         super.updateChanges()
     }

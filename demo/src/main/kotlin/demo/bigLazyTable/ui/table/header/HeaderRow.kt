@@ -31,7 +31,7 @@ fun HeaderRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        for (attribute in appState.defaultPlaylistModel.displayedAttributesInTable) {
+        for (attribute in appState.defaultTableModel.displayedAttributesInTable) {
             Column {
                 FilterTextField(
                     attribute = attribute,

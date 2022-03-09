@@ -123,15 +123,15 @@ internal class LazyTableControllerTest {
         // given
         val playlistModel = PlaylistModel(Playlist(name = "test deutsch"), appState)
 
-        appState.selectedPlaylistModel.setCurrentLanguage("english")
+        appState.selectedTableModel.setCurrentLanguage("english")
 
         // when
         playlistModel.setCurrentLanguage("deutsch")
-        viewModel.selectPlaylistModel(playlistModel = playlistModel)
+        viewModel.selectModel(tableModel = playlistModel)
 
         // then
-        assertEquals(playlistModel, appState.selectedPlaylistModel)
-        assertEquals("deutsch", appState.selectedPlaylistModel.getCurrentLanguage())
+        assertEquals(playlistModel, appState.selectedTableModel)
+        assertEquals("deutsch", appState.selectedTableModel.getCurrentLanguage())
     }
 
     // TODO:
@@ -143,15 +143,15 @@ internal class LazyTableControllerTest {
         // given
         val playlistModel = PlaylistModel(Playlist(name = "test english"), appState)
 
-        appState.selectedPlaylistModel.setCurrentLanguage("deutsch")
+        appState.selectedTableModel.setCurrentLanguage("deutsch")
 
         // when
         playlistModel.setCurrentLanguage("english")
-        viewModel.selectPlaylistModel(playlistModel = playlistModel)
+        viewModel.selectModel(tableModel = playlistModel)
 
         // then
-        assertEquals(playlistModel, appState.selectedPlaylistModel)
-        assertEquals("english", appState.selectedPlaylistModel.getCurrentLanguage())
+        assertEquals(playlistModel, appState.selectedTableModel)
+        assertEquals("english", appState.selectedTableModel.getCurrentLanguage())
     }
 
     @Test
@@ -160,10 +160,10 @@ internal class LazyTableControllerTest {
         val playlistModel = PlaylistModel(Playlist(name = "test"), appState)
 
         // when
-        viewModel.selectPlaylistModel(playlistModel = playlistModel)
+        viewModel.selectModel(tableModel = playlistModel)
 
         // then
-        assertEquals(playlistModel, appState.selectedPlaylistModel)
+        assertEquals(playlistModel, appState.selectedTableModel)
     }
 
     @Test
@@ -174,7 +174,7 @@ internal class LazyTableControllerTest {
         // then
         assertDoesNotThrow {
             // when
-            viewModel.selectPlaylistModel(playlistModel = playlistModel)
+            viewModel.selectModel(tableModel = playlistModel)
         }
     }
 
@@ -184,10 +184,10 @@ internal class LazyTableControllerTest {
         val playlistModel = PlaylistModel(Playlist(), appState)
 
         // when
-        viewModel.selectPlaylistModel(playlistModel = playlistModel)
+        viewModel.selectModel(tableModel = playlistModel)
 
         // then
-        assertEquals(playlistModel, appState.selectedPlaylistModel)
+        assertEquals(playlistModel, appState.selectedTableModel)
     }
 
     // TODO:
