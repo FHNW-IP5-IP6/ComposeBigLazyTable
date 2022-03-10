@@ -2,11 +2,9 @@ package demo.bigLazyTable.model
 
 import demo.bigLazyTable.data.database.FakePagingService
 import demo.bigLazyTable.utils.printTestMethodName
-import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
@@ -47,8 +45,6 @@ internal class LazyTableControllerTest {
         Log.info { "testing with firstVisibleItemIndex $firstVisibleItemIndex" }
     }
 
-    // TODO:
-    @Disabled("Why is it not returning false?")
     @Test
     fun `isTimeToLoadPage returns false with 0 as firstVisibleItemIndex when already loaded first page`() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
@@ -94,16 +90,6 @@ internal class LazyTableControllerTest {
         }
     }
 
-    // TODO:
-    @Disabled("Exception in thread 'AWT-EventQueue-0 @coroutine#' java.lang.NoClassDefFoundError: Could not initialize class demo.bigLazyTable.model.AppState")
-    @Test
-    fun `throws IllegalArgumentException after loadAllNeededPagesForIndex 1_000_000`() {
-        printTestMethodName(object {}.javaClass.enclosingMethod.name)
-        assertThrows<IllegalArgumentException> {
-            viewModel.loadNewPages(1_000_000)
-        }
-    }
-
     @Test
     fun `nbrOfTotalPages is rounded to the next integer when numberOfPlaylists or pageSize are not even`() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
@@ -112,46 +98,6 @@ internal class LazyTableControllerTest {
         val expected = if (isNumberOfPlaylistsAndPageSizeEven) numberDividedByPageSize else numberDividedByPageSize + 1
         assertEquals(expected, viewModel.totalPages)
         Log.info { "expected: $expected == actual ${viewModel.totalPages}" }
-    }
-
-    // TODO:
-    @Disabled("Sometimes it works & sometimes it dont")
-    @Test
-    fun `selectPlaylist changes language correctly to deutsch`() {
-        printTestMethodName(object {}.javaClass.enclosingMethod.name)
-
-        // given
-        val playlistModel = PlaylistModel(Playlist(name = "test deutsch"), appState)
-
-        appState.selectedTableModel.setCurrentLanguage("english")
-
-        // when
-        playlistModel.setCurrentLanguage("deutsch")
-        viewModel.selectModel(tableModel = playlistModel)
-
-        // then
-        assertEquals(playlistModel, appState.selectedTableModel)
-        assertEquals("deutsch", appState.selectedTableModel.getCurrentLanguage())
-    }
-
-    // TODO:
-    @Disabled("Sometimes it works & sometimes it dont")
-    @Test
-    fun `selectPlaylist changes language correctly to english`() {
-        printTestMethodName(object {}.javaClass.enclosingMethod.name)
-
-        // given
-        val playlistModel = PlaylistModel(Playlist(name = "test english"), appState)
-
-        appState.selectedTableModel.setCurrentLanguage("deutsch")
-
-        // when
-        playlistModel.setCurrentLanguage("english")
-        viewModel.selectModel(tableModel = playlistModel)
-
-        // then
-        assertEquals(playlistModel, appState.selectedTableModel)
-        assertEquals("english", appState.selectedTableModel.getCurrentLanguage())
     }
 
     @Test
@@ -190,29 +136,6 @@ internal class LazyTableControllerTest {
         assertEquals(playlistModel, appState.selectedTableModel)
     }
 
-    // TODO:
-    @Disabled("Why is it returning emptyList?")
-    @Test
-    fun `loadPageAndMapToPlaylistModels works with 0 as startIndexOfPage`() {
-        // when
-//        // TODO: java.lang.NoSuchMethodException: demo.bigLazyTable.model.LazyTableController.loadPageAndMapToPlaylistModels(int)
-//        val loadPageAndMapToPlaylistModels =
-//            LazyTableController::class.java.getDeclaredMethod("loadPageAndMapToPlaylistModels", Int::class.java).apply {
-//                isAccessible = true
-//            }
-//        val startIndexOfPage = 0
-//        val returnValue = loadPageAndMapToPlaylistModels.invoke(viewModel, startIndexOfPage)
-//        println("returnValue = ${returnValue.javaClass.name} $returnValue")
-//        assertTrue(returnValue is List<*>)
-        runBlocking {
-            // TODO: Why do both return an empty list???
-            val playlistModels = viewModel.getPageFromService(startIndex = 5665)
-            val x = pagingService.getPage(startIndex = 0, pageSize = pageSize, filters = emptyList())
-            println(x)
-            assertEquals(0, x.first())
-        }
-    }
-
     @Test
     fun `addPageToCache works with page 0`() {
         val playlistModels = listOf(
@@ -243,139 +166,66 @@ internal class LazyTableControllerTest {
         assertFalse(viewModel.isPageInCache(45))
     }
 
-    // TODO: 21.02.2022
-    @Disabled("Unexpected exception thrown: java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0")
     @Test
-    fun `loadPage works with pageNrToLoad 0 & scrolledDown = false`() {
+    fun `loadPage works with pageNrToLoad 0`() {
         assertDoesNotThrow {
-            viewModel.loadSinglePage(pageNrToLoad = 0, scrolledDown = false)
+            viewModel.loadSinglePage(pageNrToLoad = 0)
         }
     }
 
-    // TODO: 21.02.2022
-    @Disabled("Unexpected exception thrown: java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0")
     @Test
-    fun `loadPage works with pageNrToLoad 0 & scrolledDown = true`() {
+    fun `loadPage works with pageNrToLoad 100`() {
         assertDoesNotThrow {
-            viewModel.loadSinglePage(pageNrToLoad = 0, scrolledDown = true)
+            viewModel.loadSinglePage(pageNrToLoad = 100)
         }
     }
 
-    // TODO:
-    @Disabled("Unexpected exception thrown: java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0")
     @Test
-    fun `loadPage works with pageNrToLoad 100 & scrolledDown = true`() {
+    fun `updateAppStateList works with currentVisiblePageNr=0`() {
+        viewModel.loadNewPages(0)
         assertDoesNotThrow {
-            viewModel.loadSinglePage(pageNrToLoad = 100, scrolledDown = true)
+            viewModel.updateAppStateList(currentVisiblePageNr = 0)
         }
     }
 
-    // TODO:
-    @Disabled("Unexpected exception thrown: java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0")
     @Test
-    fun `updateAppStateList works with pageStartIndexToLoad=0, pageToLoad=0, isEnd=false`() {
+    fun `addToAppStateList works`() {
+        viewModel.loadNewPages(0)
         assertDoesNotThrow {
-            viewModel.updateAppStateList(
-                currentVisiblePageNr = 0,
-                pageToLoad = 0,
-                isEnd = false
-            )
+            viewModel.addNewModelsToAppState()
         }
     }
 
-    // TODO:
-    @Disabled("Unexpected exception thrown: java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0")
     @Test
-    fun `updateAppStateList works with pageStartIndexToLoad=0, pageToLoad=0, isEnd=true`() {
+    fun `removeFromAppStateList works with index=0`() {
         assertDoesNotThrow {
-            viewModel.updateAppStateList(
-                currentVisiblePageNr = 0,
-                pageToLoad = 0,
-                isEnd = true
-            )
+            viewModel.removeOldModelsFromAppState(pageNr = 0)
         }
     }
 
-    // TODO:
-    @Disabled("Unexpected exception thrown: java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0")
     @Test
-    fun `addToAppStateList works with startIndex=0 & newPageNr=1`() {
+    fun `removeFromAppStateList works with index=24960`() {
         assertDoesNotThrow {
-            viewModel.addNewModelsToAppState(
-                startIndex = 0,
-                newPageNr = 1
-            )
+            viewModel.removeOldModelsFromAppState(pageNr = 24_960)
         }
     }
 
-    // TODO:
-    @Disabled("Unexpected exception thrown: java.lang.NullPointerException")
     @Test
-    fun `addToAppStateList works with startIndex=4355 & newPageNr=45345`() {
-        assertDoesNotThrow {
-            viewModel.addNewModelsToAppState(
-                startIndex = 4355,
-                newPageNr = 45345
-            )
-        }
-    }
-
-    @Disabled("Unexpected exception thrown: java.lang.IndexOutOfBoundsException: Index 160 out of bounds for length 0")
-    @Test
-    fun `removeFromAppStateList works with index=0, isEnd=false`() {
-        assertDoesNotThrow {
-            viewModel.removeOldModelsFromAppState(
-                pageNr = 0,
-                isEnd = false
-            )
-        }
-    }
-
-    @Disabled("Unexpected exception thrown: java.lang.IndexOutOfBoundsException: Index 998240 out of bounds for length 0")
-    @Test
-    fun `removeFromAppStateList works with index=24960, isEnd=true`() {
-        assertDoesNotThrow {
-            viewModel.removeOldModelsFromAppState(
-                pageNr = 24960,
-                isEnd = true
-            )
-        }
-    }
-
-    // TODO: Why 160?
-    @Disabled("expected: <0> but was: <160>")
-    @Test
-    fun `calculateStartIndexOfOldPage works with index 0 & isEnd=false`() {
-        val oldStartIndex = viewModel.calculateStartIndexToRemove(
-            pageNr = 0,
-            isEnd = false
-        )
+    fun `calculateStartIndexToRemove works with index 0`() {
+        val oldStartIndex = viewModel.calculateStartIndexToRemove(pageNr = 0,)
         assertEquals(0, oldStartIndex)
     }
 
-    // TODO: Why 998240?
-    @Disabled("expected: <24960> but was: <998240>")
     @Test
-    fun `calculateStartIndexOfOldPage works with index 25000 & isEnd=true`() {
-        val oldStartIndex = viewModel.calculateStartIndexToRemove(
-            pageNr = 24960,
-            isEnd = true
-        )
-        assertEquals(24960, oldStartIndex)
+    fun `calculateStartIndexToRemove works with index 25000`() {
+        val oldStartIndex = viewModel.calculateStartIndexToRemove(pageNr = 25000)
+        assertEquals(999_920, oldStartIndex)
     }
 
-    @Disabled("Unexpected exception thrown: java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0")
     @Test
-    fun `removeOldPageFromList works with startIndexOldPage=0`() {
+    fun `removeOldPagesFromList works with startIndexToRemove=0`() {
         assertDoesNotThrow {
             viewModel.removeOldPagesFromList(startIndexToRemove = 0)
-        }
-    }
-
-    @Test
-    fun `removeOldPageFromList doesnt work with startIndexOldPage=-1`() {
-        assertThrows<AssertionError> {
-            viewModel.removeOldPagesFromList(startIndexToRemove = -1)
         }
     }
 
@@ -439,16 +289,16 @@ internal class LazyTableControllerTest {
         assertEquals(25_000, startIndexToLoad)
     }
 
-    // TODO: Why is it not in cache?
-    @Disabled("expected: <true> but was: <false>")
     @Test
     fun `isPageInCache works with pageNr 1`() {
+        viewModel.loadNewPages(0)
         val isInCache = viewModel.isPageInCache(1)
         assertEquals(true, isInCache)
     }
 
     @Test
     fun `isPageInCache doesnt work with pageNr 5345`() {
+        viewModel.loadNewPages(0)
         val isInCache = viewModel.isPageInCache(5345)
         assertEquals(false, isInCache)
     }
