@@ -56,54 +56,10 @@ kotlin {
 
                 // Used in FakePagingService for tests
                 implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.10")
-
-                /*
-                TODO: REMOVE ALL DEPENDENCIES IF UI TESTS DON'T WORK
-                // UI Testing
-                implementation("androidx.compose.ui:ui-test-desktop:1.0.0-beta06")
-                implementation("org.jetbrains.compose.ui:ui-test-junit4-desktop:1.0.1")
-                implementation(getSkiaDependency()) // WORKAROUND
-
-                // JUnit4
-                implementation("junit:junit:4.13.2")
-
-                // JUnit5 dependency
-                implementation("org.junit.jupiter:junit-jupiter:5.8.2")
-
-                // needed so that JUnit4/3 tests can also run in the same project with JUnit5 Tests
-                implementation("org.junit.vintage:junit-vintage-engine:5.8.2")
-                 */
             }
         }
     }
 }
-
-/*
-TODO: REMOVE THIS IF UI TESTS DON'T WORK
-fun getSkiaDependency(): String {
-    val target = getTarget()
-    val version = "0.6.7"
-    return "org.jetbrains.skiko:skiko-jvm-runtime-$target:$version"
-}
-
-fun getTarget(): String {
-    val osName = System.getProperty("os.name")
-    val targetOs = when {
-        osName == "Mac OS X" -> "macos"
-        osName.startsWith("Win") -> "windows"
-        osName.startsWith("Linux") -> "linux"
-        else -> error("Unsupported OS: $osName")
-    }
-
-    val targetArch = when (val osArch = System.getProperty("os.arch")) {
-        "x86_64", "amd64" -> "x64"
-        "aarch64" -> "arm64"
-        else -> error("Unsupported arch: $osArch")
-    }
-
-    return "${targetOs}-${targetArch}"
-}
-*/
 
 tasks.apply {
     withType<Test> {
