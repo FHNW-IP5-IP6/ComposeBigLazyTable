@@ -8,6 +8,9 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 /**
+ * TODO: Add description
+ * @param pagingService TODO: Add description
+ *
  * @author Marco Sprenger, Livio Näf
  */
 class AppState(pagingService: IPagingService<*>) {
