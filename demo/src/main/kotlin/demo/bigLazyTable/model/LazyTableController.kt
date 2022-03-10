@@ -31,92 +31,41 @@ class LazyTableController(
     val pageSize: Int = 40, // TODO: make dynamic
     private val appState: AppState
 ) {
+    // Variables for different calculations
+    private val totalCount by lazy { pagingService.getTotalCount() }
+    private var filteredCount by Delegates.notNull<Int>()
+    var totalPages = PageUtils.getTotalPages(totalCount = totalCount, pageSize = pageSize)
     private val firstPageNr = 0
 
+    // Sorting variables
     var lastSortedAttribute: Attribute<*, *, *>? = null
     var attributeSort = mutableStateMapOf<Attribute<*, *, *>, BLTSortOrder>()
     var sort: Sort? by mutableStateOf(null)
     var isSorting by mutableStateOf(false)
 
-    fun onSortChanged(attribute: Attribute<*, *, *>, newSortOrder: BLTSortOrder) {
-        resetPreviousSortedAttribute(newAttribute = attribute)
-
-        lastSortedAttribute = attribute
-        attributeSort[attribute] = newSortOrder
-
-        isSorting = newSortOrder.isSorting
-        sort = newSortOrder.sortAttribute(attribute)
-
-        scheduler.scheduleTask { initialDataLoading() }
-    }
-
-    private fun resetPreviousSortedAttribute(newAttribute: Attribute<*,*,*>) {
-        if (lastSortedAttribute != null && lastSortedAttribute != newAttribute) {
-            attributeSort[lastSortedAttribute!!] = BLTSortOrder.None
-        }
-    }
-
+    // Filtering variables
     var filters = listOf<Filter>()
     private var filteredAttributes = mutableSetOf<Attribute<*, *, *>>()
     var attributeFilter: MutableMap<Attribute<*, *, *>, String> = mutableStateMapOf()
-
-    // TODO: Spinner instead of empty ... Rows when filtering?
-    fun onFiltersChanged(attribute: Attribute<*, *, *>, newFilter: String) {
-        println("Inside onFiltersChanged with attribute=${attribute.databaseField}, newFilter=$newFilter")
-        val start = System.currentTimeMillis()
-        attributeFilter[attribute] = newFilter
-
-        if (newFilter == "") filteredAttributes.remove(attribute)
-        else filteredAttributes.add(attribute)
-
-        filters = filteredAttributes.map { a ->
-            Filter(
-                filter = attributeFilter[a] ?: "",
-                dbField = a.databaseField as Column<String>,
-                caseSensitive = false
-            )
-        }
-        println("Filters in onFiltersChanged: $filters")
-
-        isFiltering = filters.isNotEmpty()
-        if (isFiltering) {
-            filterScheduler.scheduleTask {
-                println("Before getFilteredCountNew")
-                val start1 = System.currentTimeMillis()
-                // getFilteredCountNew needed 617 ms
-                filteredCount = pagingService.getFilteredCount(filters = filters)
-                val end1 = System.currentTimeMillis()
-                println("getFilteredCountNew needed ${end1 - start1} ms")
-                totalPages = PageUtils.getTotalPages(totalCount = filteredCount, pageSize = pageSize)
-                println("filtered Count = $filteredCount")
-                appState.filteredTableModelList = ArrayList(Collections.nCopies(filteredCount, null))
-
-                initialDataLoading()
-            }
-        } else {
-            totalPages = PageUtils.getTotalPages(totalCount = totalCount, pageSize = pageSize)
-        }
-        val end = System.currentTimeMillis()
-        println("onFiltersChanged needed ${end - start} ms")
-    }
-
     var isFiltering by mutableStateOf(false)
         private set
 
+    // Schedulers
     val scheduler = Scheduler()
     private val filterScheduler = Scheduler(100)
 
-    private val totalCount by lazy { pagingService.getTotalCount() }
-    private var filteredCount by Delegates.notNull<Int>()
-    var totalPages = PageUtils.getTotalPages(totalCount = totalCount, pageSize = pageSize)
-
+    // Cache variables
     private val cacheSize = 5
     private val cache: LruCache<Int, List<PlaylistModel>> = LruCache(cacheSize)
 
+    // Needed to force a recomposition
     var recomposeStateChanger by mutableStateOf(false)
 
     /**
-     * TODO: Add description
+     * Initializer for first start up.
+     * - Sets up filters and sorting
+     * - Loads the initial data
+     * - Selects the first model in the table for the forms
      */
     init {
         appState.defaultTableModel.displayedAttributesInTable.forEach { attribute ->
@@ -133,7 +82,7 @@ class LazyTableController(
     }
 
     /**
-     * TODO: Add description
+     * Load the initial data for first start. Loads the first cache size pages.
      */
     private fun initialDataLoading() {
         for (pageNr in firstPageNr until cacheSize) {
@@ -148,13 +97,12 @@ class LazyTableController(
     }
 
     /**
-     * TODO: Add description
+     * Select to first model from the table list and set in app state.
      */
     private fun selectFirstModel() {
         val fullList = if (isFiltering) appState.filteredTableModelList else appState.tableModelList
         fullList.first()?.let { firstModel -> selectModel(firstModel) }
     }
-
 
     /**
      * Loads new pages from the service for a given index. The cache is filled with the current visible page and two before and after.
@@ -165,25 +113,11 @@ class LazyTableController(
         // Calculate page number for the given index
         val currentVisiblePageNr = getVisiblePageNr(firstVisibleItemIndex = firstVisibleItemIndex)
 
-        var loopStartIndex = -2
-        var loopEndIndex = 2
-
-        if (currentVisiblePageNr >= totalPages - 1) {
-            loopStartIndex = -4
-            loopEndIndex = 4
-        } else if (currentVisiblePageNr >= totalPages - 2) {
-            loopStartIndex = -3
-            loopEndIndex = 3
-        } else if (currentVisiblePageNr <= firstPageNr) {
-            loopStartIndex = 0
-            loopEndIndex = 0
-        } else if (currentVisiblePageNr <= firstPageNr + 1) {
-            loopStartIndex = -1
-            loopEndIndex = 1
-        }
+        // Calculate start and end index for loop
+        val indexes = calculateLoopIndexes(currentVisiblePageNr)
 
         // Load cache size pages and add them to the cache
-        for (i in loopStartIndex until cacheSize - loopEndIndex) {
+        for (i in indexes.first until cacheSize - indexes.second) {
             val pageNrToLoad = currentVisiblePageNr + i
 
             // Only load page if page number is a valid number and page is not already in cache
@@ -192,13 +126,38 @@ class LazyTableController(
             }
         }
 
-        println(cache.keys.toString())
-
         // Add new data to the app state and remove data no longer needed
         updateAppStateList(currentVisiblePageNr = currentVisiblePageNr)
 
         // Force a recomposition in the table
         forceRecompose()
+    }
+
+    /**
+     * Calculates the start and end index for the loop to load data
+     * @param pageNr Current visible page number
+     * @return Pair of start and end index for loop
+     */
+    internal fun calculateLoopIndexes(pageNr: Int): Pair<Int, Int> {
+        // Default loop settings to get two previous, one current and two next pages -> cache size pages
+        var loopStartIndex = -2
+        var loopEndIndex = 2
+
+        if (pageNr >= totalPages - 1) { // If current visible page is the last one -> get the current and the four previous pages
+            loopStartIndex = -4
+            loopEndIndex = 4
+        } else if (pageNr >= totalPages - 2) { // If current visible page is the second last one -> get the current, next and the three previous pages
+            loopStartIndex = -3
+            loopEndIndex = 3
+        } else if (pageNr <= firstPageNr) { // If current visible page is the first one -> get the current and the four next pages
+            loopStartIndex = 0
+            loopEndIndex = 0
+        } else if (pageNr <= firstPageNr + 1) { // If current visible page is the second one -> get the current, previous and the three next pages
+            loopStartIndex = -1
+            loopEndIndex = 1
+        }
+
+        return Pair(first = loopStartIndex, second = loopEndIndex)
     }
 
     /**
@@ -250,7 +209,7 @@ class LazyTableController(
     }
 
     /**
-     * TODO: Add description
+     * Adds a give list of models to the cache. If the app stat containing models with changes, a merge mechanism is used to merge these models together.
      * @param pageNr Number of the given page
      * @param pageOfModels List of models
      */
@@ -268,9 +227,9 @@ class LazyTableController(
     }
 
     /**
-     * TODO: Add description
-     * @param pageOfModels TODO: ADD param description
-     * @return TODO: Add return
+     * Merges an incoming list of models with the list in app state containing models with changes.
+     * @param pageOfModels List of models to merge
+     * @return List of models, where all models with changes are included
      */
     internal fun mergeModels(pageOfModels: MutableList<PlaylistModel>): MutableList<PlaylistModel> {
         for (i in firstPageNr until pageSize) {
@@ -291,7 +250,7 @@ class LazyTableController(
 
 
     /**
-     * TODO: Add description
+     * Removes unused models from app state and adds all models currently in cache
      * @param currentVisiblePageNr Page number of current visible page in table
      */
     internal fun updateAppStateList(currentVisiblePageNr: Int) {
@@ -300,21 +259,24 @@ class LazyTableController(
     }
 
     /**
-     * TODO: Add description
+     * Removes unused models from app state
      * @param pageNr Page number for start index to remove calculation
      */
     internal fun removeOldModelsFromAppState(pageNr: Int) {
+        // Calculate the start index for removing old models
         val startIndexToRemove = calculateStartIndexToRemove(pageNr = pageNr)
         removeOldPagesFromList(startIndexToRemove = startIndexToRemove)
     }
 
     /**
-     * TODO: Add description
+     * Calculates the index from where to start removing old models.
      * @param pageNr Page number for start index to remove calculation
      */
     internal fun calculateStartIndexToRemove(pageNr: Int): Int {
+        // Subtract two from the current visible page, because there are always two previous pages loaded
         var calcPageNr = pageNr - 2
 
+        // Handle edge cases if the current visible page is near to zero or total pages
         if (calcPageNr < 0) {
             calcPageNr = 0
         } else if (calcPageNr >= totalPages) {
@@ -325,18 +287,19 @@ class LazyTableController(
     }
 
     /**
-     * TODO: Add description
+     * Removes old models from the app state. Starts with the passed index and removes the next cache size pages. Removing means to set a list entry to null.
      * @param startIndexToRemove Index in list to start removing models
      */
     internal fun removeOldPagesFromList(startIndexToRemove: Int) {
-        if (isFiltering) {
-            for (i in startIndexToRemove until startIndexToRemove + (cacheSize * pageSize)) {
+        // Loop from given start index until cache size pages
+        for (i in startIndexToRemove until startIndexToRemove + (cacheSize * pageSize)) {
+
+            // Check if filtering is active, to differentiate between app state filtered list or full list
+            if (isFiltering) {
                 if (i in firstPageNr until filteredCount) {
                     appState.filteredTableModelList.set(index = i, element = null)
                 }
-            }
-        } else {
-            for (i in startIndexToRemove until startIndexToRemove + (cacheSize * pageSize)) {
+            } else {
                 if (i in firstPageNr until totalCount) {
                     appState.tableModelList.set(index = i, element = null)
                 }
@@ -345,16 +308,23 @@ class LazyTableController(
     }
 
     /**
-     * TODO: Add description
+     * Adds all models currently in cache to the app state list.
      */
     internal fun addNewModelsToAppState() {
+        // Find the smallest page number in cache
         val smallestPageNrInCache = cache.keys.first()
 
+        // Loop over all keys currently in the cache
         for (key in smallestPageNrInCache until smallestPageNrInCache + cacheSize) {
+            // Check if the key is a valid page number
             if (key < totalPages) {
+                // Calculate the start index of the page with the current key
                 val startIndexOfKey = getFirstIndexOfPage(key)
+                // Loop over the whole page
                 for (i in startIndexOfKey until startIndexOfKey + pageSize) {
+                    // Check if a specific element existing for the given key in the cache
                     if (cache[key]?.get(i % pageSize) != null) {
+                        // Check if filtering is active, to differentiate between app state filtered list or full list
                         if (isFiltering) {
                             if (i in firstPageNr until filteredCount) {
                                 appState.filteredTableModelList.set(index = i, element = cache[key]!![i % pageSize])
@@ -367,6 +337,66 @@ class LazyTableController(
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * TODO: Add description
+     * @param attribute TODO: Add description
+     * @param newSortOrder TODO: Add description
+     */
+    fun onSortChanged(attribute: Attribute<*, *, *>, newSortOrder: BLTSortOrder) {
+        resetPreviousSortedAttribute(newAttribute = attribute)
+
+        lastSortedAttribute = attribute
+        attributeSort[attribute] = newSortOrder
+
+        isSorting = newSortOrder.isSorting
+        sort = newSortOrder.sortAttribute(attribute)
+
+        scheduler.scheduleTask { initialDataLoading() }
+    }
+
+    /**
+     * TODO: Add description
+     * @param newAttribute TODO: Add description
+     */
+    private fun resetPreviousSortedAttribute(newAttribute: Attribute<*,*,*>) {
+        if (lastSortedAttribute != null && lastSortedAttribute != newAttribute) {
+            attributeSort[lastSortedAttribute!!] = BLTSortOrder.None
+        }
+    }
+
+    /**
+     * TODO: Add description
+     * @param attribute TODO: Add description
+     * @param newFilter TODO: Add description
+     */
+    fun onFiltersChanged(attribute: Attribute<*, *, *>, newFilter: String) {
+        attributeFilter[attribute] = newFilter
+
+        if (newFilter == "") filteredAttributes.remove(attribute)
+        else filteredAttributes.add(attribute)
+
+        filters = filteredAttributes.map { a ->
+            Filter(
+                filter = attributeFilter[a] ?: "",
+                dbField = a.databaseField as Column<String>,
+                caseSensitive = false
+            )
+        }
+
+        isFiltering = filters.isNotEmpty()
+        if (isFiltering) {
+            filterScheduler.scheduleTask {
+                filteredCount = pagingService.getFilteredCount(filters = filters)
+                totalPages = PageUtils.getTotalPages(totalCount = filteredCount, pageSize = pageSize)
+                appState.filteredTableModelList = ArrayList(Collections.nCopies(filteredCount, null))
+
+                initialDataLoading()
+            }
+        } else {
+            totalPages = PageUtils.getTotalPages(totalCount = totalCount, pageSize = pageSize)
         }
     }
 
