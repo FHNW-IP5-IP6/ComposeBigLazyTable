@@ -6,11 +6,12 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FormatSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -32,6 +33,7 @@ fun FilterTextField(
     } else FilterDisabledTextField()
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FilterEnabledTextField(
     attribute: Attribute<*, *, *>,
@@ -81,6 +83,7 @@ fun FilterEnabledTextField(
             value = controller.displayedFilterStrings[attribute].toString(),
             onValueChange = { newValue ->
                 when (attribute) {
+                    // TODO: Add missing Attributes
                     is IntegerAttribute -> {
                         val allowedNonNumberChars = listOf('=', '!', '>', '<', '[', ',', ']')
                         val newRestrictedValue = newValue.filter { it.isDigit() || allowedNonNumberChars.contains(it) }
@@ -383,7 +386,11 @@ fun FilterEnabledTextField(
             singleLine = true,
             leadingIcon = {
                 if (attribute is StringAttribute) {
+                    val showTooltip = remember { mutableStateOf(false) }
                     IconButton(
+                        modifier = Modifier
+                            .onPointerEvent(PointerEventType.Enter) { showTooltip.value = true }
+                            .onPointerEvent(PointerEventType.Exit) { showTooltip.value = false },
                         enabled = controller.attributeFilterNew[attribute] != null,
                         onClick = {
                             controller.attributeCaseSensitive[attribute] =
@@ -403,6 +410,10 @@ fun FilterEnabledTextField(
                             contentDescription = "Case Sensitive Filtering",
                             tint = if (controller.attributeCaseSensitive[attribute] == true) Color.White else Color.Gray
                         )
+                        Tooltip(showTooltip) {
+                            // Tooltip content goes here.
+                            Text("Tooltip Text!!")
+                        }
                     }
                 }
             },

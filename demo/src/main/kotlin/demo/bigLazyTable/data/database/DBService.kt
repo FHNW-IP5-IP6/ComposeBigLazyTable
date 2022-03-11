@@ -4,8 +4,10 @@ import bigLazyTable.paging.*
 import demo.bigLazyTable.data.database.FilterUtil.caseSensitiveLike
 import demo.bigLazyTable.data.database.FilterUtil.filterEquals
 import demo.bigLazyTable.data.database.FilterUtil.selectWithAllFilters
+import demo.bigLazyTable.model.AppState
 import demo.bigLazyTable.model.Playlist
 import demo.bigLazyTable.model.PlaylistDto
+import demo.bigLazyTable.model.PlaylistModel
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -79,7 +81,7 @@ object DBService : IPagingService<Playlist> {
 
     override fun getTotalCount(): Int = transaction {
         println("getTotalCount is called")
-        DatabasePlaylists.selectAll().count().toInt()
+        DatabasePlaylists.slice(DatabasePlaylists.id, DatabasePlaylists.collaborative, DatabasePlaylists.name/*, usw... */).selectAll().count().toInt()
     }
 
     override fun getFilteredCount(filters: List<Filter>): Int {

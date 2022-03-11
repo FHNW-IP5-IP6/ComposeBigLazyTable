@@ -7,8 +7,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -42,6 +45,11 @@ fun LazyTable(
                 verticalLazyListState.scrollToItem(0)
             }
 
+            var loading = remember { mutableStateOf(false) }
+            if (loading.value) {
+                // TODO: Center & make scrollbar visible
+                CircularProgressIndicator()
+            }
             LazyColumn(
                 modifier = Modifier.padding(end = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -50,16 +58,19 @@ fun LazyTable(
                 val lazyListItems = if (isFiltering) appState.filteredList else appState.lazyModelList
                 items(items = lazyListItems) { playlistModel ->
                     when (playlistModel) {
-                        null -> PlaylistRowPlaceholder(
+                        null -> loading.value = true/*PlaylistRowPlaceholder(
                             horizontalScrollState = horizontalScrollState,
                             appState = appState
-                        )
-                        else -> PlaylistRow(
-                            controller = controller,
-                            playlistModel = playlistModel,
-                            horizontalScrollState = horizontalScrollState,
-                            appState = appState
-                        )
+                        )*/
+                        else -> {
+                            loading.value = false
+                            PlaylistRow(
+                                controller = controller,
+                                playlistModel = playlistModel,
+                                horizontalScrollState = horizontalScrollState,
+                                appState = appState
+                            )
+                        }
                     }
                 }
             }
