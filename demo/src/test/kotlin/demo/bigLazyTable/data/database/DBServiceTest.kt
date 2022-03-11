@@ -1,12 +1,12 @@
 package demo.bigLazyTable.data.database
 
-import bigLazyTable.paging.Filter
-import bigLazyTable.paging.StringFilter
+import bigLazyTable.paging.*
 import demo.bigLazyTable.model.Playlist
 import demo.bigLazyTable.utils.printTestMethodName
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -42,6 +42,7 @@ internal class DBServiceTest {
             "org.sqlite.JDBC"
         )
         TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
+        println("total count ${dbService.getTotalCount()}")
     }
 
     private fun printFixedTestValues() = Log.info {
@@ -403,22 +404,6 @@ internal class DBServiceTest {
         Log.info { "Has thrown Exception!" }
     }
 
-    // TODO: Implement indexOf method first!
-//    @Test
-//    fun `indexOf with valid id returns correct index`() {
-//        printTestMethodName(object {}.javaClass.enclosingMethod.name)
-//
-//        // given
-//        val correctIndex = -1
-//
-//        // when
-//        val randomItemIndex = dbService.indexOf(startIndexRandom.toLong())
-//
-//        // then
-//        assertEquals(correctIndex, randomItemIndex)
-//        Log.info { "index $correctIndex == randomItemIndexForTest $randomItemIndex" }
-//    }
-
     @Test
     fun `indexOf with invalid id returns Exception`() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
@@ -432,6 +417,224 @@ internal class DBServiceTest {
             Log.info { "Has not thrown Exception!" }
         }
         Log.info { "Has thrown Exception!" }
+    }
+
+    @Test
+    fun `greater filter works`() {
+        // given
+        val filter = IntFilter(1, DatabasePlaylists.num_edits, NumberFilterType.GREATER_EQUALS)
+
+        // when
+        page = dbService.getPage(
+            startIndex,
+            pageSize,
+            filters = listOf(filter),
+            sort = Sort(DatabasePlaylists.num_edits, SortOrder.ASC)
+        )
+
+        // then
+        assertTrue(page.isNotEmpty())
+        assertEquals(1, page.first())
+        assertEquals(1, page.last())
+    }
+
+    @Test
+    fun `greater equals filter works`() {
+        // given
+        val filter = IntFilter(1, DatabasePlaylists.num_edits, NumberFilterType.GREATER)
+
+        // when
+        page = dbService.getPage(
+            startIndex,
+            pageSize,
+            filters = listOf(filter),
+            sort = Sort(DatabasePlaylists.num_edits, SortOrder.ASC)
+        )
+
+        // then
+        assertTrue(page.isNotEmpty())
+        assertEquals(1, page.first())
+        assertEquals(1, page.last())
+    }
+
+    @Test
+    fun `less filter works`() {
+        // given
+        val filter = IntFilter(1, DatabasePlaylists.num_edits, NumberFilterType.LESS)
+
+        // when
+        page = dbService.getPage(
+            startIndex,
+            pageSize,
+            filters = listOf(filter),
+            sort = Sort(DatabasePlaylists.num_edits, SortOrder.ASC)
+        )
+
+        // then
+        assertTrue(page.isNotEmpty())
+        assertEquals(1, page.first())
+        assertEquals(1, page.last())
+    }
+
+    @Test
+    fun `less equals filter works`() {
+        // given
+        val filter = IntFilter(1, DatabasePlaylists.num_edits, NumberFilterType.LESS_EQUALS)
+
+        // when
+        page = dbService.getPage(
+            startIndex,
+            pageSize,
+            filters = listOf(filter),
+            sort = Sort(DatabasePlaylists.num_edits, SortOrder.ASC)
+        )
+
+        // then
+        assertTrue(page.isNotEmpty())
+        assertEquals(1, page.first())
+        assertEquals(1, page.last())
+    }
+
+    @Test
+    fun `equals filter works`() {
+        // given
+        val filter = IntFilter(6, DatabasePlaylists.num_edits, NumberFilterType.EQUALS)
+
+        // when
+        page = dbService.getPage(
+            startIndex,
+            pageSize,
+            filters = listOf(filter),
+            sort = Sort(DatabasePlaylists.num_edits, SortOrder.ASC)
+        )
+
+        // then
+        assertTrue(page.isNotEmpty())
+        assertEquals(1, page.first())
+        assertEquals(1, page.last())
+    }
+
+    @Test
+    fun `not equals filter works`() {
+        // given
+        val filter = IntFilter(1, DatabasePlaylists.num_edits, NumberFilterType.NOT_EQUALS)
+
+        // when
+        page = dbService.getPage(
+            startIndex,
+            pageSize,
+            filters = listOf(filter),
+            sort = Sort(DatabasePlaylists.num_edits, SortOrder.ASC)
+        )
+
+        // then
+        assertTrue(page.isNotEmpty())
+        assertEquals(1, page.first())
+        assertEquals(1, page.last())
+    }
+
+    @Test
+    fun `between both included filter works`() {
+        // given
+        val fromFilter = IntFilter(1, DatabasePlaylists.num_edits)
+        val toFilter = IntFilter(10, DatabasePlaylists.num_edits)
+        val filter = IntFilter(
+            6,
+            DatabasePlaylists.num_edits,
+            NumberFilterType.BETWEEN_BOTH_INCLUDED,
+            between = Between(fromFilter, toFilter)
+        )
+
+        // when
+        page = dbService.getPage(
+            startIndex,
+            pageSize,
+            filters = listOf(filter),
+            sort = Sort(DatabasePlaylists.num_edits, SortOrder.ASC)
+        )
+
+        // then
+        assertTrue(page.isNotEmpty())
+        assertEquals(1, page.first())
+        assertEquals(1, page.last())
+    }
+
+    @Test
+    fun `between both not included filter works`() {
+        // given
+        val fromFilter = IntFilter(1, DatabasePlaylists.num_edits)
+        val toFilter = IntFilter(10, DatabasePlaylists.num_edits)
+        val filter = IntFilter(
+            6,
+            DatabasePlaylists.num_edits,
+            NumberFilterType.BETWEEN_BOTH_NOT_INCLUDED,
+            between = Between(fromFilter, toFilter)
+        )
+
+        // when
+        page = dbService.getPage(
+            startIndex,
+            pageSize,
+            filters = listOf(filter),
+            sort = Sort(DatabasePlaylists.num_edits, SortOrder.ASC)
+        )
+
+        // then
+        assertTrue(page.isNotEmpty())
+        assertEquals(1, page.first())
+        assertEquals(1, page.last())
+    }
+
+    @Test
+    fun `between from included filter works`() {
+        // given
+        val fromFilter = IntFilter(1, DatabasePlaylists.num_edits)
+        val toFilter = IntFilter(10, DatabasePlaylists.num_edits)
+        val filter = IntFilter(
+            6,
+            DatabasePlaylists.num_edits,
+            NumberFilterType.BETWEEN_FROM_INCLUDED,
+            between = Between(fromFilter, toFilter)
+        )
+
+        // when
+        page = dbService.getPage(
+            startIndex,
+            pageSize,
+            filters = listOf(filter),
+            sort = Sort(DatabasePlaylists.num_edits, SortOrder.ASC)
+        )
+
+        // then
+        assertTrue(page.isNotEmpty())
+        assertEquals(1, page.first())
+        assertEquals(1, page.last())
+    }
+
+    @Test
+    fun `between to included filter works`() {
+        // given
+        val fromFilter = IntFilter(1, DatabasePlaylists.num_edits)
+        val toFilter = IntFilter(10, DatabasePlaylists.num_edits)
+        val filter = IntFilter(
+            6,
+            DatabasePlaylists.num_edits,
+            NumberFilterType.BETWEEN_TO_INCLUDED,
+            between = Between(fromFilter, toFilter)
+        )
+
+        // when
+        page = dbService.getPage(
+            startIndex,
+            pageSize,
+            filters = listOf(filter),
+            sort = Sort(DatabasePlaylists.num_edits, SortOrder.ASC)
+        )
+
+        // then
+        assertTrue(page.isNotEmpty())
+        assertEquals(1, page.first())
+        assertEquals(1, page.last())
     }
 
 }
