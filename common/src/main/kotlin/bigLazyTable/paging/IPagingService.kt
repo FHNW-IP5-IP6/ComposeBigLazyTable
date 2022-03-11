@@ -14,7 +14,7 @@ data class Sort(
  */
 interface IPagingService<T> {
 
-    fun getPage(startIndex: Int, pageSize: Int, filters: List<Filter>, sort: Sort? = null): List<T>
+    fun getPage(startIndex: Int, pageSize: Int, filters: List<Filter> = emptyList(), sort: Sort? = null): List<T>
 
     fun getFilteredCount(filters: List<Filter>): Int
 

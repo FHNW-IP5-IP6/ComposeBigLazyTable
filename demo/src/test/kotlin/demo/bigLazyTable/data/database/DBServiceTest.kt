@@ -1,5 +1,7 @@
 package demo.bigLazyTable.data.database
 
+import bigLazyTable.paging.Filter
+import bigLazyTable.paging.StringFilter
 import demo.bigLazyTable.model.Playlist
 import demo.bigLazyTable.utils.printTestMethodName
 import kotlinx.coroutines.runBlocking
@@ -11,10 +13,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import java.sql.Connection
 import java.util.NoSuchElementException
-/*
+
 private val Log = KotlinLogging.logger {}
 
-@Disabled
 internal class DBServiceTest {
 
     private lateinit var dbService: DBService
@@ -248,10 +249,12 @@ internal class DBServiceTest {
 
             // then
             for (i in filters.indices) {
+                val stringFilters = listOf(StringFilter(filters[i], DatabasePlaylists.name, caseSensitive = false))
+
                 Log.info { "With filter$i=${filters[i]}" }
 
-                val filteredCount = dbService.getFilteredCount(filters[i])
-                page = dbService.getPage(startIndex, filteredCount, filters[i])
+                val filteredCount = dbService.getFilteredCount(stringFilters)
+                page = dbService.getPage(startIndex, filteredCount, stringFilters)
                 assertEquals(filteredCount, page.size)
 
                 if (filteredCount != 0) {
@@ -278,10 +281,12 @@ internal class DBServiceTest {
 
             // then
             for (i in filters.indices) {
+                val stringFilters = listOf(StringFilter(filters[i], DatabasePlaylists.name, caseSensitive = true))
+
                 Log.info { "With filter$i=${filters[i]}" }
 
-                val filteredCount = dbService.getFilteredCount(filters[i], caseSensitive = true)
-                page = dbService.getPage(startIndex, filteredCount, filters[i], caseSensitive = true)
+                val filteredCount = dbService.getFilteredCount(stringFilters)
+                page = dbService.getPage(startIndex, filteredCount, stringFilters)
                 assertEquals(filteredCount, page.size)
 
                 if (filteredCount != 0) {
@@ -308,10 +313,12 @@ internal class DBServiceTest {
 
             // then
             for (i in filters.indices) {
+                val stringFilters = listOf(StringFilter(filters[i], DatabasePlaylists.name, caseSensitive = true))
+
                 Log.info { "With filter$i=${filters[i]}" }
 
-                val filteredCount = dbService.getFilteredCount(filters[i])
-                page = dbService.getPage(startIndex, filteredCount, filters[i])
+                val filteredCount = dbService.getFilteredCount(stringFilters)
+                page = dbService.getPage(startIndex, filteredCount, stringFilters)
 
                 assertEquals(filteredCount, page.size)
 
@@ -323,20 +330,20 @@ internal class DBServiceTest {
     }
 
     @Test
-    fun `getFilteredCount throws IllegalArgumentException on empty string`() {
+    fun `getFilteredCount throws IllegalArgumentException on empty stringFilter list`() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
         printFixedTestValues()
 
         runBlocking {
             // when
-            val filter = ""
+            val stringFilters = emptyList<Filter>()
 
             // then
-            Log.info { "With filter=$filter(empty string)" }
+            Log.info { "With filter=empty filter" }
 
             assertThrows<IllegalArgumentException> {
                 // when
-                dbService.getFilteredCount(filter)
+                dbService.getFilteredCount(stringFilters)
                 Log.info { "Has not thrown Exception!" }
             }
             Log.info { "Has thrown Exception!" }
@@ -428,4 +435,3 @@ internal class DBServiceTest {
     }
 
 }
- */
