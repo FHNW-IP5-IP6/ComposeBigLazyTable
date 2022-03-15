@@ -1,8 +1,6 @@
 package demo.bigLazyTable.ui.table.header
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -37,11 +35,9 @@ fun FilterEnabledTextField(
     attribute: Attribute<*, *, *>,
     controller: LazyTableController
 ) {
-    if (attribute is BooleanAttribute) {
-        val toggleState = remember { mutableStateOf(ToggleableState.Indeterminate) }
-        Row(
-            horizontalArrangement = Arrangement.Center
-        ) {
+    when (attribute) {
+        is BooleanAttribute -> {
+            val toggleState = remember { mutableStateOf(ToggleableState.Indeterminate) }
             TriStateCheckbox(
                 state = toggleState.value,
                 onClick = {
@@ -76,23 +72,85 @@ fun FilterEnabledTextField(
                 }
             )
         }
-    } else {
-        TextField(
-            modifier = Modifier.width(attribute.tableColumnWidth),
-            value = controller.displayedFilterStrings[attribute].toString(),
-            onValueChange = { newValue ->
-                when (attribute) {
-                    is NumberAttribute -> {
-                        try {
-                            val allowedNonNumberChars = listOf('=', '!', '>', '<', '[', ',', ']')
-                            val newRestrictedValue =
-                                newValue.filter { it.isDigit() || allowedNonNumberChars.contains(it) }
-                            controller.displayedFilterStrings[attribute] = newRestrictedValue
-                            println("newNumberValue: $newRestrictedValue")
-                            if (newRestrictedValue.length > 1) {
-                                when (newRestrictedValue[0]) {
-                                    '!' -> {
-                                        if (newRestrictedValue[1] == '=') {
+        is StringAttribute -> {
+            TextField(
+                modifier = Modifier.width(attribute.tableColumnWidth),
+                value = controller.displayedFilterStrings[attribute].toString(),
+                onValueChange = { newValue ->
+                    controller.displayedFilterStrings[attribute] = newValue
+                    controller.attributeFilterNew[attribute] = StringFilter(
+                        filter = newValue,
+                        dbField = attribute.databaseField as Column<String>,
+                        // Case sensitive is not set again after first time! -> Workaround is that we create a new
+                        // StringFilter everytime CaseSensitive icon is clicked [see below]
+                        caseSensitive = controller.attributeCaseSensitive[attribute]!!
+                    )
+                    controller.onFilterChanged()
+                },
+                textStyle = TextStyle(color = Color.White),
+                // TODO: Hardcoded strings oke oder .properties file oder sonst was?
+                label = { Text("Filter", color = Color.White) },
+                singleLine = true,
+                leadingIcon  = { LeadingIcon(controller = controller, attribute = attribute) },
+                trailingIcon = { TrailingIcon(controller = controller, attribute = attribute) }
+            )
+        }
+        is NumberAttribute -> {
+            TextField(
+                modifier = Modifier.width(attribute.tableColumnWidth),
+                value = controller.displayedFilterStrings[attribute].toString(),
+                onValueChange = { newValue ->
+                    try {
+                        val allowedNonNumberChars = listOf('=', '!', '>', '<', '[', ',', ']')
+                        val newRestrictedValue =
+                            newValue.filter { it.isDigit() || allowedNonNumberChars.contains(it) }
+                        controller.displayedFilterStrings[attribute] = newRestrictedValue
+                        println("newNumberValue: $newRestrictedValue")
+                        if (newRestrictedValue.length > 1) {
+                            when (newRestrictedValue[0]) {
+                                '!' -> {
+                                    if (newRestrictedValue[1] == '=') {
+                                        if (newRestrictedValue.length > 2) {
+                                            val value = newRestrictedValue.substring(2).trim()
+                                            if (value != "") {
+                                                createFilter(
+                                                    controller = controller,
+                                                    attribute = attribute,
+                                                    value = value,
+                                                    filterType = NumberFilterType.NOT_EQUALS
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                                '=' -> {
+                                    if (newRestrictedValue[1] == '!') {
+                                        if (newRestrictedValue.length > 2) {
+                                            val value = newRestrictedValue.substring(2).trim()
+                                            if (value != "") {
+                                                createFilter(
+                                                    controller = controller,
+                                                    attribute = attribute,
+                                                    value = value,
+                                                    filterType = NumberFilterType.NOT_EQUALS
+                                                )
+                                            }
+                                        }
+                                    } else if (newRestrictedValue[1].isDigit()) {
+                                        val value = newRestrictedValue.substring(1).trim()
+                                        if (value != "") {
+                                            createFilter(
+                                                controller = controller,
+                                                attribute = attribute,
+                                                value = value,
+                                                filterType = NumberFilterType.EQUALS
+                                            )
+                                        }
+                                    }
+                                }
+                                '>' -> {
+                                    when {
+                                        newRestrictedValue[1] == '=' -> {
                                             if (newRestrictedValue.length > 2) {
                                                 val value = newRestrictedValue.substring(2).trim()
                                                 if (value != "") {
@@ -100,236 +158,192 @@ fun FilterEnabledTextField(
                                                         controller = controller,
                                                         attribute = attribute,
                                                         value = value,
-                                                        filterType = NumberFilterType.NOT_EQUALS
+                                                        filterType = NumberFilterType.GREATER_EQUALS
                                                     )
                                                 }
                                             }
                                         }
-                                    }
-                                    '=' -> {
-                                        if (newRestrictedValue[1] == '!') {
-                                            if (newRestrictedValue.length > 2) {
-                                                val value = newRestrictedValue.substring(2).trim()
-                                                if (value != "") {
-                                                    createFilter(
-                                                        controller = controller,
-                                                        attribute = attribute,
-                                                        value = value,
-                                                        filterType = NumberFilterType.NOT_EQUALS
-                                                    )
-                                                }
-                                            }
-                                        } else if (newRestrictedValue[1].isDigit()) {
+                                        newRestrictedValue[1].isDigit() -> {
                                             val value = newRestrictedValue.substring(1).trim()
                                             if (value != "") {
                                                 createFilter(
                                                     controller = controller,
                                                     attribute = attribute,
                                                     value = value,
-                                                    filterType = NumberFilterType.EQUALS
+                                                    filterType = NumberFilterType.GREATER
                                                 )
                                             }
                                         }
                                     }
-                                    '>' -> {
-                                        when {
-                                            newRestrictedValue[1] == '=' -> {
-                                                if (newRestrictedValue.length > 2) {
-                                                    val value = newRestrictedValue.substring(2).trim()
-                                                    if (value != "") {
-                                                        createFilter(
-                                                            controller = controller,
-                                                            attribute = attribute,
-                                                            value = value,
-                                                            filterType = NumberFilterType.GREATER_EQUALS
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                            newRestrictedValue[1].isDigit() -> {
-                                                val value = newRestrictedValue.substring(1).trim()
+                                }
+                                '<' -> {
+                                    when {
+                                        newRestrictedValue[1] == '=' -> {
+                                            if (newRestrictedValue.length > 2) {
+                                                val value = newRestrictedValue.substring(2).trim()
                                                 if (value != "") {
                                                     createFilter(
                                                         controller = controller,
                                                         attribute = attribute,
                                                         value = value,
-                                                        filterType = NumberFilterType.GREATER
+                                                        filterType = NumberFilterType.LESS_EQUALS
                                                     )
                                                 }
                                             }
                                         }
-                                    }
-                                    '<' -> {
-                                        when {
-                                            newRestrictedValue[1] == '=' -> {
-                                                if (newRestrictedValue.length > 2) {
-                                                    val value = newRestrictedValue.substring(2).trim()
-                                                    if (value != "") {
-                                                        createFilter(
-                                                            controller = controller,
-                                                            attribute = attribute,
-                                                            value = value,
-                                                            filterType = NumberFilterType.LESS_EQUALS
-                                                        )
-                                                    }
-                                                }
+                                        newRestrictedValue[1].isDigit() -> {
+                                            val value = newRestrictedValue.substring(1).trim()
+                                            if (value != "") {
+                                                createFilter(
+                                                    controller = controller,
+                                                    attribute = attribute,
+                                                    value = value,
+                                                    filterType = NumberFilterType.LESS
+                                                )
                                             }
-                                            newRestrictedValue[1].isDigit() -> {
-                                                val value = newRestrictedValue.substring(1).trim()
-                                                if (value != "") {
+                                        }
+                                    }
+                                }
+                                '[' -> {
+                                    val lastChar = newRestrictedValue.trim().last()
+                                    if (newRestrictedValue.contains(',') && ((lastChar == ']') || lastChar == '[')) {
+                                        val from =
+                                            newRestrictedValue.substringAfter('[').substringBefore(',').trim()
+                                        if (from.isNotBlank()) {
+                                            println("from $from")
+
+                                            val to =
+                                                newRestrictedValue.substringAfter(',').substringBefore(lastChar)
+                                                    .trim()
+                                            if (to.isNotBlank()) {
+                                                println("to $to")
+                                                if (lastChar == ']') {
                                                     createFilter(
                                                         controller = controller,
                                                         attribute = attribute,
-                                                        value = value,
-                                                        filterType = NumberFilterType.LESS
+                                                        value = "",
+                                                        filterType = NumberFilterType.BETWEEN_BOTH_INCLUDED,
+                                                        isBetween = true,
+                                                        from = from,
+                                                        to = to
+                                                    )
+                                                } else {
+                                                    createFilter(
+                                                        controller = controller,
+                                                        attribute = attribute,
+                                                        value = "",
+                                                        filterType = NumberFilterType.BETWEEN_FROM_INCLUDED,
+                                                        isBetween = true,
+                                                        from = from,
+                                                        to = to
                                                     )
                                                 }
                                             }
                                         }
                                     }
-                                    '[' -> {
-                                        val lastChar = newRestrictedValue.trim().last()
-                                        if (newRestrictedValue.contains(',') && ((lastChar == ']') || lastChar == '[')) {
-                                            val from =
-                                                newRestrictedValue.substringAfter('[').substringBefore(',').trim()
-                                            if (from.isNotBlank()) {
-                                                println("from $from")
+                                }
+                                ']' -> {
+                                    val lastChar = newRestrictedValue.trim().last()
+                                    if (newRestrictedValue.contains(',') && ((lastChar == ']') || lastChar == '[')) {
+                                        val from =
+                                            newRestrictedValue.substringAfter(']').substringBefore(',').trim()
+                                        if (from.isNotBlank()) {
+                                            println("from $from")
 
-                                                val to =
-                                                    newRestrictedValue.substringAfter(',').substringBefore(lastChar)
-                                                        .trim()
-                                                if (to.isNotBlank()) {
-                                                    println("to $to")
-                                                    if (lastChar == ']') {
-                                                        createFilter(
-                                                            controller = controller,
-                                                            attribute = attribute,
-                                                            value = "",
-                                                            filterType = NumberFilterType.BETWEEN_BOTH_INCLUDED,
-                                                            isBetween = true,
-                                                            from = from,
-                                                            to = to
-                                                        )
-                                                    } else {
-                                                        createFilter(
-                                                            controller = controller,
-                                                            attribute = attribute,
-                                                            value = "",
-                                                            filterType = NumberFilterType.BETWEEN_FROM_INCLUDED,
-                                                            isBetween = true,
-                                                            from = from,
-                                                            to = to
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    ']' -> {
-                                        val lastChar = newRestrictedValue.trim().last()
-                                        if (newRestrictedValue.contains(',') && ((lastChar == ']') || lastChar == '[')) {
-                                            val from =
-                                                newRestrictedValue.substringAfter(']').substringBefore(',').trim()
-                                            if (from.isNotBlank()) {
-                                                println("from $from")
-
-                                                val to =
-                                                    newRestrictedValue.substringAfter(',').substringBefore(lastChar)
-                                                        .trim()
-                                                if (to.isNotBlank()) {
-                                                    println("to $to")
-                                                    if (lastChar == ']') {
-                                                        createFilter(
-                                                            controller = controller,
-                                                            attribute = attribute,
-                                                            value = "",
-                                                            filterType = NumberFilterType.BETWEEN_TO_INCLUDED,
-                                                            isBetween = true,
-                                                            from = from,
-                                                            to = to
-                                                        )
-                                                    } else {
-                                                        createFilter(
-                                                            controller = controller,
-                                                            attribute = attribute,
-                                                            value = "",
-                                                            filterType = NumberFilterType.BETWEEN_BOTH_NOT_INCLUDED,
-                                                            isBetween = true,
-                                                            from = from,
-                                                            to = to
-                                                        )
-                                                    }
+                                            val to =
+                                                newRestrictedValue.substringAfter(',').substringBefore(lastChar)
+                                                    .trim()
+                                            if (to.isNotBlank()) {
+                                                println("to $to")
+                                                if (lastChar == ']') {
+                                                    createFilter(
+                                                        controller = controller,
+                                                        attribute = attribute,
+                                                        value = "",
+                                                        filterType = NumberFilterType.BETWEEN_TO_INCLUDED,
+                                                        isBetween = true,
+                                                        from = from,
+                                                        to = to
+                                                    )
+                                                } else {
+                                                    createFilter(
+                                                        controller = controller,
+                                                        attribute = attribute,
+                                                        value = "",
+                                                        filterType = NumberFilterType.BETWEEN_BOTH_NOT_INCLUDED,
+                                                        isBetween = true,
+                                                        from = from,
+                                                        to = to
+                                                    )
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
-                        } catch (e: Exception) {
-                            // TODO: Give User hint what went wrong & how to do it right
-                            // for now we just ignore any occurring exception
                         }
+                    } catch (e: Exception) {
+                        // TODO: Give User hint what went wrong & how to do it right
+                        // for now we just ignore any occurring exception
                     }
-                    else -> {
-                        controller.displayedFilterStrings[attribute] = newValue
-                        controller.attributeFilterNew[attribute] = StringFilter(
-                            filter = newValue,
-                            dbField = attribute.databaseField as Column<String>,
-                            // Case sensitive is not set again after first time! -> Workaround is that we create a new
-                            // StringFilter everytime CaseSensitive icon is clicked [see below]
-                            caseSensitive = controller.attributeCaseSensitive[attribute]!!
-                        )
-                        controller.onFilterChanged()
-                    }
-                }
-            },
-            textStyle = TextStyle(color = Color.White),
-            // TODO: Hardcoded strings oke oder .properties file oder sonst was?
-            label = { Text("Filter", color = Color.White) },
-            singleLine = true,
-            leadingIcon = {
-                if (attribute is StringAttribute) {
-                    IconButton(
-                        enabled = controller.attributeFilterNew[attribute] != null,
-                        onClick = {
-                            controller.attributeCaseSensitive[attribute] =
-                                !controller.attributeCaseSensitive[attribute]!!
+                },
+                textStyle = TextStyle(color = Color.White),
+                // TODO: Hardcoded strings oke oder .properties file oder sonst was?
+                label = { Text("Filter", color = Color.White) },
+                singleLine = true,
+                trailingIcon = { TrailingIcon(controller = controller, attribute = attribute) }
+            )
+        }
+    }
+}
 
-                            // Here we create a new StringFilter that caseSensitive changes are reflected
-                            controller.attributeFilterNew[attribute] = StringFilter(
-                                filter = controller.displayedFilterStrings[attribute]!!,
-                                dbField = attribute.databaseField as Column<String>,
-                                caseSensitive = controller.attributeCaseSensitive[attribute]!!
-                            )
-                            controller.onFilterChanged()
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.FormatSize,
-                            contentDescription = "Case Sensitive Filtering",
-                            tint = if (controller.attributeCaseSensitive[attribute] == true) Color.White else Color.Gray
-                        )
-                    }
-                }
-            },
-            trailingIcon = {
-                if (controller.displayedFilterStrings[attribute].toString().isNotEmpty()) {
-                    IconButton(
-                        onClick = {
-                            controller.displayedFilterStrings[attribute] = ""
-                            controller.attributeFilterNew[attribute] = null
-                            controller.onFilterChanged()
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Close,
-                            contentDescription = "Clear Filter",
-                            tint = Color.White
-                        )
-                    }
-                }
-            }
+@Composable
+fun LeadingIcon(
+    controller: LazyTableController,
+    attribute: Attribute<*, *, *>
+) {
+    IconButton(
+        enabled = controller.attributeFilterNew[attribute] != null,
+        onClick = {
+            controller.attributeCaseSensitive[attribute] =
+                !controller.attributeCaseSensitive[attribute]!!
+
+            // Here we create a new StringFilter that caseSensitive changes are reflected
+            controller.attributeFilterNew[attribute] = StringFilter(
+                filter = controller.displayedFilterStrings[attribute]!!,
+                dbField = attribute.databaseField as Column<String>,
+                caseSensitive = controller.attributeCaseSensitive[attribute]!!
+            )
+            controller.onFilterChanged()
+        }
+    ) {
+        Icon(
+            imageVector = Icons.Filled.FormatSize,
+            contentDescription = "Case Sensitive Filtering",
+            tint = if (controller.attributeCaseSensitive[attribute] == true) Color.White else Color.Gray
         )
+    }
+}
+
+@Composable
+fun TrailingIcon(
+    controller: LazyTableController,
+    attribute: Attribute<*, *, *>
+) {
+    if (controller.displayedFilterStrings[attribute].toString().isNotEmpty()) {
+        IconButton(
+            onClick = {
+                controller.displayedFilterStrings[attribute] = ""
+                controller.attributeFilterNew[attribute] = null
+                controller.onFilterChanged()
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Close,
+                contentDescription = "Clear Filter",
+                tint = Color.White
+            )
+        }
     }
 }
 
