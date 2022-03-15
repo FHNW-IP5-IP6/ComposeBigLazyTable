@@ -175,9 +175,10 @@ class ComposeFormsPersonModel : BaseModel<ComposeFormsPersonLabels>(title = Comp
                             value = Random().nextInt(20), readOnly = true)
 
     val age             = LongAttribute(this, ComposeFormsPersonLabels.AGE,
-                            observedAttributes = listOf(
-                                birthDate addOnChangeListener { ageAttr, birthDateVal -> ageAttr.setValueAsText(updateBirthDate(birthDateVal)) }
-                            ))
+        observedAttributes = listOf(
+            birthDate addOnChangeListener { ageAttr, birthDateVal -> ageAttr.setValueAsText(updateBirthDate(birthDateVal)) }
+        ),
+        tableColumnWidth = 150.dp)
 
 
     //*****************************************************************************************************************

@@ -22,6 +22,7 @@
 
 package composeForms.model.attributes
 
+import androidx.compose.ui.unit.Dp
 import composeForms.convertibles.CustomConvertible
 import composeForms.model.ILabel
 import composeForms.model.IModel
@@ -29,6 +30,7 @@ import composeForms.model.formatter.IFormatter
 import composeForms.model.meanings.Default
 import composeForms.model.meanings.SemanticMeaning
 import composeForms.model.validators.semanticValidators.SemanticValidator
+import demo.bigLazyTable.ui.theme.MinTableCellWidth
 import org.jetbrains.exposed.sql.Column
 
 /**
@@ -64,21 +66,23 @@ class StringAttribute<L>(
     formatter               : IFormatter<String>?                   = null,
 
     canBeFiltered           : Boolean                               = true,
-    databaseField           : Column<String>?                       = null
+    databaseField           : Column<String>?                       = null,
+    tableColumnWidth        : Dp                                    = MinTableCellWidth
 
 ) : Attribute<StringAttribute<L>, String, L>(
-    model = model,
-    value = value,
-    label = label,
-    required = required,
-    readOnly = readOnly,
-    observedAttributes = observedAttributes,
-    validators = validators,
-    convertibles = convertibles,
-    meaning = meaning,
-    formatter = formatter,
-    canBeFiltered = canBeFiltered,
-    databaseField = databaseField
+    model               = model,
+    value               = value,
+    label               = label,
+    required            = required,
+    readOnly            = readOnly,
+    observedAttributes  = observedAttributes,
+    validators          = validators,
+    convertibles        = convertibles,
+    meaning             = meaning,
+    formatter           = formatter,
+    canBeFiltered       = canBeFiltered,
+    databaseField       = databaseField,
+    tableColumnWidth    = if (tableColumnWidth < MinTableCellWidth) MinTableCellWidth else tableColumnWidth
 ) where L: Enum<*>, L : ILabel {
 
     override val typeT: String

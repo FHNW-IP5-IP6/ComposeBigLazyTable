@@ -22,6 +22,7 @@
 
 package composeForms.model.attributes
 
+import androidx.compose.ui.unit.Dp
 import composeForms.convertibles.CustomConvertible
 import composeForms.model.ILabel
 import composeForms.model.IModel
@@ -30,6 +31,7 @@ import composeForms.model.meanings.Default
 import composeForms.model.meanings.SemanticMeaning
 import composeForms.model.validators.semanticValidators.SelectionValidator
 import composeForms.model.validators.semanticValidators.SemanticValidator
+import demo.bigLazyTable.ui.theme.MinTableCellWidth
 import org.jetbrains.exposed.sql.Column
 
 /**
@@ -70,7 +72,8 @@ class SelectionAttribute<L>(
     },
 
     canBeFiltered       : Boolean                               = true,
-    databaseField       : Column<Set<L>>?                       = null
+    databaseField       : Column<Set<L>>?                       = null,
+    tableColumnWidth    : Dp                                    = MinTableCellWidth
 
 ) : Attribute<SelectionAttribute<L>, Set<L>, L>(
     model = model,
@@ -84,7 +87,8 @@ class SelectionAttribute<L>(
     meaning = meaning,
     formatter = formatter,
     canBeFiltered = canBeFiltered,
-    databaseField = databaseField
+    databaseField = databaseField,
+    tableColumnWidth = if (tableColumnWidth < MinTableCellWidth) MinTableCellWidth else tableColumnWidth
 ) where L : ILabel, L: Enum<*> {
 
     override val typeT: Set<L>

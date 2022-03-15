@@ -23,6 +23,7 @@
 package composeForms.model.attributes
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.unit.Dp
 import composeForms.convertibles.*
 import kotlinx.coroutines.*
 import composeForms.model.ILabel
@@ -75,7 +76,8 @@ abstract class Attribute <A,T,L> (
     var formatter                           : IFormatter<T>?,
 
     var canBeFiltered                       : Boolean,
-    var databaseField                       : Column<T>?
+    var databaseField                       : Column<T>?,
+    var tableColumnWidth                    : Dp
 
 ) where A : Attribute<A, T, L>, T : Any?, L : ILabel, L: Enum<*> {
 

@@ -22,10 +22,12 @@
 
 package composeForms.model.attributes
 
+import androidx.compose.ui.unit.Dp
 import composeForms.model.ILabel
 import composeForms.model.IModel
 import composeForms.model.meanings.Default
 import composeForms.model.meanings.SemanticMeaning
+import demo.bigLazyTable.ui.theme.MinTableCellWidth
 import org.jetbrains.exposed.sql.Column
 
 /**
@@ -58,7 +60,8 @@ open class DecisionAttribute<L>(
     meaning                             : SemanticMeaning<Any>                  = Default(),
 
     canBeFiltered                       : Boolean                               = true,
-    databaseField                       : Column<Any>?                          = null
+    databaseField                       : Column<Any>?                          = null,
+    tableColumnWidth                    : Dp                                    = MinTableCellWidth
 
 ) : DualAttribute<DecisionAttribute<L>, Any, L>(
     model = model,
@@ -72,7 +75,8 @@ open class DecisionAttribute<L>(
     observedAttributes = observedAttributes,
     meaning = meaning,
     canBeFiltered = canBeFiltered,
-    databaseField = databaseField
+    databaseField = databaseField,
+    tableColumnWidth = if (tableColumnWidth < MinTableCellWidth) MinTableCellWidth else tableColumnWidth
 ) where L: Enum<*>, L : ILabel {
 
 

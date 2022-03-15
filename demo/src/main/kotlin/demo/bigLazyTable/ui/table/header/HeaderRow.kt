@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import composeForms.model.attributes.Attribute
 import composeForms.ui.theme.BackgroundColorHeader
 import demo.bigLazyTable.model.*
+import demo.bigLazyTable.ui.table.AttributeTableCell
 import demo.bigLazyTable.ui.table.TableCell
 
 @Composable
@@ -39,12 +40,18 @@ fun HeaderRow(
                     controller = controller
                 )
                 Box {
-                    TableCell(
-                        text = attribute.getLabel(),
+                    AttributeTableCell(
+                        isTitle = true,
+                        attribute = attribute,
                         color = Color.White,
-                        backgroundColor = BackgroundColorHeader,
-                        fontWeight = FontWeight.Bold
+                        backgroundColor = BackgroundColorHeader
                     )
+//                    TableCell(
+//                        text = attribute.getLabel(),
+//                        color = Color.White,
+//                        backgroundColor = BackgroundColorHeader,
+//                        fontWeight = FontWeight.Bold
+//                    )
                     SortButton(
                         modifier = Modifier.align(Alignment.CenterEnd),
                         attribute = attribute,

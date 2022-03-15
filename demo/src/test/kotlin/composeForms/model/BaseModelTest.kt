@@ -203,7 +203,7 @@ internal class BaseModelTest {
     @Test
     fun testCreateLongAttribute() {
         //when
-        val attribute = LongAttribute(model, Label.TEST, 5)
+        val attribute = LongAttribute(model, Label.TEST, 5, tableColumnWidth = 150.dp)
 
         //then
         assertEquals(5,attribute.getValue())
@@ -211,7 +211,7 @@ internal class BaseModelTest {
         assertEquals(5,attribute.getSavedValue())
 
         //when
-        val attributeDefaultVal = LongAttribute(model, label = Label.TEST)
+        val attributeDefaultVal = LongAttribute(model, label = Label.TEST, tableColumnWidth = 150.dp)
 
         //then
         assertEquals(null, attributeDefaultVal.getValue())
@@ -426,7 +426,7 @@ internal class BaseModelTest {
         assertEquals(AttributeType.INTEGER, model.getAttributeType(attr))
 
         //when
-        attr= LongAttribute(model, Label.NO_OF_CHILDREN)
+        attr= LongAttribute(model, Label.NO_OF_CHILDREN, tableColumnWidth = 150.dp)
         //then
         assertEquals(AttributeType.LONG, model.getAttributeType(attr))
 

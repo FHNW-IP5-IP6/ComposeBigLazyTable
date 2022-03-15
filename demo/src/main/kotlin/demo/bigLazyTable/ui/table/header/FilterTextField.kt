@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.dp
 import bigLazyTable.paging.*
 import composeForms.model.attributes.*
 import demo.bigLazyTable.model.LazyTableController
@@ -29,7 +28,7 @@ fun FilterTextField(
             attribute = attribute,
             controller = controller
         )
-    } else FilterDisabledTextField()
+    } else FilterDisabledTextField(attribute)
 }
 
 @Composable
@@ -77,7 +76,7 @@ fun FilterEnabledTextField(
         }
     } else {
         TextField(
-            modifier = Modifier.width(180.dp),
+            modifier = Modifier.width(attribute.tableColumnWidth),
             value = controller.displayedFilterStrings[attribute].toString(),
             onValueChange = { newValue ->
                 when (attribute) {
@@ -418,9 +417,9 @@ fun FilterEnabledTextField(
 
 // TODO: Should we write something when a field can not be filtered?
 @Composable
-fun FilterDisabledTextField() {
+fun FilterDisabledTextField(attribute: Attribute<*, *, *>) {
     TextField(
-        modifier = Modifier.width(180.dp),
+        modifier = Modifier.width(attribute.tableColumnWidth),
         value = "",
         onValueChange = {},
         textStyle = TextStyle(color = Color.White),

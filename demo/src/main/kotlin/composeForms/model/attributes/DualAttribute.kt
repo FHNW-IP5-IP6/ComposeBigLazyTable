@@ -22,12 +22,14 @@
 
 package composeForms.model.attributes
 
+import androidx.compose.ui.unit.Dp
 import composeForms.model.ILabel
 import composeForms.model.IModel
 import composeForms.model.formatter.IFormatter
 import composeForms.model.meanings.SemanticMeaning
 import composeForms.model.validators.ValidatorType
 import composeForms.model.validators.semanticValidators.CustomValidator
+import demo.bigLazyTable.ui.theme.MinTableCellWidth
 import org.jetbrains.exposed.sql.Column
 
 /**
@@ -62,7 +64,8 @@ abstract class DualAttribute<D,T,L>(
     meaning                             : SemanticMeaning<T>,
 
     canBeFiltered                       : Boolean,
-    databaseField                       : Column<T>?
+    databaseField                       : Column<T>?,
+    tableColumnWidth                    : Dp
 
 ) : Attribute<DualAttribute<D, T, L>, T, L>(
     model = model,
@@ -86,7 +89,8 @@ abstract class DualAttribute<D,T,L>(
     meaning = meaning,
     formatter = IFormatter { it.toString() },
     canBeFiltered = canBeFiltered,
-    databaseField = databaseField
+    databaseField = databaseField,
+    tableColumnWidth = if (tableColumnWidth < MinTableCellWidth) MinTableCellWidth else tableColumnWidth
 ) where D : DualAttribute<D, T, L>, L : ILabel, L: Enum<*> {
 
     init{
