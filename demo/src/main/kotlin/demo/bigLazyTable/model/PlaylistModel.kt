@@ -27,7 +27,7 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         readOnly = true,
         canBeFiltered = true,
         databaseField = DatabasePlaylists.id,
-        tableColumnWidth = 300.dp
+        tableColumnWidth = 100.dp
     )
 
     private val numEdits = IntegerAttribute(
@@ -36,7 +36,7 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         value = playlist.numEdits,
         canBeFiltered = true,
         databaseField = DatabasePlaylists.num_edits,
-        tableColumnWidth = 150.dp
+        tableColumnWidth = 200.dp
     )
 
     private val name = StringAttribute(
