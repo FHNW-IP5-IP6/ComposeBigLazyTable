@@ -31,6 +31,7 @@ object FilterUtil {
             is FloatFilter -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
             is IntFilter -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
             is LongFilter -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+            is ShortFilter -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
             is StringFilter -> filterEquals(filter)
         }
         for (i in 1 until filters.size) {
@@ -40,6 +41,7 @@ object FilterUtil {
                 is FloatFilter -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
                 is IntFilter -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
                 is LongFilter -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+                is ShortFilter -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
                 is StringFilter -> filterEquals(filter)
             }
             sql = sql and sql2
@@ -51,27 +53,28 @@ object FilterUtil {
 
     private fun chooseCorrectFilterTypeMethod(filter: Filter, filterType: NumberFilterType): Op<Boolean> {
         return when (filterType) {
-            NumberFilterType.EQUALS -> filterEquals(filter)
-            NumberFilterType.NOT_EQUALS -> filterNotEquals(filter)
+            NumberFilterType.EQUALS  -> filterEquals(filter)
+            NumberFilterType.LESS    -> filterLess(filter)
             NumberFilterType.GREATER -> filterGreater(filter)
+            NumberFilterType.NOT_EQUALS     -> filterNotEquals(filter)
+            NumberFilterType.LESS_EQUALS    -> filterLessEquals(filter)
             NumberFilterType.GREATER_EQUALS -> filterGreaterEquals(filter)
-            NumberFilterType.LESS -> filterLess(filter)
-            NumberFilterType.LESS_EQUALS -> filterLessEquals(filter)
-            NumberFilterType.BETWEEN_BOTH_INCLUDED -> filterBetweenBothIncluded(filter)
-            NumberFilterType.BETWEEN_BOTH_NOT_INCLUDED -> filterBetweenBothNotIncluded(filter)
-            NumberFilterType.BETWEEN_FROM_INCLUDED -> filterBetweenFromIncluded(filter)
-            NumberFilterType.BETWEEN_TO_INCLUDED -> filterBetweenToIncluded(filter)
+            NumberFilterType.BETWEEN_TO_INCLUDED        -> filterBetweenToIncluded(filter)
+            NumberFilterType.BETWEEN_FROM_INCLUDED      -> filterBetweenFromIncluded(filter)
+            NumberFilterType.BETWEEN_BOTH_INCLUDED      -> filterBetweenBothIncluded(filter)
+            NumberFilterType.BETWEEN_BOTH_NOT_INCLUDED  -> filterBetweenBothNotIncluded(filter)
         }
     }
 
     private fun Table.selectWithFilter(filter: Filter): Query {
         val sql: Op<Boolean> = when (filter) {
             is BooleanFilter -> filterEquals(filter)
-            is DoubleFilter -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-            is FloatFilter -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-            is IntFilter -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-            is LongFilter -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-            is StringFilter -> filterEquals(filter)
+            is DoubleFilter  -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+            is FloatFilter   -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+            is IntFilter     -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+            is LongFilter    -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+            is ShortFilter   -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+            is StringFilter  -> filterEquals(filter)
         }
         return select { sql }
     }
@@ -81,12 +84,9 @@ object FilterUtil {
         is IntFilter     -> filter.dbField eq filter.filter
         is DoubleFilter  -> filter.dbField eq filter.filter
         is FloatFilter   -> filter.dbField eq filter.filter
-        is BooleanFilter -> like(filter.dbField as Column<String>, filter.filter.toString())//filter.dbField eq filter.filter // TODO: check -> in db == true/false doesnt work yet
+        is ShortFilter   -> filter.dbField eq filter.filter
+        is BooleanFilter -> filter.dbField as Column<String> like filter.filter.toString()
         is StringFilter  -> caseSensitiveLike(filter.caseSensitive, filter.dbField, filter.filter)
-    }
-
-    fun like(dbField: Column<String>, filter: String): Op<Boolean> {
-        return dbField like filter
     }
 
     /**
@@ -96,77 +96,86 @@ object FilterUtil {
         if (caseSensitive) dbField like filter
         else dbField.lowerCase() like filter.lowercase(Locale.getDefault())
 
-    fun filterNotEquals(filter: Filter): Op<Boolean> = when (filter) {
+    private fun filterNotEquals(filter: Filter): Op<Boolean> = when (filter) {
         is LongFilter    -> filter.dbField neq filter.filter
         is IntFilter     -> filter.dbField neq filter.filter
         is DoubleFilter  -> filter.dbField neq filter.filter
         is FloatFilter   -> filter.dbField neq filter.filter
+        is ShortFilter   -> filter.dbField neq filter.filter
         is StringFilter  -> caseSensitiveLike(filter.caseSensitive, filter.dbField, filter.filter)
         else -> throw IllegalArgumentException("Only number & string filters can be called with this function, but received $filter")
     }
 
-    fun filterGreater(filter: Filter): Op<Boolean> = when (filter) {
+    private fun filterGreater(filter: Filter): Op<Boolean> = when (filter) {
         is LongFilter   -> filter.dbField greater filter.filter
         is IntFilter    -> filter.dbField greater filter.filter
         is DoubleFilter -> filter.dbField greater filter.filter
         is FloatFilter  -> filter.dbField greater filter.filter
+        is ShortFilter  -> filter.dbField greater filter.filter
         else -> throw IllegalArgumentException("Only number filters can be called with this function, but received $filter")
     }
 
-    fun filterGreaterEquals(filter: Filter): Op<Boolean> = when (filter) {
+    private fun filterGreaterEquals(filter: Filter): Op<Boolean> = when (filter) {
         is LongFilter   -> filter.dbField greaterEq filter.filter
         is IntFilter    -> filter.dbField greaterEq filter.filter
         is DoubleFilter -> filter.dbField greaterEq filter.filter
         is FloatFilter  -> filter.dbField greaterEq filter.filter
+        is ShortFilter  -> filter.dbField greaterEq filter.filter
         else -> throw IllegalArgumentException("Only number filters can be called with this function, but received $filter")
     }
 
-    fun filterLess(filter: Filter): Op<Boolean> = when (filter) {
+    private fun filterLess(filter: Filter): Op<Boolean> = when (filter) {
         is LongFilter   -> filter.dbField less filter.filter
         is IntFilter    -> filter.dbField less filter.filter
         is DoubleFilter -> filter.dbField less filter.filter
         is FloatFilter  -> filter.dbField less filter.filter
+        is ShortFilter  -> filter.dbField less filter.filter
         else -> throw IllegalArgumentException("Only number filters can be called with this function, but received $filter")
     }
 
-    fun filterLessEquals(filter: Filter): Op<Boolean> = when (filter) {
+    private fun filterLessEquals(filter: Filter): Op<Boolean> = when (filter) {
         is LongFilter   -> filter.dbField lessEq filter.filter
         is IntFilter    -> filter.dbField lessEq filter.filter
         is DoubleFilter -> filter.dbField lessEq filter.filter
         is FloatFilter  -> filter.dbField lessEq filter.filter
+        is ShortFilter  -> filter.dbField lessEq filter.filter
         else -> throw IllegalArgumentException("Only number filters can be called with this function, but received $filter")
     }
 
     // TODO: is there something like between?
-    fun filterBetweenBothIncluded(filter: Filter): Op<Boolean> = when (filter) {
+    private fun filterBetweenBothIncluded(filter: Filter): Op<Boolean> = when (filter) {
         is LongFilter   -> filterGreaterEquals(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
         is IntFilter    -> filterGreaterEquals(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
         is DoubleFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
         is FloatFilter  -> filterGreaterEquals(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
+        is ShortFilter  -> filterGreaterEquals(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
         else -> throw IllegalArgumentException("Only number filters can be called with this function, but received $filter")
     }
 
-    fun filterBetweenBothNotIncluded(filter: Filter): Op<Boolean> = when (filter) {
+    private fun filterBetweenBothNotIncluded(filter: Filter): Op<Boolean> = when (filter) {
         is LongFilter   -> filterGreater(filter.between!!.fromFilter) and filterLess(filter.between!!.toFilter)
         is IntFilter    -> filterGreater(filter.between!!.fromFilter) and filterLess(filter.between!!.toFilter)
         is DoubleFilter -> filterGreater(filter.between!!.fromFilter) and filterLess(filter.between!!.toFilter)
         is FloatFilter  -> filterGreater(filter.between!!.fromFilter) and filterLess(filter.between!!.toFilter)
+        is ShortFilter  -> filterGreater(filter.between!!.fromFilter) and filterLess(filter.between!!.toFilter)
         else -> throw IllegalArgumentException("Only number filters can be called with this function, but received $filter")
     }
 
-    fun filterBetweenFromIncluded(filter: Filter): Op<Boolean> = when (filter) {
+    private fun filterBetweenFromIncluded(filter: Filter): Op<Boolean> = when (filter) {
         is LongFilter   -> filterGreaterEquals(filter.between!!.fromFilter) and filterLess(filter.between!!.toFilter)
         is IntFilter    -> filterGreaterEquals(filter.between!!.fromFilter) and filterLess(filter.between!!.toFilter)
         is DoubleFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLess(filter.between!!.toFilter)
         is FloatFilter  -> filterGreaterEquals(filter.between!!.fromFilter) and filterLess(filter.between!!.toFilter)
+        is ShortFilter  -> filterGreaterEquals(filter.between!!.fromFilter) and filterLess(filter.between!!.toFilter)
         else -> throw IllegalArgumentException("Only number filters can be called with this function, but received $filter")
     }
 
-    fun filterBetweenToIncluded(filter: Filter): Op<Boolean> = when (filter) {
+    private fun filterBetweenToIncluded(filter: Filter): Op<Boolean> = when (filter) {
         is LongFilter   -> filterGreater(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
         is IntFilter    -> filterGreater(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
         is DoubleFilter -> filterGreater(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
         is FloatFilter  -> filterGreater(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
+        is ShortFilter  -> filterGreater(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
         else -> throw IllegalArgumentException("Only number filters can be called with this function, but received $filter")
     }
 

@@ -41,6 +41,14 @@ data class IntFilter(
     val between: Between<Int>? = null
 ) : Filter()
 
+data class ShortFilter(
+    val filter: Short,
+    val dbField: Column<Short>,
+//    val caseSensitive: Boolean,
+    val filterType: NumberFilterType = NumberFilterType.EQUALS,
+    val between: Between<Short>? = null
+) : Filter()
+
 data class FloatFilter(
     val filter: Float,
     val dbField: Column<Float>,
