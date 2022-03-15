@@ -27,7 +27,7 @@ fun BigLazyTableUI(controller: LazyTableController, appState: AppState) {
             )
             FormContainer(
                 weight = 3f,
-                model = appState.selectedPlaylistModel,
+                model = appState.selectedTableModel,
                 appState = appState
             )
         }
