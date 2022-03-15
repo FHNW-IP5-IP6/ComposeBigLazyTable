@@ -32,10 +32,10 @@ import composeForms.model.Labels
 internal class LongAttributeTest : NumberAttributeTest<Long>(){
 
     override fun provideAttribute(model: BaseModel<Labels>, value: Long?): Attribute<*, Any, *> {
-        return LongAttribute(model, Labels.TEST, value, tableColumnWidth = 150.dp) as Attribute<*, Any, *>
+        return LongAttribute(model, Labels.TEST, value) as Attribute<*, Any, *>
     }
     override fun provideNumberAttribute(model: BaseModel<Labels>, value: Long?): NumberAttribute<*, Long, Labels> {
-        return LongAttribute(model, Labels.TEST, value, tableColumnWidth = 150.dp)
+        return LongAttribute(model, Labels.TEST, value)
     }
 
     init{

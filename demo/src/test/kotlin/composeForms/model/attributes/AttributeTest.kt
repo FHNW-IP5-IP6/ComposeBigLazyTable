@@ -500,7 +500,7 @@ abstract class AttributeTest<T : Any>{
                             ReplacementPair("eins", "1")
                         ), convertUserView = true
                     )
-                ), tableColumnWidth = 150.dp
+                )
             )
 
             //when
