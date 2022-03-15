@@ -104,8 +104,6 @@ fun FilterEnabledTextField(
                                                 // Invalid input
                                             }
                                         }
-                                    } else {
-                                        // invalid
                                     }
                                 }
                                 '=' -> {
@@ -139,8 +137,6 @@ fun FilterEnabledTextField(
                                         } catch (e: Exception) {
                                             // Invalid input
                                         }
-                                    } else {
-                                        // invalid
                                     }
                                 }
                                 '>' -> {
@@ -177,9 +173,6 @@ fun FilterEnabledTextField(
                                                 // Invalid input
                                             }
                                         }
-                                        else -> {
-                                            // invalid input
-                                        }
                                     }
                                 }
                                 '<' -> {
@@ -215,9 +208,6 @@ fun FilterEnabledTextField(
                                             } catch (e: Exception) {
                                                 // Invalid input
                                             }
-                                        }
-                                        else -> {
-                                            // invalid input
                                         }
                                     }
                                 }
@@ -256,19 +246,11 @@ fun FilterEnabledTextField(
                                                             to = to
                                                         )
                                                     }
-                                                } else {
-                                                    // invalid input
                                                 }
-
-                                            } else {
-                                                // invalid input
                                             }
-
                                         } catch (e: Exception) {
                                             // invalid input
                                         }
-                                    } else {
-                                        // invalid input
                                     }
                                 }
                                 ']' -> {
@@ -306,23 +288,12 @@ fun FilterEnabledTextField(
                                                             to = to
                                                         )
                                                     }
-                                                } else {
-                                                    // invalid input
                                                 }
-
-                                            } else {
-                                                // invalid input
                                             }
-
                                         } catch (e: Exception) {
                                             // invalid input
                                         }
-                                    } else {
-                                        // invalid input
                                     }
-                                }
-                                else -> {
-                                    // invalid input
                                 }
                             }
                         }
@@ -390,7 +361,6 @@ fun FilterEnabledTextField(
     }
 }
 
-// TODO: Exception in thread "AWT-EventQueue-0" java.lang.NumberFormatException: For input string: "12900000000"
 fun createFilter(
     controller: LazyTableController,
     attribute: Attribute<*, *, *>,
@@ -401,111 +371,51 @@ fun createFilter(
     to: String = ""
 ) {
     when (attribute) {
-        is ShortAttribute -> {
-            controller.attributeFilterNew[attribute] = ShortFilter(
-                filter = if (isBetween) 0 else value.toShort(),
-                dbField = attribute.databaseField!!,
-                filterType = filterType,
-                between = if (isBetween) {
-                    Between(
-                        fromFilter = ShortFilter(
-                            filter = from.toShort(),
-                            dbField = attribute.databaseField!!,
-                            filterType = filterType
-                        ),
-                        toFilter = ShortFilter(
-                            filter = to.toShort(),
-                            dbField = attribute.databaseField!!,
-                            filterType = filterType
-                        )
-                    )
-                } else null
-            )
-        }
-        is IntegerAttribute -> {
-            controller.attributeFilterNew[attribute] = IntFilter(
-                filter = if (isBetween) 0 else value.toInt(),
-                dbField = attribute.databaseField!!,
-                filterType = filterType,
-                between = if (isBetween) {
-                    Between(
-                        fromFilter = IntFilter(
-                            filter = from.toInt(),
-                            dbField = attribute.databaseField!!,
-                            filterType = filterType
-                        ),
-                        toFilter = IntFilter(
-                            filter = to.toInt(),
-                            dbField = attribute.databaseField!!,
-                            filterType = filterType
-                        )
-                    )
-                } else null
-            )
-        }
-        is LongAttribute -> {
-            controller.attributeFilterNew[attribute] = LongFilter(
-                filter = if (isBetween) 0 else value.toLong(),
-                dbField = attribute.databaseField!!,
-                filterType = filterType,
-                between = if (isBetween) {
-                    Between(
-                        fromFilter = LongFilter(
-                            filter = from.toLong(),
-                            dbField = attribute.databaseField!!,
-                            filterType = filterType
-                        ),
-                        toFilter = LongFilter(
-                            filter = to.toLong(),
-                            dbField = attribute.databaseField!!,
-                            filterType = filterType
-                        )
-                    )
-                } else null
-            )
-        }
-        is FloatAttribute -> {
-            controller.attributeFilterNew[attribute] = FloatFilter(
-                filter = if (isBetween) 0f else value.toFloat(),
-                dbField = attribute.databaseField!!,
-                filterType = filterType,
-                between = if (isBetween) {
-                    Between(
-                        fromFilter = FloatFilter(
-                            filter = from.toFloat(),
-                            dbField = attribute.databaseField!!,
-                            filterType = filterType
-                        ),
-                        toFilter = FloatFilter(
-                            filter = to.toFloat(),
-                            dbField = attribute.databaseField!!,
-                            filterType = filterType
-                        )
-                    )
-                } else null
-            )
-        }
-        is DoubleAttribute -> {
-            controller.attributeFilterNew[attribute] = DoubleFilter(
-                filter = if (isBetween) 0.0 else value.toDouble(),
-                dbField = attribute.databaseField!!,
-                filterType = filterType,
-                between = if (isBetween) {
-                    Between(
-                        fromFilter = DoubleFilter(
-                            filter = from.toDouble(),
-                            dbField = attribute.databaseField!!,
-                            filterType = filterType
-                        ),
-                        toFilter = DoubleFilter(
-                            filter = to.toDouble(),
-                            dbField = attribute.databaseField!!,
-                            filterType = filterType
-                        )
-                    )
-                } else null
-            )
-        }
+        is ShortAttribute -> createShortFilter(
+            controller = controller,
+            attribute = attribute,
+            value = value,
+            filterType = filterType,
+            isBetween = isBetween,
+            from = from,
+            to = to
+        )
+        is IntegerAttribute -> createIntFilter(
+            controller = controller,
+            attribute = attribute,
+            value = value,
+            filterType = filterType,
+            isBetween = isBetween,
+            from = from,
+            to = to
+        )
+        is LongAttribute -> createLongFilter(
+            controller = controller,
+            attribute = attribute,
+            value = value,
+            filterType = filterType,
+            isBetween = isBetween,
+            from = from,
+            to = to
+        )
+        is FloatAttribute -> createFloatFilter(
+            controller = controller,
+            attribute = attribute,
+            value = value,
+            filterType = filterType,
+            isBetween = isBetween,
+            from = from,
+            to = to
+        )
+        is DoubleAttribute -> createDoubleFilter(
+            controller = controller,
+            attribute = attribute,
+            value = value,
+            filterType = filterType,
+            isBetween = isBetween,
+            from = from,
+            to = to
+        )
     }
     controller.onFilterChanged()
 }
