@@ -4,6 +4,65 @@ import bigLazyTable.paging.*
 import composeForms.model.attributes.*
 import demo.bigLazyTable.model.LazyTableController
 
+fun createFilter(
+    controller: LazyTableController,
+    attribute: Attribute<*, *, *>,
+    value: String,
+    filterType: NumberFilterType,
+    isBetween: Boolean = false,
+    from: String = "",
+    to: String = ""
+) {
+    when (attribute) {
+        is ShortAttribute -> createShortFilter(
+            controller = controller,
+            attribute = attribute,
+            value = value,
+            filterType = filterType,
+            isBetween = isBetween,
+            from = from,
+            to = to
+        )
+        is IntegerAttribute -> createIntFilter(
+            controller = controller,
+            attribute = attribute,
+            value = value,
+            filterType = filterType,
+            isBetween = isBetween,
+            from = from,
+            to = to
+        )
+        is LongAttribute -> createLongFilter(
+            controller = controller,
+            attribute = attribute,
+            value = value,
+            filterType = filterType,
+            isBetween = isBetween,
+            from = from,
+            to = to
+        )
+        is FloatAttribute -> createFloatFilter(
+            controller = controller,
+            attribute = attribute,
+            value = value,
+            filterType = filterType,
+            isBetween = isBetween,
+            from = from,
+            to = to
+        )
+        is DoubleAttribute -> createDoubleFilter(
+            controller = controller,
+            attribute = attribute,
+            value = value,
+            filterType = filterType,
+            isBetween = isBetween,
+            from = from,
+            to = to
+        )
+    }
+    controller.onFilterChanged()
+}
+
 fun createShortFilter(
     controller: LazyTableController,
     attribute: ShortAttribute<*>,

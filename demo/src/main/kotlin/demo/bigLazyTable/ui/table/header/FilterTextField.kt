@@ -1,5 +1,6 @@
 package demo.bigLazyTable.ui.table.header
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.*
@@ -38,7 +39,9 @@ fun FilterEnabledTextField(
 ) {
     if (attribute is BooleanAttribute) {
         val toggleState = remember { mutableStateOf(ToggleableState.Indeterminate) }
-        Row {
+        Row(
+            horizontalArrangement = Arrangement.Center
+        ) {
             TriStateCheckbox(
                 state = toggleState.value,
                 onClick = {
@@ -72,7 +75,6 @@ fun FilterEnabledTextField(
                     }
                 }
             )
-            Text(controller.displayedFilterStrings[attribute]!!, color = Color.White)
         }
     } else {
         TextField(
@@ -81,16 +83,17 @@ fun FilterEnabledTextField(
             onValueChange = { newValue ->
                 when (attribute) {
                     is NumberAttribute -> {
-                        val allowedNonNumberChars = listOf('=', '!', '>', '<', '[', ',', ']')
-                        val newRestrictedValue = newValue.filter { it.isDigit() || allowedNonNumberChars.contains(it) }
-                        controller.displayedFilterStrings[attribute] = newRestrictedValue
-                        println("newNumberValue: $newRestrictedValue")
-                        if (newRestrictedValue.length > 1) {
-                            when (newRestrictedValue[0]) {
-                                '!' -> {
-                                    if (newRestrictedValue[1] == '=') {
-                                        if (newRestrictedValue.length > 2) {
-                                            try {
+                        try {
+                            val allowedNonNumberChars = listOf('=', '!', '>', '<', '[', ',', ']')
+                            val newRestrictedValue =
+                                newValue.filter { it.isDigit() || allowedNonNumberChars.contains(it) }
+                            controller.displayedFilterStrings[attribute] = newRestrictedValue
+                            println("newNumberValue: $newRestrictedValue")
+                            if (newRestrictedValue.length > 1) {
+                                when (newRestrictedValue[0]) {
+                                    '!' -> {
+                                        if (newRestrictedValue[1] == '=') {
+                                            if (newRestrictedValue.length > 2) {
                                                 val value = newRestrictedValue.substring(2).trim()
                                                 if (value != "") {
                                                     createFilter(
@@ -100,16 +103,12 @@ fun FilterEnabledTextField(
                                                         filterType = NumberFilterType.NOT_EQUALS
                                                     )
                                                 }
-                                            } catch (e: Exception) {
-                                                // Invalid input
                                             }
                                         }
                                     }
-                                }
-                                '=' -> {
-                                    if (newRestrictedValue[1] == '!') {
-                                        if (newRestrictedValue.length > 2) {
-                                            try {
+                                    '=' -> {
+                                        if (newRestrictedValue[1] == '!') {
+                                            if (newRestrictedValue.length > 2) {
                                                 val value = newRestrictedValue.substring(2).trim()
                                                 if (value != "") {
                                                     createFilter(
@@ -119,12 +118,8 @@ fun FilterEnabledTextField(
                                                         filterType = NumberFilterType.NOT_EQUALS
                                                     )
                                                 }
-                                            } catch (e: Exception) {
-                                                // Invalid input
                                             }
-                                        }
-                                    } else if (newRestrictedValue[1].isDigit()) {
-                                        try {
+                                        } else if (newRestrictedValue[1].isDigit()) {
                                             val value = newRestrictedValue.substring(1).trim()
                                             if (value != "") {
                                                 createFilter(
@@ -134,16 +129,12 @@ fun FilterEnabledTextField(
                                                     filterType = NumberFilterType.EQUALS
                                                 )
                                             }
-                                        } catch (e: Exception) {
-                                            // Invalid input
                                         }
                                     }
-                                }
-                                '>' -> {
-                                    when {
-                                        newRestrictedValue[1] == '=' -> {
-                                            if (newRestrictedValue.length > 2) {
-                                                try {
+                                    '>' -> {
+                                        when {
+                                            newRestrictedValue[1] == '=' -> {
+                                                if (newRestrictedValue.length > 2) {
                                                     val value = newRestrictedValue.substring(2).trim()
                                                     if (value != "") {
                                                         createFilter(
@@ -153,13 +144,9 @@ fun FilterEnabledTextField(
                                                             filterType = NumberFilterType.GREATER_EQUALS
                                                         )
                                                     }
-                                                } catch (e: Exception) {
-                                                    // Invalid input
                                                 }
                                             }
-                                        }
-                                        newRestrictedValue[1].isDigit() -> {
-                                            try {
+                                            newRestrictedValue[1].isDigit() -> {
                                                 val value = newRestrictedValue.substring(1).trim()
                                                 if (value != "") {
                                                     createFilter(
@@ -169,17 +156,13 @@ fun FilterEnabledTextField(
                                                         filterType = NumberFilterType.GREATER
                                                     )
                                                 }
-                                            } catch (e: Exception) {
-                                                // Invalid input
                                             }
                                         }
                                     }
-                                }
-                                '<' -> {
-                                    when {
-                                        newRestrictedValue[1] == '=' -> {
-                                            if (newRestrictedValue.length > 2) {
-                                                try {
+                                    '<' -> {
+                                        when {
+                                            newRestrictedValue[1] == '=' -> {
+                                                if (newRestrictedValue.length > 2) {
                                                     val value = newRestrictedValue.substring(2).trim()
                                                     if (value != "") {
                                                         createFilter(
@@ -189,13 +172,9 @@ fun FilterEnabledTextField(
                                                             filterType = NumberFilterType.LESS_EQUALS
                                                         )
                                                     }
-                                                } catch (e: Exception) {
-                                                    // Invalid input
                                                 }
                                             }
-                                        }
-                                        newRestrictedValue[1].isDigit() -> {
-                                            try {
+                                            newRestrictedValue[1].isDigit() -> {
                                                 val value = newRestrictedValue.substring(1).trim()
                                                 if (value != "") {
                                                     createFilter(
@@ -205,16 +184,12 @@ fun FilterEnabledTextField(
                                                         filterType = NumberFilterType.LESS
                                                     )
                                                 }
-                                            } catch (e: Exception) {
-                                                // Invalid input
                                             }
                                         }
                                     }
-                                }
-                                '[' -> {
-                                    val lastChar = newRestrictedValue.trim().last()
-                                    if (newRestrictedValue.contains(',') && ((lastChar == ']') || lastChar == '[')) {
-                                        try {
+                                    '[' -> {
+                                        val lastChar = newRestrictedValue.trim().last()
+                                        if (newRestrictedValue.contains(',') && ((lastChar == ']') || lastChar == '[')) {
                                             val from =
                                                 newRestrictedValue.substringAfter('[').substringBefore(',').trim()
                                             if (from.isNotBlank()) {
@@ -248,15 +223,11 @@ fun FilterEnabledTextField(
                                                     }
                                                 }
                                             }
-                                        } catch (e: Exception) {
-                                            // invalid input
                                         }
                                     }
-                                }
-                                ']' -> {
-                                    val lastChar = newRestrictedValue.trim().last()
-                                    if (newRestrictedValue.contains(',') && ((lastChar == ']') || lastChar == '[')) {
-                                        try {
+                                    ']' -> {
+                                        val lastChar = newRestrictedValue.trim().last()
+                                        if (newRestrictedValue.contains(',') && ((lastChar == ']') || lastChar == '[')) {
                                             val from =
                                                 newRestrictedValue.substringAfter(']').substringBefore(',').trim()
                                             if (from.isNotBlank()) {
@@ -290,12 +261,13 @@ fun FilterEnabledTextField(
                                                     }
                                                 }
                                             }
-                                        } catch (e: Exception) {
-                                            // invalid input
                                         }
                                     }
                                 }
                             }
+                        } catch (e: Exception) {
+                            // TODO: Give User hint what went wrong & how to do it right
+                            // for now we just ignore any occurring exception
                         }
                     }
                     else -> {
@@ -359,65 +331,6 @@ fun FilterEnabledTextField(
             }
         )
     }
-}
-
-fun createFilter(
-    controller: LazyTableController,
-    attribute: Attribute<*, *, *>,
-    value: String,
-    filterType: NumberFilterType,
-    isBetween: Boolean = false,
-    from: String = "",
-    to: String = ""
-) {
-    when (attribute) {
-        is ShortAttribute -> createShortFilter(
-            controller = controller,
-            attribute = attribute,
-            value = value,
-            filterType = filterType,
-            isBetween = isBetween,
-            from = from,
-            to = to
-        )
-        is IntegerAttribute -> createIntFilter(
-            controller = controller,
-            attribute = attribute,
-            value = value,
-            filterType = filterType,
-            isBetween = isBetween,
-            from = from,
-            to = to
-        )
-        is LongAttribute -> createLongFilter(
-            controller = controller,
-            attribute = attribute,
-            value = value,
-            filterType = filterType,
-            isBetween = isBetween,
-            from = from,
-            to = to
-        )
-        is FloatAttribute -> createFloatFilter(
-            controller = controller,
-            attribute = attribute,
-            value = value,
-            filterType = filterType,
-            isBetween = isBetween,
-            from = from,
-            to = to
-        )
-        is DoubleAttribute -> createDoubleFilter(
-            controller = controller,
-            attribute = attribute,
-            value = value,
-            filterType = filterType,
-            isBetween = isBetween,
-            from = from,
-            to = to
-        )
-    }
-    controller.onFilterChanged()
 }
 
 // TODO: Should we write something when a field can not be filtered?
