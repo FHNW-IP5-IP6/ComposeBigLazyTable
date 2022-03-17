@@ -40,11 +40,15 @@ fun PlaylistRow(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         for (attribute in playlistModel.displayedAttributesInTable) {
-            TableCell(
-                text = attribute.getValueAsText(),
-                backgroundColor = backgroundColor,
-                hasError = !attribute.isValid()
+            AttributeTableCell(
+                attribute = attribute,
+                backgroundColor = backgroundColor
             )
+//            TableCell(
+//                text = attribute.getValueAsText(),
+//                backgroundColor = backgroundColor,
+//                hasError = !attribute.isValid()
+//            )
         }
     }
 }
@@ -67,6 +71,7 @@ fun PlaylistRowPlaceholder(
     ) {
         for (attribute in lazyListAttributes) {
             TableCell(
+                attribute = attribute,
                 text = "...",
                 backgroundColor = backgroundColor
             )

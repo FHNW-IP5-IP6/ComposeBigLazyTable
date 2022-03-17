@@ -22,12 +22,14 @@
 
 package composeForms.model.attributes
 
+import androidx.compose.ui.unit.Dp
 import composeForms.convertibles.CustomConvertible
 import composeForms.model.ILabel
 import composeForms.model.IModel
 import composeForms.model.formatter.IFormatter
 import composeForms.model.meanings.SemanticMeaning
 import composeForms.model.validators.semanticValidators.SemanticValidator
+import demo.bigLazyTable.ui.theme.MinTableCellWidth
 import org.jetbrains.exposed.sql.Column
 
 /**
@@ -63,19 +65,21 @@ abstract class NumberAttribute <N,T,L> (
     formatter               : IFormatter<T>?,
 
     canBeFiltered           : Boolean,
-    databaseField           : Column<T>?
+    databaseField           : Column<T>?,
+    tableColumnWidth        : Dp
 
 ) : Attribute<N, T, L>(
-    model = model,
-    value = value,
-    label = label,
-    required = required,
-    readOnly = readOnly,
-    observedAttributes = observedAttributes,
-    validators = validators,
-    convertibles = convertibles,
-    meaning = meaning,
-    formatter = formatter,
-    canBeFiltered = canBeFiltered,
-    databaseField = databaseField
+    model               = model,
+    value               = value,
+    label               = label,
+    required            = required,
+    readOnly            = readOnly,
+    observedAttributes  = observedAttributes,
+    validators          = validators,
+    convertibles        = convertibles,
+    meaning             = meaning,
+    formatter           = formatter,
+    canBeFiltered       = canBeFiltered,
+    databaseField       = databaseField,
+    tableColumnWidth    = if (tableColumnWidth < MinTableCellWidth) MinTableCellWidth else tableColumnWidth
 ) where N : NumberAttribute<N, T, L>, T : Number, T : Comparable<T>, L: Enum<*>, L : ILabel

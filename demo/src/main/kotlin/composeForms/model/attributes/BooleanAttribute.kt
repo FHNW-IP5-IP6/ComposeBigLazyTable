@@ -22,10 +22,12 @@
 
 package composeForms.model.attributes
 
+import androidx.compose.ui.unit.Dp
 import composeForms.model.ILabel
 import composeForms.model.IModel
 import composeForms.model.meanings.Default
 import composeForms.model.meanings.SemanticMeaning
+import demo.bigLazyTable.ui.theme.MinTableCellWidth
 import org.jetbrains.exposed.sql.Column
 
 /**
@@ -59,7 +61,8 @@ class BooleanAttribute<L>(
     trueText                : L                                     = Decision.True as L,
 
     canBeFiltered           : Boolean                               = true,
-    databaseField           : Column<Boolean>?                      = null
+    databaseField           : Column<Boolean>?                      = null,
+    tableColumnWidth        : Dp                                    = MinTableCellWidth
 
 ) : DualAttribute<BooleanAttribute<L>, Boolean, L>(
     model = model,
@@ -73,7 +76,8 @@ class BooleanAttribute<L>(
     observedAttributes = observedAttributes,
     meaning = meaning,
     canBeFiltered = canBeFiltered,
-    databaseField = databaseField
+    databaseField = databaseField,
+    tableColumnWidth = if (tableColumnWidth < MinTableCellWidth) MinTableCellWidth else tableColumnWidth
 ) where L : ILabel, L: Enum<*> {
 
     override val typeT: Boolean

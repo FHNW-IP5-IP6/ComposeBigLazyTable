@@ -1,5 +1,6 @@
 package demo.bigLazyTable.model
 
+import androidx.compose.ui.unit.dp
 import composeForms.model.BaseModel
 import composeForms.model.attributes.*
 import composeForms.model.modelElements.Field
@@ -7,6 +8,7 @@ import composeForms.model.modelElements.FieldSize
 import composeForms.model.modelElements.Group
 import composeForms.model.modelElements.HeaderGroup
 import demo.bigLazyTable.data.database.DatabasePlaylists
+import org.jetbrains.exposed.sql.Column
 
 /**
  * @author Marco Sprenger, Livio Näf
@@ -24,7 +26,17 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         value = playlist.id,
         readOnly = true,
         canBeFiltered = true,
-        databaseField = DatabasePlaylists.id
+        databaseField = DatabasePlaylists.id,
+        tableColumnWidth = 100.dp
+    )
+
+    private val numEdits = IntegerAttribute(
+        model = this,
+        label = BLTLabels.NUM_EDITS,
+        value = playlist.numEdits,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.num_edits,
+        tableColumnWidth = 200.dp
     )
 
     private val name = StringAttribute(
@@ -32,7 +44,8 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         label = BLTLabels.NAME,
         value = playlist.name,
         canBeFiltered = true,
-        databaseField = DatabasePlaylists.name
+        databaseField = DatabasePlaylists.name,
+        tableColumnWidth = 200.dp
     )
 
     private val modifiedAt = IntegerAttribute(
@@ -41,7 +54,8 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         required = true,
         value = playlist.modifiedAt,
         canBeFiltered = true,
-        databaseField = DatabasePlaylists.modified_at
+        databaseField = DatabasePlaylists.modified_at,
+        tableColumnWidth = 80.dp
     )
 
     private val track0ArtistName = StringAttribute(
@@ -59,7 +73,8 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         falseText = BLTLabels.SELECTION_NO,
         value = playlist.collaborative,
         canBeFiltered = true,
-        databaseField = DatabasePlaylists.collaborative
+        databaseField = DatabasePlaylists.collaborative,
+        tableColumnWidth = 150.dp
     )
 
     private val numTracks = IntegerAttribute(
@@ -70,28 +85,26 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         databaseField = DatabasePlaylists.num_tracks
     )
 
-    private val numTracksDouble = DoubleAttribute(
+    private val durationMs = IntegerAttribute(
         model = this,
-        label = BLTLabels.NUM_TRACKS_DOUBLE,
-        value = playlist.numTracksDouble,
+        label = BLTLabels.DURATION_MS,
+        value = playlist.durationMs,
         canBeFiltered = true,
-        databaseField = DatabasePlaylists.num_tracks_double
+        databaseField = DatabasePlaylists.duration_ms
     )
 
-    private val numTracksFloat = FloatAttribute(
+    private val numFollowers = DoubleAttribute(
         model = this,
-        label = BLTLabels.NUM_TRACKS_FLOAT,
-        value = playlist.numTracksFloat,
-        canBeFiltered = true,
-        databaseField = DatabasePlaylists.num_tracks_float
+        label = BLTLabels.NUM_FOLLOWERS,
+        value = playlist.numFollowers.toDouble(),
+        databaseField = DatabasePlaylists.num_followers as Column<Double>
     )
 
-    private val numEdits = IntegerAttribute(
+    private val numArtists = FloatAttribute(
         model = this,
-        label = BLTLabels.NUM_EDITS,
-        value = playlist.numEdits,
-        canBeFiltered = false,
-        databaseField = DatabasePlaylists.num_edits
+        label = BLTLabels.NUM_ARTISTS,
+        value = playlist.numArtists.toFloat(),
+        databaseField = DatabasePlaylists.num_artists as Column<Float>
     )
 
     val displayedAttributesInTable = listOf(
@@ -102,20 +115,9 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         track0ArtistName,
         collaborative,
         numTracks,
-        numTracksDouble,
-        numTracksFloat
-    )
-
-    private val durationMs = IntegerAttribute(
-        model = this,
-        label = BLTLabels.DURATION_MS,
-        value = playlist.durationMs
-    )
-
-    private val numArtists = IntegerAttribute(
-        model = this,
-        label = BLTLabels.NUM_ARTISTS,
-        value = playlist.numArtists
+        durationMs,
+        numFollowers,
+        numArtists
     )
 
     private val track0TrackName = StringAttribute(

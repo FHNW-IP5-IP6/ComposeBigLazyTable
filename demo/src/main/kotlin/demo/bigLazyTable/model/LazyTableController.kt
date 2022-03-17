@@ -1,16 +1,13 @@
 package demo.bigLazyTable.model
 
 import androidx.compose.runtime.*
-import bigLazyTable.paging.Filter
-import bigLazyTable.paging.IPagingService
-import bigLazyTable.paging.Sort
-import composeForms.model.attributes.Attribute
+import bigLazyTable.paging.*
+import composeForms.model.attributes.*
 import demo.bigLazyTable.utils.PageUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
-import org.jetbrains.exposed.sql.Column
 import org.junit.platform.commons.util.LruCache
 import java.util.*
 import kotlin.collections.ArrayList
@@ -37,16 +34,18 @@ class LazyTableController(
     var totalPages = PageUtils.getTotalPages(totalCount = totalCount, pageSize = pageSize)
     private val firstPageNr = 0
 
+
     // Sorting variables
+    var isSorting by mutableStateOf(false)
     var lastSortedAttribute: Attribute<*, *, *>? = null
     var attributeSort = mutableStateMapOf<Attribute<*, *, *>, BLTSortOrder>()
     var sort: Sort? by mutableStateOf(null)
-    var isSorting by mutableStateOf(false)
 
     // Filtering variables
     var filters = listOf<Filter>()
-    private var filteredAttributes = mutableSetOf<Attribute<*, *, *>>()
-    var attributeFilter: MutableMap<Attribute<*, *, *>, String> = mutableStateMapOf()
+    var displayedFilterStrings: MutableMap<Attribute<*, *, *>, String> = mutableStateMapOf()
+    var attributeFilterNew: MutableMap<Attribute<*, *, *>, Filter?> = mutableStateMapOf()
+    var attributeCaseSensitive = mutableStateMapOf<Attribute<*, *, *>, Boolean>()
     var isFiltering by mutableStateOf(false)
         private set
 
@@ -70,9 +69,10 @@ class LazyTableController(
     init {
         appState.defaultTableModel.displayedAttributesInTable.forEach { attribute ->
             if (attribute.canBeFiltered) {
-                attributeFilter[attribute] = ""
+                displayedFilterStrings[attribute] = ""
             }
             attributeSort[attribute] = BLTSortOrder.None
+            attributeCaseSensitive[attribute] = false
         }
 
         CoroutineScope(Dispatchers.Main).launch {
@@ -340,6 +340,22 @@ class LazyTableController(
         }
     }
 
+//        fun onSortChanged(attribute: Attribute<*, *, *>, newSortOrder: BLTSortOrder) {
+//            resetPreviousSortedAttribute(newAttribute = attribute)
+//
+//            lastSortedAttribute = attribute
+//            attributeSort[attribute] = newSortOrder
+//            sort = newSortOrder.sortAttribute(attribute)
+//
+//            scheduler.scheduleTask { loadFirstPagesToFillCacheAndAddToAppStateList() }
+//        }
+//
+//        private fun resetPreviousSortedAttribute(newAttribute: Attribute<*, *, *>) {
+//            if (lastSortedAttribute != null && lastSortedAttribute != newAttribute) {
+//                attributeSort[lastSortedAttribute!!] = BLTSortOrder.None
+//            }
+//        }
+
     /**
      * TODO: Add description
      * @param attribute TODO: Add description
@@ -367,38 +383,68 @@ class LazyTableController(
         }
     }
 
-    /**
-     * TODO: Add description
-     * @param attribute TODO: Add description
-     * @param newFilter TODO: Add description
-     */
-    fun onFiltersChanged(attribute: Attribute<*, *, *>, newFilter: String) {
-        attributeFilter[attribute] = newFilter
+    // TODO: Spinner?
+    fun onFilterChanged() {
+        println("Inside onFiltersChanged")
+        val start = System.currentTimeMillis()
 
-        if (newFilter == "") filteredAttributes.remove(attribute)
-        else filteredAttributes.add(attribute)
-
-        filters = filteredAttributes.map { a ->
-            Filter(
-                filter = attributeFilter[a] ?: "",
-                dbField = a.databaseField as Column<String>,
-                caseSensitive = false
-            )
-        }
+        filters = attributeFilterNew.values.filterNotNull()
+        println("Filters in onNumberFilterChanged: $filters")
 
         isFiltering = filters.isNotEmpty()
         if (isFiltering) {
             filterScheduler.scheduleTask {
+                println("Before getFilteredCountNew")
+                val start1 = System.currentTimeMillis()
+                // getFilteredCountNew needed 617 ms
                 filteredCount = pagingService.getFilteredCount(filters = filters)
-                totalPages = PageUtils.getTotalPages(totalCount = filteredCount, pageSize = pageSize)
+                println("filtered count = $filteredCount")
+                val end1 = System.currentTimeMillis()
+                println("getFilteredCountNew needed ${end1 - start1} ms")
+
+                println("filtered Count = $filteredCount")
                 appState.filteredTableModelList = ArrayList(Collections.nCopies(filteredCount, null))
 
                 initialDataLoading()
             }
-        } else {
-            totalPages = PageUtils.getTotalPages(totalCount = totalCount, pageSize = pageSize)
         }
+
+        val end = System.currentTimeMillis()
+        println("onFiltersChanged needed ${end - start} ms")
     }
+
+//    /**
+//     * TODO: Add description
+//     * @param attribute TODO: Add description
+//     * @param newFilter TODO: Add description
+//     */
+//    fun onFiltersChanged(attribute: Attribute<*, *, *>, newFilter: String) {
+//        attributeFilter[attribute] = newFilter
+//
+//        if (newFilter == "") filteredAttributes.remove(attribute)
+//        else filteredAttributes.add(attribute)
+//
+//        filters = filteredAttributes.map { a ->
+//            Filter(
+//                filter = attributeFilter[a] ?: "",
+//                dbField = a.databaseField as Column<String>,
+//                caseSensitive = false
+//            )
+//        }
+//
+//        isFiltering = filters.isNotEmpty()
+//        if (isFiltering) {
+//            filterScheduler.scheduleTask {
+//                filteredCount = pagingService.getFilteredCount(filters = filters)
+//                totalPages = PageUtils.getTotalPages(totalCount = filteredCount, pageSize = pageSize)
+//                appState.filteredTableModelList = ArrayList(Collections.nCopies(filteredCount, null))
+//
+//                initialDataLoading()
+//            }
+//        } else {
+//            totalPages = PageUtils.getTotalPages(totalCount = totalCount, pageSize = pageSize)
+//        }
+//    }
 
     /**
      * Select a model from the table.

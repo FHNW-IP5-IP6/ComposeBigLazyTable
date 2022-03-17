@@ -5,6 +5,7 @@ import demo.bigLazyTable.utils.printTestMethodName
 import mu.KotlinLogging
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
@@ -13,18 +14,18 @@ private val Log = KotlinLogging.logger {}
 internal class LazyTableControllerTest {
 
     private lateinit var viewModel: LazyTableController
-    private lateinit var pagingService: FakePagingService
     private lateinit var appState: AppState
 
-    private val numberOfPlaylists = 1_000_000
+    private val numberOfPlaylists = 5_000 //1_000_000
     private val pageSize = 40
+
+    private var pagingService: FakePagingService = FakePagingService(
+        numberOfPlaylists = numberOfPlaylists,
+        pageSize = pageSize
+    )
 
     @BeforeEach
     fun setUp() {
-        pagingService = FakePagingService(
-            numberOfPlaylists = numberOfPlaylists,
-            pageSize = pageSize
-        )
         appState = AppState(pagingService = pagingService)
         viewModel = LazyTableController(
             pagingService = pagingService,
@@ -216,6 +217,7 @@ internal class LazyTableControllerTest {
         assertEquals(0, oldStartIndex)
     }
 
+    @Disabled("Enable when testing with numberOfPlaylists = 1_000_000")
     @Test
     fun `calculateStartIndexToRemove works with index 25000`() {
         val oldStartIndex = viewModel.calculateStartIndexToRemove(pageNr = 25000)

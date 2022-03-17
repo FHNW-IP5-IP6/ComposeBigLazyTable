@@ -494,7 +494,7 @@ abstract class AttributeTest<T : Any>{
         if(attribute is LongAttribute) {
             //given
             val attr = LongAttribute(
-                model,label =  Labels.TEST, convertibles = listOf(
+                model, label =  Labels.TEST, convertibles = listOf(
                     CustomConvertible(
                         listOf(
                             ReplacementPair("eins", "1")

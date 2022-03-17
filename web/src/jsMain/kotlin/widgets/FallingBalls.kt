@@ -7,11 +7,13 @@ import org.jetbrains.compose.common.foundation.layout.*
 import org.jetbrains.compose.common.material.Button
 import org.jetbrains.compose.common.material.Slider
 import org.jetbrains.compose.common.material.Text
+import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 import org.jetbrains.compose.common.ui.Modifier
 import org.jetbrains.compose.common.ui.background
 import org.jetbrains.compose.common.ui.unit.dp
 import org.jetbrains.compose.common.ui.unit.em
 
+@OptIn(ExperimentalComposeWebWidgetsApi::class)
 @Composable
 fun FallingBalls(text: String) {
     Column(Modifier.fillMaxWidth().fillMaxHeight(1f)) {

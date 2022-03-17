@@ -3,6 +3,7 @@ package demo.bigLazyTable.data.database
 import bigLazyTable.paging.Filter
 import bigLazyTable.paging.IPagingService
 import bigLazyTable.paging.Sort
+import bigLazyTable.paging.StringFilter
 import demo.bigLazyTable.model.Playlist
 import demo.bigLazyTable.utils.PageUtils
 import kotlin.reflect.full.memberProperties
@@ -34,11 +35,12 @@ class FakePagingService(val numberOfPlaylists: Int, val pageSize: Int) : IPaging
     ): List<Playlist> {
         val adjustedFilters = mutableListOf<Filter>()
         filters.forEach {
+            it as StringFilter
             val filterString = it.filter
             if (!it.caseSensitive) {
                 filterString.lowercase()
             }
-            adjustedFilters.add(Filter(
+            adjustedFilters.add(StringFilter(
                 filter = filterString,
                 dbField =  it.dbField,
                 caseSensitive = it.caseSensitive
@@ -49,6 +51,7 @@ class FakePagingService(val numberOfPlaylists: Int, val pageSize: Int) : IPaging
         allData.values.forEach { playlists ->
             var filteredData = playlists
             adjustedFilters.forEach { filter ->
+                filter as StringFilter
                 filteredData = filteredData.filter { it.getField<String>(filter.dbField?.name ?: "") == filter.filter }
             }
             allDataFiltered.addAll(filteredData)
@@ -64,11 +67,12 @@ class FakePagingService(val numberOfPlaylists: Int, val pageSize: Int) : IPaging
 
         val adjustedFilters = mutableListOf<Filter>()
         filters.forEach {
+            it as StringFilter
             val filterString = it.filter
             if (!it.caseSensitive) {
                 filterString.lowercase()
             }
-            adjustedFilters.add(Filter(
+            adjustedFilters.add(StringFilter(
                 filter = filterString,
                 dbField =  it.dbField,
                 caseSensitive = it.caseSensitive
@@ -78,6 +82,7 @@ class FakePagingService(val numberOfPlaylists: Int, val pageSize: Int) : IPaging
         allData.values.forEach { playlists ->
             var filteredData = playlists
             adjustedFilters.forEach { filter ->
+                filter as StringFilter
                 filteredData = filteredData.filter { it.getField<String>(filter.dbField?.name ?: "") == filter.filter }
             }
             count += filteredData.size

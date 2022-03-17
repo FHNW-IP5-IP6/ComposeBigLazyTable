@@ -22,12 +22,14 @@
 
 package composeForms.model.attributes
 
+import androidx.compose.ui.unit.Dp
 import composeForms.convertibles.CustomConvertible
 import composeForms.model.ILabel
 import composeForms.model.IModel
 import composeForms.model.formatter.IFormatter
 import composeForms.model.meanings.SemanticMeaning
 import composeForms.model.validators.semanticValidators.SemanticValidator
+import demo.bigLazyTable.ui.theme.MinTableCellWidth
 import org.jetbrains.exposed.sql.Column
 
 /**
@@ -64,7 +66,8 @@ abstract class FloatingPointAttribute <F,T,L> (
     formatter                   : IFormatter<T>?,
 
     canBeFiltered               : Boolean,
-    databaseField               : Column<T>?
+    databaseField               : Column<T>?,
+    tableColumnWidth            : Dp
 
 ) : NumberAttribute<F, T, L>(
     model = model,
@@ -78,5 +81,6 @@ abstract class FloatingPointAttribute <F,T,L> (
     meaning = meaning,
     formatter = formatter,
     canBeFiltered = canBeFiltered,
-    databaseField = databaseField
+    databaseField = databaseField,
+    tableColumnWidth = if (tableColumnWidth < MinTableCellWidth) MinTableCellWidth else tableColumnWidth
 ) where F : FloatingPointAttribute<F, T, L>, T : Number, T : Comparable<T>, L: Enum<*>, L : ILabel

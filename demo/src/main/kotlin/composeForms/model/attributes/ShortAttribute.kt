@@ -22,6 +22,7 @@
 
 package composeForms.model.attributes
 
+import androidx.compose.ui.unit.Dp
 import composeForms.convertibles.CustomConvertible
 import composeForms.model.ILabel
 import composeForms.model.IModel
@@ -29,6 +30,7 @@ import composeForms.model.formatter.IFormatter
 import composeForms.model.meanings.Default
 import composeForms.model.meanings.SemanticMeaning
 import composeForms.model.validators.semanticValidators.SemanticValidator
+import demo.bigLazyTable.ui.theme.MinTableCellWidth
 import org.jetbrains.exposed.sql.Column
 
 /**
@@ -65,7 +67,8 @@ class ShortAttribute<L>(
     formatter               : IFormatter<Short>?                    = null,
 
     canBeFiltered           : Boolean                               = true,
-    databaseField           : Column<Short>?                        = null
+    databaseField           : Column<Short>?                        = null,
+    tableColumnWidth        : Dp                                    = MinTableCellWidth
 
 ) : NumberAttribute<ShortAttribute<L>, Short, L>(
     model = model,
@@ -79,7 +82,8 @@ class ShortAttribute<L>(
     meaning = meaning,
     formatter = formatter,
     canBeFiltered = canBeFiltered,
-    databaseField = databaseField
+    databaseField = databaseField,
+    tableColumnWidth = if (tableColumnWidth < MinTableCellWidth) MinTableCellWidth else tableColumnWidth
 ) where L: Enum<*>, L : ILabel {
 
     override val typeT: Short

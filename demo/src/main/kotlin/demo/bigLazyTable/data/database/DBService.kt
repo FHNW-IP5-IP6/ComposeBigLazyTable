@@ -1,6 +1,9 @@
 package demo.bigLazyTable.data.database
 
 import bigLazyTable.paging.*
+import demo.bigLazyTable.data.database.FilterUtil.caseSensitiveLike
+import demo.bigLazyTable.data.database.FilterUtil.filterEquals
+import demo.bigLazyTable.data.database.FilterUtil.selectWithAllFilters
 import demo.bigLazyTable.model.Playlist
 import demo.bigLazyTable.model.PlaylistDto
 import org.jetbrains.exposed.sql.*
@@ -50,8 +53,7 @@ object DBService : IPagingService<Playlist> {
             val end = System.currentTimeMillis()
             println("getPage transaction without sort needed ${end - start1} ms")
             return rv
-        }
-        else {
+        } else {
             println("Inside getPage transaction with sort")
             val start1 = System.currentTimeMillis()
             val rv = transaction {
@@ -75,93 +77,6 @@ object DBService : IPagingService<Playlist> {
         }
     }
 
-    fun Column<String>.toType() {
-        val x = this as? Column<Int> ?: this as? Column<Double>
-    }
-
-    // https://discuss.kotlinlang.org/t/checking-type-in-generic/3100/2
-    inline fun <reified T> Column<T>.test() {
-        when (T::class) {
-            Int::class -> {
-                println("Int")
-                this as Column<Int>
-            }
-            else -> println("${T::class}")
-        }
-    }
-
-    private fun Table.selectWithAllFilters(filters: List<Filter>): Query {
-        println("Inside selectWithAllFilters")
-        val start = System.currentTimeMillis()
-        if (filters.isEmpty()) return Query(this, null)
-
-        // TODO: Could this be removed due to the below for loop?
-        if (filters.size == 1) {
-            val filter = filters.first()
-            return selectWithFilter(filter)
-        }
-
-        val firstFilter = filters.first()
-//        when (firstFilter.dbField) {
-//            is Column<Int> -> {}
-//            is String -> {}
-//        }
-
-
-        var sql: Op<Boolean> = firstFilter.dbField as Column<String> like "%${firstFilter.filter}%"
-        for (i in 1 until filters.size) {
-            // TODO: as Column<Double/Float/Int/...> equals filter.toDouble()/usw
-//            when (dbField)
-            val filter = filters[i]
-            sql = sql and (filter.dbField as Column<String> like "%${filter.filter}%")
-        }
-        val end = System.currentTimeMillis()
-        println("Just before return: selectWithAllFilters needed ${end - start} ms")
-        return this.select { sql }
-    }
-
-    private fun Table.selectWithFilter(filter: Filter): Query {
-        println("Inside selectWithFilter")
-        val start = System.currentTimeMillis()
-        if (filter.dbField == null) return Query(this, null)
-
-        val rv = selectWithFilter(
-            caseSensitive = filter.caseSensitive,
-            dbField = filter.dbField,
-            filter = filter.filter
-        )
-
-        val end = System.currentTimeMillis()
-        println("selectWithFilter needed ${end -start} ms")
-        return rv
-    }
-
-    private fun Table.selectWithFilter(caseSensitive: Boolean, dbField: Column<*>?, filter: String): Query {
-        if (dbField == null) return Query(this, null)
-        return this.select { caseSensitiveFilter(caseSensitive, dbField as Column<String>, filter) }
-    }
-
-    // TODO: Move this knowledge into documentation
-// By default, the SQLite LIKE operator is case-insensitive for ASCII characters (which covers all english language
-// letters), and case-sensitive for unicode characters that are beyond the ASCII range (ä, ö, ü, ...)
-// PostgreSQL is a case-sensitive database by default
-// Text comparison in MySQL is case insensitive by default, while in H2 it is case sensitive
-// From MariaDB docs, it depends on OS. For Windows, it's not case-sensitive.
-    private fun SqlExpressionBuilder.caseSensitiveFilter(
-        caseSensitive: Boolean,
-        columnWhichShouldMatch: Column<String>,
-        filter: String
-    ): Op<Boolean> {
-        println("Inside caseSensitiveFilter")
-        val start = System.currentTimeMillis()
-        val rv = if (caseSensitive) columnWhichShouldMatch like "%$filter%"
-        else columnWhichShouldMatch.lowerCase() like "%${filter.lowercase(Locale.getDefault())}%"
-
-        val end = System.currentTimeMillis()
-        println("caseSensitiveFilter needed ${end - start} ms")
-        return rv
-    }
-
     override fun getTotalCount(): Int = transaction {
         println("getTotalCount is called")
         DatabasePlaylists.selectAll().count().toInt()
@@ -172,7 +87,7 @@ object DBService : IPagingService<Playlist> {
 
         return transaction {
             DatabasePlaylists
-                .selectWithAllFilters(filters = filters)
+                .selectWithAllFilters(filters)
                 .count()
                 .toInt()
         }

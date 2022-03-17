@@ -22,6 +22,7 @@
 
 package composeForms.model
 
+import androidx.compose.ui.unit.dp
 import composeForms.communication.AttributeType
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -211,7 +212,7 @@ internal class BaseModelTest {
         assertEquals(5,attribute.getSavedValue())
 
         //when
-        val attributeDefaultVal = LongAttribute(model, label = Label.TEST)
+        val attributeDefaultVal = LongAttribute(model, label = Label.TEST, tableColumnWidth = 150.dp)
 
         //then
         assertEquals(null, attributeDefaultVal.getValue())
@@ -426,7 +427,7 @@ internal class BaseModelTest {
         assertEquals(AttributeType.INTEGER, model.getAttributeType(attr))
 
         //when
-        attr= LongAttribute(model, Label.NO_OF_CHILDREN)
+        attr= LongAttribute(model, Label.NO_OF_CHILDREN, tableColumnWidth = 150.dp)
         //then
         assertEquals(AttributeType.LONG, model.getAttributeType(attr))
 
@@ -439,7 +440,7 @@ internal class BaseModelTest {
         //when
         attr = object : Attribute<StringAttribute<Label>, String, Label>(model,
             Label.NO_OF_CHILDREN, null, false, false, emptyList(), emptyList(),
-            emptyList(), Default(), IFormatter{it?:""}, false, null){
+            emptyList(), Default(), IFormatter{it?:""}, false, null, 0.dp){
             override val typeT: String
                 get() = ""
         }

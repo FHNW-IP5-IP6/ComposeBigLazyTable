@@ -9,11 +9,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import composeForms.model.attributes.Attribute
+
+@Composable
+fun AttributeTableCell(
+    attribute: Attribute<*, *, *>,
+    isTitle: Boolean = false,
+    color: Color = Color.Black,
+    backgroundColor: Color
+) {
+    TableCell(
+        attribute = attribute,
+        text = if (isTitle) attribute.getLabel() else attribute.getValueAsText(),
+        width = attribute.tableColumnWidth,
+        color = color,
+        backgroundColor = backgroundColor,
+        hasError = !attribute.isValid(),
+        fontWeight = if (isTitle) FontWeight.Bold else FontWeight.Normal
+    )
+}
 
 @Composable
 fun TableCell(
+    attribute: Attribute<*, *, *>,
     text: String,
-    width: Dp = 180.dp, // TODO: How to dynamically adjust?
+    width: Dp = attribute.tableColumnWidth,
     color: Color = Color.Black,
     backgroundColor: Color,
     fontWeight: FontWeight = FontWeight.Normal,
