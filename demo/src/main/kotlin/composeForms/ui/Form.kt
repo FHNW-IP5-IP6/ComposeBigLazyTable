@@ -32,11 +32,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.platform.LocalWindowInfo
 import composeForms.model.IModel
+import composeForms.model.attributes.DualAttribute
 import composeForms.model.modelElements.HeaderGroup
 import composeForms.ui.theme.BodyBackground
+import demo.bigLazyTable.frameWindowScope
 import demo.bigLazyTable.model.AppState
 
 
@@ -54,10 +58,10 @@ class Form {
     @ExperimentalMaterialApi
     @ExperimentalFoundationApi
     @Composable
-    fun of(model: IModel<*>, appState: AppState? = null){
-        val keyEventsFromUIElement = remember { mutableMapOf<Key, MutableMap<Int, ()->Unit>>() }
+    fun of(model: IModel<*>, appState: AppState? = null) {
+        val keyEventsFromUIElement = remember { mutableMapOf<Key, MutableMap<Int, () -> Unit>>() }
         val showValidations = remember { mutableStateOf(false) }
-        //addDefaultKeyBehaviour(composeForms.model, keyEventsFromUIElement){ showValidations.value = it }
+        addDefaultKeyBehaviour(model, keyEventsFromUIElement) { showValidations.value = it }
 
         Column(modifier = Modifier.fillMaxSize().background(BodyBackground)) {
             Header(model = model, appState = appState) { showValidations.value = it }
@@ -81,8 +85,12 @@ class Form {
 @ExperimentalMaterialApi
 @ExperimentalFoundationApi
 @Composable
-private fun Body(model: IModel<*>, showValidationMessages: MutableState<Boolean>, keyListener : MutableMap<Key, MutableMap<Int, () -> Unit>>){
-    with(model){
+private fun Body(
+    model: IModel<*>,
+    showValidationMessages: MutableState<Boolean>,
+    keyListener: MutableMap<Key, MutableMap<Int, () -> Unit>>
+) {
+    with(model) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             item {
                 if (getAllGroups().isEmpty()) {
@@ -93,7 +101,7 @@ private fun Body(model: IModel<*>, showValidationMessages: MutableState<Boolean>
                         Group(model, getCurrentWizardGroup()!!, showValidationMessages, keyListener)
                     }
                 } else { // all groups
-                    getAllGroups().filter{ it !is HeaderGroup }.forEach {
+                    getAllGroups().filter { it !is HeaderGroup }.forEach {
                         Group(model, it, showValidationMessages, keyListener)
                     }
                 }
@@ -108,85 +116,87 @@ private fun Body(model: IModel<*>, showValidationMessages: MutableState<Boolean>
 @ExperimentalMaterialApi
 @ExperimentalFoundationApi
 @Composable
-private fun StickyBody(model: IModel<*>){
-    with(model){
+private fun StickyBody(model: IModel<*>) {
+    with(model) {
         getAllGroups().filterIsInstance<HeaderGroup<*>>().forEach {
             Group(model, it, mutableStateOf(false))
         }
     }
 }
 
-/*
+
 /**
  * Adds default behaviour for key events. Therefore the key events have to be passed further if some field specific
  * events are made.
  * @param composeForms.model: [IModel] that receives the command clicked on the keyboard.
  */
-
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun addDefaultKeyBehaviour(composeForms.model: IModel<*>, keyListener: Map<Key, MutableMap<Int, ()->Unit>>,
-                                   changeShowError: (Boolean) -> Unit){
+private fun addDefaultKeyBehaviour(
+    model: IModel<*>, keyListener: Map<Key, MutableMap<Int, () -> Unit>>,
+    changeShowError: (Boolean) -> Unit
+) {
 
-    val key: Key = if(System.getProperty("os.name") == "Mac OS X") Key.MetaLeft else Key.CtrlLeft
-    // What is new way in compose to do this???
-    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.S))){
-        changeShowError(!composeForms.model.save())
-    }
-    // What is new way in compose to do this???
-    LocalAppWindow.current.keyboard.setShortcut(Key.Tab){
-        composeForms.model.focusNext()
-        keyListener[Key.Tab]?.map { it.value }?.forEach{ it()}
-    }
-    // What is new way in compose to do this???
-    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(Key.Tab, Key.ShiftLeft))){
-        composeForms.model.focusPrevious()
-        keyListener[Key.Tab]?.forEach {
-            it.value()
-        }
-    }
-    // What is new way in compose to do this???
-    LocalAppWindow.current.keyboard.setShortcut(Key.Spacebar){
-        if(composeForms.model.getCurrentFocusedAttribute() is DualAttribute<*,*,*>){
-            (composeForms.model.getCurrentFocusedAttribute() as DualAttribute<*,*,*>).changeDecision()
-        }
-        keyListener[Key.Spacebar]?.map { it.value }?.forEach{ it()}
-    }
-    // What is new way in compose to do this???
-    LocalAppWindow.current.keyboard.setShortcut(Key.Enter){
-        keyListener[Key.Enter]?.map { it.value }?.forEach{ it()}
-    }
-    // What is new way in compose to do this???
-    LocalAppWindow.current.keyboard.setShortcut(Key.DirectionUp){
-        keyListener[Key.DirectionUp]?.map { it.value }?.forEach{ it()}
-    }
-    // What is new way in compose to do this???
-    LocalAppWindow.current.keyboard.setShortcut(Key.DirectionDown){
-        keyListener[Key.DirectionDown]?.map { it.value }?.forEach{ it()}
-    }
-    // What is new way in compose to do this???
-    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.R))){
-        composeForms.model.reset()
-    }
-    // What is new way in compose to do this???
-    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.B))){
-        if(composeForms.model.getCurrentGroupIndex() != 0){
-            composeForms.model.previousWizardGroup()
-        }
-    }
-    // What is new way in compose to do this???
-    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.N))){
-        changeShowError(!composeForms.model.save())
-    }
-    // What is new way in compose to do this???
-    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.E))){
-        if(composeForms.model.isWizardMode() && composeForms.model.isLastWizardGroup() && composeForms.model.isValidForWizardGroup()) {
-            AppManager.focusedWindow?.close()
-        }
-    }
-    // What is new way in compose to do this???
-    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.M))){
-        keyListener[Key.M]?.map { it.value }?.forEach{ it()}
-    }
+    val key: Key = if (System.getProperty("os.name") == "Mac OS X") Key.MetaLeft else Key.CtrlLeft
 
-}*/
+    /*
+    Unluckily Compose API has changed in this part a lot & it is not anymore possible to access LocalAppWindow.current
+    because this one doesn't exist anymore! There is a LocalWindowInfo.current but only with 1 method isWindowFocused.
+
+    The new way & more information can be found here: https://github.com/JetBrains/compose-jb/blob/master/tutorials/Keyboard/README.md
+
+    In Short:
+    There are two ways to handle key events in Compose for Desktop:
+    - By setting up an event handler based on the element that is in focus
+    - By setting up an event handler in the scope of the window
+    */
+
+//    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.S))){
+//        changeShowError(!model.save())
+//    }
+//    LocalAppWindow.current.keyboard.setShortcut(Key.Tab){
+//        model.focusNext()
+//        keyListener[Key.Tab]?.map { it.value }?.forEach{ it()}
+//    }
+//    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(Key.Tab, Key.ShiftLeft))){
+//        model.focusPrevious()
+//        keyListener[Key.Tab]?.forEach {
+//            it.value()
+//        }
+//    }
+//    LocalAppWindow.current.keyboard.setShortcut(Key.Spacebar){
+//        if(model.getCurrentFocusedAttribute() is DualAttribute<*, *, *>){
+//            (model.getCurrentFocusedAttribute() as DualAttribute<*,*,*>).changeDecision()
+//        }
+//        keyListener[Key.Spacebar]?.map { it.value }?.forEach{ it()}
+//    }
+//    LocalAppWindow.current.keyboard.setShortcut(Key.Enter){
+//        keyListener[Key.Enter]?.map { it.value }?.forEach{ it()}
+//    }
+//    LocalAppWindow.current.keyboard.setShortcut(Key.DirectionUp){
+//        keyListener[Key.DirectionUp]?.map { it.value }?.forEach{ it()}
+//    }
+//    LocalAppWindow.current.keyboard.setShortcut(Key.DirectionDown){
+//        keyListener[Key.DirectionDown]?.map { it.value }?.forEach{ it()}
+//    }
+//    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.R))){
+//        model.reset()
+//    }
+//    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.B))){
+//        if(model.getCurrentGroupIndex() != 0){
+//            model.previousWizardGroup()
+//        }
+//    }
+//    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.N))){
+//        changeShowError(!model.save())
+//    }
+//    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.E))){
+//        if(model.isWizardMode() && model.isLastWizardGroup() && model.isValidForWizardGroup()) {
+//            AppManager.focusedWindow?.close()
+//        }
+//    }
+//    LocalAppWindow.current.keyboard.setShortcut(KeysSet(setOf(key, Key.M))){
+//        keyListener[Key.M]?.map { it.value }?.forEach{ it()}
+//    }
+
+}

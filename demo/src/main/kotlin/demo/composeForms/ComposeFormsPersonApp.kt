@@ -14,6 +14,7 @@ import java.awt.Dimension
 fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
+//        onKeyEvent = TODO: key events would needed to be passed here or for each TextField or other UI Item,
         title = "Person Editor"
     ) {
         window.size = Dimension(1600, 800)
