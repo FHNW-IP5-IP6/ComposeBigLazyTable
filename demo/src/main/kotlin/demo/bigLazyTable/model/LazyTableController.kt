@@ -2,6 +2,7 @@ package demo.bigLazyTable.model // TODO: move to package controler
 
 import androidx.compose.runtime.*
 import bigLazyTable.paging.*
+import composeForms.model.BaseModel
 import composeForms.model.attributes.*
 import demo.bigLazyTable.utils.PageUtils
 import kotlinx.coroutines.CoroutineScope
@@ -33,10 +34,10 @@ class LRUCache<key, value> (val maxSize: Int) : LinkedHashMap<key, value>(maxSiz
     }
 }
 
-class LazyTableController(
+class LazyTableController<T: BaseModel<*>>(
     private val pagingService: IPagingService<*>,
     val pageSize: Int = 40, // TODO: make dynamic
-    private val appState: AppState // TODO: Remove as param & create in class
+//    private val appState: AppState // TODO: Remove as param & create in class
 ) {
     // Variables for different calculations
     private val totalCount by lazy { pagingService.getTotalCount() }
@@ -45,7 +46,7 @@ class LazyTableController(
     private val firstPageNr = 0
 
 
-//    private val appState: AppState = AppState(pagingService, PlaylistModel(Playlist()))
+    val appState = AppState<PlaylistModel>(pagingService, Playlist().toPlaylistModel(null))
 
     // Sorting variables
     var isSorting by mutableStateOf(false)
@@ -113,7 +114,7 @@ class LazyTableController(
      */
     private fun selectFirstModel() {
         val fullList = if (isFiltering) appState.filteredTableModelList else appState.tableModelList
-        fullList.first()?.let { firstModel -> selectModel(firstModel) }
+        fullList.first()?.let { firstModel -> selectModel(firstModel as T) }
     }
 
     /**
@@ -378,7 +379,6 @@ class LazyTableController(
 
         lastSortedAttribute = attribute
         attributeSort[attribute] = newSortOrder
-
         isSorting = newSortOrder.isSorting
         sort = newSortOrder.sortAttribute(attribute)
 
@@ -466,16 +466,16 @@ class LazyTableController(
      * Side effects: Sets the global language on the passed model.
      * @param tableModel model to select
      */
-    fun selectModel(tableModel: PlaylistModel) {
+    fun selectModel(tableModel: T) {
         setCurrentLanguage(tableModel = tableModel)
-        appState.selectedTableModel = tableModel
+        appState.selectedTableModel = tableModel as PlaylistModel
     }
 
     /**
      * Sets the global language saved in app state to a model
      * @param tableModel model to set the global language
      */
-    private fun setCurrentLanguage(tableModel: PlaylistModel) {
+    private fun setCurrentLanguage(tableModel: T) {
         val currentLanguage = appState.defaultTableModel.getCurrentLanguage()
         tableModel.setCurrentLanguage(lang = currentLanguage)
     }

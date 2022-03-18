@@ -1,9 +1,13 @@
 package demo.bigLazyTable.model
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import bigLazyTable.paging.IPagingService
+import composeForms.model.BaseModel
+import composeForms.model.IModel
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -15,7 +19,7 @@ import kotlin.collections.ArrayList
  */
 // TODO: Generisch machen
 // TableState
-class AppState(pagingService: IPagingService<*>, playlistModel: PlaylistModel? = null) {
+class AppState<T: BaseModel<*>>(pagingService: IPagingService<*>, defaultModel: T) {
 
     /**
      * Default model used in form and table to store global data
@@ -23,30 +27,32 @@ class AppState(pagingService: IPagingService<*>, playlistModel: PlaylistModel? =
      * - current Language
      * - default data when table data is loading
      */
-    val defaultTableModel by mutableStateOf(PlaylistModel(Playlist(), this))
+//    val defaultTableModel by mutableStateOf(PlaylistModel(Playlist(), this))
     // TODO: Kein PlaylistModel(Playlist()
-//    val defaultTableModel: PlaylistModel by mutableStateOf(playlistModel)
+    val defaultTableModel: T by mutableStateOf(defaultModel)
 
     /**
      * Current selected model in table.
      * This is the current model behind the form.
      */
-    var selectedTableModel by mutableStateOf(defaultTableModel)
+    var selectedTableModel: T by mutableStateOf(defaultTableModel)
 
     /**
      * List of models. Size is the totalCount of the provided data.
      * All elements currently in the table cache are stored in this list. The rest is filled with null.
      */
-    var tableModelList: MutableList<PlaylistModel?> = ArrayList(Collections.nCopies(pagingService.getTotalCount(), null))
+    var tableModelList: MutableList<T?> = ArrayList(Collections.nCopies(pagingService.getTotalCount(), null))
+//    var tableModelList: MutableList<T?> = mutableStateListOf()
 
     /**
      * List of filtered models. Size is the filteredCount of the provided data.
      * All elements currently in the table cache are stored in this list. The rest is filled with null.
      */
-    var filteredTableModelList: MutableList<PlaylistModel?> = ArrayList(Collections.nCopies(40, null))
+    // TODO: Make 40 dynamic!
+    var filteredTableModelList: MutableList<T?> = ArrayList(Collections.nCopies(40, null))
 
     /**
      * List of all models containing changes. Used to prevent loosing changed data if new data is loaded from the service.
      */
-    val changedTableModels: MutableList<PlaylistModel> = mutableListOf()
+    val changedTableModels: MutableList<T> = mutableListOf()
 }

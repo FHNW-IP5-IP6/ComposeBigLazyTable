@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import demo.bigLazyTable.model.AppState
 import demo.bigLazyTable.model.LazyTableController
+import demo.bigLazyTable.model.PlaylistModel
 import demo.bigLazyTable.ui.form.FormContainer
 import demo.bigLazyTable.ui.table.TableContainer
 import demo.bigLazyTable.ui.theme.BigLazyTableTheme
@@ -17,18 +18,18 @@ import demo.bigLazyTable.ui.theme.BigLazyTableTheme
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun BigLazyTableUI(controller: LazyTableController, appState: AppState) {
+fun BigLazyTableUI(controller: LazyTableController<*>/*, appState: AppState<PlaylistModel>*/) {
     BigLazyTableTheme {
         Row(modifier = Modifier.fillMaxSize()) {
             TableContainer(
                 weight = 2f,
                 controller = controller,
-                appState = appState
+                appState = controller.appState
             )
             FormContainer(
                 weight = 3f,
-                model = appState.selectedTableModel,
-                appState = appState
+                model = controller.appState.selectedTableModel,
+                appState = controller.appState
             )
         }
     }

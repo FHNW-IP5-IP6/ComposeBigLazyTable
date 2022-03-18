@@ -14,7 +14,7 @@ import demo.bigLazyTable.ui.theme.ContentDescriptionSortIcon
 fun SortButton(
     modifier: Modifier,
     attribute: Attribute<*, *, *>,
-    controller: LazyTableController
+    controller: LazyTableController<*>
 ) {
     // TODO: Decide if we remove nextSortState() or nextSortState
     //  Decide for function or member approach

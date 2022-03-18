@@ -23,7 +23,7 @@ import org.jetbrains.exposed.sql.Column
 @Composable
 fun FilterTextField(
     attribute: Attribute<*, *, *>,
-    controller: LazyTableController
+    controller: LazyTableController<*>
 ) {
     if (attribute.canBeFiltered) {
         FilterEnabledTextField(
@@ -36,7 +36,7 @@ fun FilterTextField(
 @Composable
 fun FilterEnabledTextField(
     attribute: Attribute<*, *, *>,
-    controller: LazyTableController
+    controller: LazyTableController<*>
 ) {
     when (attribute) {
         is BooleanAttribute -> {
@@ -123,7 +123,7 @@ fun FilterEnabledTextField(
 
 @Composable
 fun LeadingIcon(
-    controller: LazyTableController,
+    controller: LazyTableController<*>,
     attribute: Attribute<*, *, *>
 ) {
     IconButton(
@@ -151,7 +151,7 @@ fun LeadingIcon(
 
 @Composable
 fun TrailingIcon(
-    controller: LazyTableController,
+    controller: LazyTableController<*>,
     attribute: Attribute<*, *, *>
 ) {
     if (controller.displayedFilterStrings[attribute].toString().isNotEmpty()) {

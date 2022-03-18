@@ -10,7 +10,7 @@ object NumberTextFieldUtil {
     // TODO: Move to controller
     fun onValueChange(
         newValue: String,
-        controller: LazyTableController,
+        controller: LazyTableController<*>,
         attribute: Attribute<*, *, *>
     ) {
         try {

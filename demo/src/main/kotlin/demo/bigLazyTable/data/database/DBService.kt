@@ -55,7 +55,7 @@ object DBService : IPagingService<Playlist> {
             val rv = transaction {
                 DatabasePlaylists
                     .selectWithAllFilters(filters)
-                    .orderBy(sort.dbField as Column<String> to sort.sortOrder)
+                    .orderBy(sort.dbField as Column<String> to sort.sortOrder) // TODO: Remove Column<String> cast
                     .limit(n = pageSize, offset = start)
                     .map {
                         println("Inside map of getPage with sort")

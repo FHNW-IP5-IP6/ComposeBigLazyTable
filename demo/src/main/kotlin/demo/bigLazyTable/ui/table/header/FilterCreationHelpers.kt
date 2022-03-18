@@ -5,7 +5,7 @@ import composeForms.model.attributes.*
 import demo.bigLazyTable.model.LazyTableController
 
 fun createFilter(
-    controller: LazyTableController,
+    controller: LazyTableController<*>,
     attribute: Attribute<*, *, *>,
     value: String,
     filterType: NumberFilterType,
@@ -64,7 +64,7 @@ fun createFilter(
 }
 
 fun createShortFilter(
-    controller: LazyTableController,
+    controller: LazyTableController<*>,
     attribute: ShortAttribute<*>,
     value: String,
     filterType: NumberFilterType,
@@ -94,7 +94,7 @@ fun createShortFilter(
 }
 
 fun createIntFilter(
-    controller: LazyTableController,
+    controller: LazyTableController<*>,
     attribute: IntegerAttribute<*>,
     value: String,
     filterType: NumberFilterType,
@@ -124,7 +124,7 @@ fun createIntFilter(
 }
 
 fun createLongFilter(
-    controller: LazyTableController,
+    controller: LazyTableController<*>,
     attribute: LongAttribute<*>,
     value: String,
     filterType: NumberFilterType,
@@ -154,7 +154,7 @@ fun createLongFilter(
 }
 
 fun createFloatFilter(
-    controller: LazyTableController,
+    controller: LazyTableController<*>,
     attribute: FloatAttribute<*>,
     value: String,
     filterType: NumberFilterType,
@@ -184,7 +184,7 @@ fun createFloatFilter(
 }
 
 fun createDoubleFilter(
-    controller: LazyTableController,
+    controller: LazyTableController<*>,
     attribute: DoubleAttribute<*>,
     value: String,
     filterType: NumberFilterType,
