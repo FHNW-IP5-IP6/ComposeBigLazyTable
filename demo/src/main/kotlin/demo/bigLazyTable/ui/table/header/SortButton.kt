@@ -15,19 +15,21 @@ fun SortButton(
     attribute: Attribute<*, *, *>,
     controller: LazyTableController
 ) {
+    // TODO: Decide if we remove nextSortState() or nextSortState
+    //  Decide for function or member approach
     val sortOrder = controller.attributeSort[attribute]
     IconButton(
         modifier = modifier,
         onClick = {
             controller.onSortChanged(
                 attribute = attribute,
-                newSortOrder = sortOrder?.nextSortState() ?: BLTSortOrder.None
+                newSortOrder = sortOrder?.nextSortState/*nextSortState()*/ ?: BLTSortOrder.None
             )
         }
     ) {
         Icon(
-            imageVector = sortOrder?.nextSortIcon() ?: BLTSortOrder.None.icon,
-            contentDescription = "Sortieren",
+            imageVector = sortOrder?.nextSortIcon/*nextSortIcon()*/ ?: BLTSortOrder.None.icon,
+            contentDescription = "Sort",
             tint = Color.White
         )
     }

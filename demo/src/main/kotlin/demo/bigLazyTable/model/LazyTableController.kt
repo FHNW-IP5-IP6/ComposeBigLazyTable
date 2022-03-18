@@ -419,6 +419,9 @@ class LazyTableController(
 
                 initialDataLoading()
             }
+        } else {
+            // Make sure that after last filter removed sort order stays
+            scheduler.scheduleTask { initialDataLoading() }
         }
 
         val end = System.currentTimeMillis()

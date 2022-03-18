@@ -175,7 +175,7 @@ fun FilterDisabledTextField(attribute: Attribute<*, *, *>) {
         modifier = Modifier.width(attribute.tableColumnWidth),
         value = "",
         onValueChange = {},
-        textStyle = TextStyle(color = Color.White),
+        textStyle = TextStyle(color = Color.White), // TODO: Needed?
         singleLine = true,
         enabled = false
     )
