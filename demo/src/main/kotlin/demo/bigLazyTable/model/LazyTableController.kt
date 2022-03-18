@@ -1,4 +1,4 @@
-package demo.bigLazyTable.model
+package demo.bigLazyTable.model // TODO: move to package controler
 
 import androidx.compose.runtime.*
 import bigLazyTable.paging.*
@@ -8,12 +8,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
-import org.junit.platform.commons.util.LruCache
+import org.junit.platform.commons.util.LruCache // TODO: Other LruCache (android.util.LruCache<K, V>)
 import java.util.*
+import java.util.logging.Logger
 import kotlin.collections.ArrayList
 import kotlin.properties.Delegates
 
-private val Log = KotlinLogging.logger {}
+private val Log = KotlinLogging.logger {} // TODO: Why not below logger
+val log2 = Logger.getLogger("classname")
 
 /**
  * TODO: Add class documentation
@@ -23,10 +25,18 @@ private val Log = KotlinLogging.logger {}
  *
  * @author Marco Sprenger, Livio Näf
  */
+
+// TODO: Add log
+class LRUCache<key, value> (val maxSize: Int) : LinkedHashMap<key, value>(maxSize, 0.75f, true){
+    override fun removeEldestEntry(eldest: MutableMap.MutableEntry<key, value>?): Boolean {
+        return size > maxSize
+    }
+}
+
 class LazyTableController(
     private val pagingService: IPagingService<*>,
     val pageSize: Int = 40, // TODO: make dynamic
-    private val appState: AppState
+    private val appState: AppState // TODO: Remove as param & create in class
 ) {
     // Variables for different calculations
     private val totalCount by lazy { pagingService.getTotalCount() }
@@ -34,6 +44,8 @@ class LazyTableController(
     var totalPages = PageUtils.getTotalPages(totalCount = totalCount, pageSize = pageSize)
     private val firstPageNr = 0
 
+
+//    private val appState: AppState = AppState(pagingService, PlaylistModel(Playlist()))
 
     // Sorting variables
     var isSorting by mutableStateOf(false)

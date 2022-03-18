@@ -13,7 +13,9 @@ import kotlin.collections.ArrayList
  *
  * @author Marco Sprenger, Livio Näf
  */
-class AppState(pagingService: IPagingService<*>) {
+// TODO: Generisch machen
+// TableState
+class AppState(pagingService: IPagingService<*>, playlistModel: PlaylistModel) {
 
     /**
      * Default model used in form and table to store global data
@@ -21,7 +23,9 @@ class AppState(pagingService: IPagingService<*>) {
      * - current Language
      * - default data when table data is loading
      */
-    val defaultTableModel by mutableStateOf(PlaylistModel(Playlist(), this))
+    // TODO: Kein PlaylistModel(Playlist()
+//    val defaultTableModel by mutableStateOf(PlaylistModel(Playlist(), this))
+    val defaultTableModel: PlaylistModel by mutableStateOf(playlistModel)
 
     /**
      * Current selected model in table.

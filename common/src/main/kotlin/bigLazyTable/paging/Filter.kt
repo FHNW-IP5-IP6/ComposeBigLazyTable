@@ -2,6 +2,19 @@ package bigLazyTable.paging
 
 import org.jetbrains.exposed.sql.Column
 
+
+//class TestFilter<T> {
+//    var dbField: Column<T>? = null
+//
+//    var args: List<T> = TODO()
+//    var operation: NumberFilterType
+//
+//    fun updateValues(vararg valueAsString: String) {
+//        //convertieren nach T
+//    }
+//}
+
+// TODO: Operation?
 enum class NumberFilterType {
     EQUALS,
     NOT_EQUALS,

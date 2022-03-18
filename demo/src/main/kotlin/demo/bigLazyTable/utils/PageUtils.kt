@@ -26,6 +26,7 @@ object PageUtils {
      * @return the total pages for the defined [totalCount] & [pageSize] which is just the next bigger int of the
      * division of those values - Example: 10 / 3 = 4, where [totalCount]=10 & [pageSize]=3
      */
+    // TODO: MOve to controller
     fun getTotalPages(
         totalCount: Int,
         pageSize: Int

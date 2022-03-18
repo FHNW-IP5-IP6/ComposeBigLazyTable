@@ -1,4 +1,4 @@
-package demo.bigLazyTable.model
+package demo.bigLazyTable.model // TODO: move to package controler
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -23,7 +23,7 @@ sealed class BLTSortOrder(
         override fun nextSortState(): BLTSortOrder = Desc
         override fun nextSortIcon(): ImageVector = nextSortState().icon
         override fun sortAttribute(attribute: Attribute<*, *, *>): Sort = Sort(
-            dbField = attribute.databaseField as Column<String>,
+            dbField = attribute.databaseField, // TODO: Mit genauem Typ! Check!
             sortOrder = sortOrder!!
         )
     }
@@ -32,7 +32,7 @@ sealed class BLTSortOrder(
         override fun nextSortState(): BLTSortOrder = None
         override fun nextSortIcon(): ImageVector = nextSortState().icon
         override fun sortAttribute(attribute: Attribute<*, *, *>): Sort = Sort(
-            dbField = attribute.databaseField as Column<String>,
+            dbField = attribute.databaseField,
             sortOrder = sortOrder!!
         )
     }

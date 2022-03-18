@@ -6,6 +6,8 @@ import demo.bigLazyTable.model.LazyTableController
 
 object NumberTextFieldUtil {
 
+    // TODO: Future improvement -> Add a FilterAttribute
+    // TODO: Move to controller
     fun onValueChange(
         newValue: String,
         controller: LazyTableController,

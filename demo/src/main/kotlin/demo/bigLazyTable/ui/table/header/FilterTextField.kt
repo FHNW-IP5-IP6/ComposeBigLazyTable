@@ -41,6 +41,7 @@ fun FilterEnabledTextField(
             TriStateCheckbox(
                 state = toggleState.value,
                 onClick = {
+                    // TODO: Move complete when into controller
                     when (toggleState.value) {
                         ToggleableState.Indeterminate -> {
                             toggleState.value = ToggleableState.On
@@ -88,7 +89,7 @@ fun FilterEnabledTextField(
                     controller.onFilterChanged()
                 },
                 textStyle = TextStyle(color = Color.White),
-                // TODO: Hardcoded strings oke oder .properties file oder sonst was?
+                // TODO: Hardcoded strings oke oder .properties file oder sonst was? recherche falls einfach sonst oke so
                 label = { Text("Filter", color = Color.White) },
                 singleLine = true,
                 leadingIcon  = { LeadingIcon(controller = controller, attribute = attribute) },
@@ -100,6 +101,7 @@ fun FilterEnabledTextField(
                 modifier = Modifier.width(attribute.tableColumnWidth),
                 value = controller.displayedFilterStrings[attribute].toString(),
                 onValueChange = { newValue ->
+                    // Controller.doit
                     NumberTextFieldUtil.onValueChange(
                         newValue = newValue,
                         controller = controller,

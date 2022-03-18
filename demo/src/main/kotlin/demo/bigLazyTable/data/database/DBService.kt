@@ -1,15 +1,11 @@
 package demo.bigLazyTable.data.database
 
 import bigLazyTable.paging.*
-import demo.bigLazyTable.data.database.FilterUtil.caseSensitiveLike
-import demo.bigLazyTable.data.database.FilterUtil.filterEquals
-import demo.bigLazyTable.data.database.FilterUtil.selectWithAllFilters
+//import demo.bigLazyTable.data.database.FilterUtil.selectWithAllFilters
 import demo.bigLazyTable.model.Playlist
 import demo.bigLazyTable.model.PlaylistDto
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.util.*
 
 /**
  * @author Marco Sprenger, Livio Näf
