@@ -15,6 +15,9 @@ import androidx.compose.ui.text.TextStyle
 import bigLazyTable.paging.*
 import composeForms.model.attributes.*
 import demo.bigLazyTable.model.LazyTableController
+import demo.bigLazyTable.ui.theme.ContentDescriptionCaseSensitiveIcon
+import demo.bigLazyTable.ui.theme.ContentDescriptionClearFilterIcon
+import demo.bigLazyTable.ui.theme.FilterLabel
 import org.jetbrains.exposed.sql.Column
 
 @Composable
@@ -90,7 +93,7 @@ fun FilterEnabledTextField(
                 },
                 textStyle = TextStyle(color = Color.White),
                 // TODO: Hardcoded strings oke oder .properties file oder sonst was? recherche falls einfach sonst oke so
-                label = { Text("Filter", color = Color.White) },
+                label = { Text(text = FilterLabel, color = Color.White) },
                 singleLine = true,
                 leadingIcon  = { LeadingIcon(controller = controller, attribute = attribute) },
                 trailingIcon = { TrailingIcon(controller = controller, attribute = attribute) }
@@ -110,7 +113,7 @@ fun FilterEnabledTextField(
                 },
                 textStyle = TextStyle(color = Color.White),
                 // TODO: Hardcoded strings oke oder .properties file oder sonst was?
-                label = { Text("Filter", color = Color.White) },
+                label = { Text(text = FilterLabel, color = Color.White) },
                 singleLine = true,
                 trailingIcon = { TrailingIcon(controller = controller, attribute = attribute) }
             )
@@ -140,7 +143,7 @@ fun LeadingIcon(
     ) {
         Icon(
             imageVector = Icons.Filled.FormatSize,
-            contentDescription = "Case Sensitive Filtering",
+            contentDescription = ContentDescriptionCaseSensitiveIcon,
             tint = if (controller.attributeCaseSensitive[attribute] == true) Color.White else Color.Gray
         )
     }
@@ -161,7 +164,7 @@ fun TrailingIcon(
         ) {
             Icon(
                 imageVector = Icons.Filled.Close,
-                contentDescription = "Clear Filter",
+                contentDescription = ContentDescriptionClearFilterIcon,
                 tint = Color.White
             )
         }

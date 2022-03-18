@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.Color
 import composeForms.model.attributes.Attribute
 import demo.bigLazyTable.model.BLTSortOrder
 import demo.bigLazyTable.model.LazyTableController
+import demo.bigLazyTable.ui.theme.ContentDescriptionSortIcon
 
 @Composable
 fun SortButton(
@@ -29,7 +30,7 @@ fun SortButton(
     ) {
         Icon(
             imageVector = sortOrder?.nextSortIcon/*nextSortIcon()*/ ?: BLTSortOrder.None.icon,
-            contentDescription = "Sort",
+            contentDescription = ContentDescriptionSortIcon,
             tint = Color.White
         )
     }

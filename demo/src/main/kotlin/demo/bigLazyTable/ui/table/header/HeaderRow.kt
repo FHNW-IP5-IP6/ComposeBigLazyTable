@@ -46,12 +46,6 @@ fun HeaderRow(
                         color = Color.White,
                         backgroundColor = BackgroundColorHeader
                     )
-//                    TableCell(
-//                        text = attribute.getLabel(),
-//                        color = Color.White,
-//                        backgroundColor = BackgroundColorHeader,
-//                        fontWeight = FontWeight.Bold
-//                    )
                     SortButton(
                         modifier = Modifier.align(Alignment.CenterEnd),
                         attribute = attribute,
