@@ -91,9 +91,16 @@ object FilterUtil {
     }
 
     /**
-     * Is implemented with the thinking that the database will use case sensitive like by default or with a pragma
+     * Is implemented with the thinking that the database will
+     * use case sensitive like by default or with a pragma
+     *
+     * [dbField] must be lowerCase() in the else case
      */
-    fun caseSensitiveLike(caseSensitive: Boolean, dbField: Column<String>, filter: String): Op<Boolean> =
+    private fun caseSensitiveLike(
+        caseSensitive: Boolean,
+        dbField: Column<String>,
+        filter: String
+    ): Op<Boolean> =
         if (caseSensitive) dbField like filter
         else dbField.lowerCase() like filter.lowercase(Locale.getDefault())
 
