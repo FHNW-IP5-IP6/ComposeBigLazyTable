@@ -38,8 +38,9 @@ class LRUCache<key, value> (val maxSize: Int) : LinkedHashMap<key, value>(maxSiz
 
 class LazyTableController<T: BaseModel<*>>(
     private val pagingService: IPagingService<*>,
-    val pageSize: Int = 40, // TODO: make dynamic
-//    private val appState: AppState // TODO: Remove as param & create in class
+    defaultModel: T,
+    private val mapToModels: (List<Any?>, AppState<T>) -> List<T>,
+    private val pageSize: Int = 40, // TODO: make dynamic
 ) {
     // Variables for different calculations
     private val totalCount by lazy { pagingService.getTotalCount() }
@@ -47,8 +48,7 @@ class LazyTableController<T: BaseModel<*>>(
     var totalPages = getTotalPages(totalCount = totalCount, pageSize = pageSize)
     private val firstPageNr = 0
 
-
-    val appState = AppState<PlaylistModel>(pagingService, Playlist().toPlaylistModel(null))
+    val appState = AppState(pagingService, defaultModel)
 
     // Sorting variables
     var isSorting by mutableStateOf(false)
@@ -70,7 +70,7 @@ class LazyTableController<T: BaseModel<*>>(
 
     // Cache variables
     private val cacheSize = 5
-    private val cache: LruCache<Int, List<PlaylistModel>> = LruCache(cacheSize)
+    private val cache: LruCache<Int, List<T>> = LruCache(cacheSize)
 
     // Needed to force a recomposition
     var recomposeStateChanger by mutableStateOf(false)
@@ -82,7 +82,7 @@ class LazyTableController<T: BaseModel<*>>(
      * - Selects the first model in the table for the forms
      */
     init {
-        appState.defaultTableModel.displayedAttributesInTable.forEach { attribute ->
+        appState.defaultTableModel.displayedAttributesInTable!!.forEach { attribute ->
             if (attribute.canBeFiltered) {
                 displayedFilterStrings[attribute] = ""
                 attributeFilterNew[attribute] = null
@@ -211,7 +211,7 @@ class LazyTableController<T: BaseModel<*>>(
      * - Does log the time in milliseconds, the request took.
      * @param startIndex Index to start requesting [pageSize] page
      */
-    internal fun getPageFromService(startIndex: Int): List<PlaylistModel> {
+    internal fun getPageFromService(startIndex: Int): List<T> {
         Log.info("Requesting data from paging service with startIndex $startIndex")
         Log.info("Filter set for request: $filters")
         Log.info("Sorting set for request: $sort")
@@ -228,12 +228,7 @@ class LazyTableController<T: BaseModel<*>>(
         val end = System.currentTimeMillis()
         Log.info("The request took ${end - start} milliseconds.")
 
-        return page.toPlaylistModels()
-    }
-
-    // Helper function to map a list of Any to a list of playlistModels
-    private fun List<Any?>.toPlaylistModels(): List<PlaylistModel> {
-        return map { PlaylistModel(it as Playlist, appState) }
+        return mapToModels(page, appState)
     }
 
     /**
@@ -241,7 +236,7 @@ class LazyTableController<T: BaseModel<*>>(
      * @param pageNr Number of the given page
      * @param pageOfModels List of models
      */
-    internal fun addPageToCache(pageNr: Int, pageOfModels: List<PlaylistModel>) {
+    internal fun addPageToCache(pageNr: Int, pageOfModels: List<T>) {
         // Create a mutable list from the given models
         var modelListForCache = pageOfModels.toMutableList()
 
@@ -259,7 +254,7 @@ class LazyTableController<T: BaseModel<*>>(
      * @param pageOfModels List of models to merge
      * @return List of models, where all models with changes are included
      */
-    internal fun mergeModels(pageOfModels: MutableList<PlaylistModel>): MutableList<PlaylistModel> {
+    internal fun mergeModels(pageOfModels: MutableList<T>): MutableList<T> {
         for (i in firstPageNr until pageSize) {
             // Check if a changed model is existing for the current iteration model
             val tableModel = appState.changedTableModels.find { tableModel -> tableModel.id.getValue() == pageOfModels[i].id.getValue() }
@@ -484,7 +479,7 @@ class LazyTableController<T: BaseModel<*>>(
      */
     fun selectModel(tableModel: T) {
         setCurrentLanguage(tableModel = tableModel)
-        appState.selectedTableModel = tableModel as PlaylistModel
+        appState.selectedTableModel = tableModel
     }
 
     /**

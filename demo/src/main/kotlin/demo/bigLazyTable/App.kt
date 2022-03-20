@@ -11,6 +11,7 @@ import demo.bigLazyTable.data.database.DBService
 import demo.bigLazyTable.data.database.SqliteDb
 import demo.bigLazyTable.model.AppState
 import demo.bigLazyTable.model.LazyTableController
+import demo.bigLazyTable.model.Playlist
 import demo.bigLazyTable.model.PlaylistModel
 import demo.bigLazyTable.ui.BigLazyTableUI
 import java.awt.Dimension
@@ -38,19 +39,18 @@ fun main() = application {
 
         val service = DBService
 
-        // Needs remember. Without it, the view just shows empty (...) Items (happens after language change)
-//        val appState = remember { AppState(pagingService = service) }
+        val mapToPlaylistModels: (List<Any?>, AppState<PlaylistModel>) -> List<PlaylistModel> = { page, appState ->
+            page.map { PlaylistModel(it as Playlist, appState) }
+        }
 
         val controller = remember {
-            LazyTableController<PlaylistModel>(
+            LazyTableController(
                 pagingService = service,
-//                appState = appState
+                defaultModel = Playlist().toPlaylistModel(null),
+                mapToModels = mapToPlaylistModels
             ) // side effect: init loads first data to display
         }
-        BigLazyTableUI(
-            controller = controller,
-//            appState = appState
-        )
+        BigLazyTableUI(controller = controller)
     }
 }
 
