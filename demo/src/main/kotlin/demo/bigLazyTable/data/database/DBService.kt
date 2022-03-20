@@ -74,8 +74,10 @@ object DBService : IPagingService<Playlist> {
     }
 
     override fun getTotalCount(): Int = transaction {
-        println("getTotalCount is called")
-        DatabasePlaylists.selectAll().count().toInt()
+        DatabasePlaylists
+            .selectAll()
+            .count()
+            .toInt()
     }
 
     override fun getFilteredCount(filters: List<Filter>): Int {

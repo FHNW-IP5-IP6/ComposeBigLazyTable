@@ -10,6 +10,7 @@ data class Sort(
 )
 
 /**
+ * // TODO: Add description?
  * @author Marco Sprenger, Livio Näf
  */
 interface IPagingService<T> {
@@ -23,9 +24,5 @@ interface IPagingService<T> {
     fun get(id: Long): T
 
     fun indexOf(id: Long, filter: String = ""): Int
-
-    //fun update(dao: T): Boolean
-
-    //fun create(): EntityKey
 
 }
