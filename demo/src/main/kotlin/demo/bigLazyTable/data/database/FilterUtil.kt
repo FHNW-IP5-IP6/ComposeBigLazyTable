@@ -1,6 +1,8 @@
 package demo.bigLazyTable.data.database
 
 import bigLazyTable.paging.*
+import demo.bigLazyTable.data.database.FilterUtil.chooseCorrectFilterTypeMethod
+import demo.bigLazyTable.data.database.FilterUtil.filterEquals
 //import demo.bigLazyTable.data.database.FilterUtil.selectWithFilter
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -25,23 +27,23 @@ fun Table.selectWithAllFilters(filters: List<Filter>): Query {
 
     // TODO: Better way than this ugly code?
     var sql = when (val filter = filters.first()) {
-        is BooleanFilter -> FilterUtil.filterEquals(filter)
-        is DoubleFilter -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is FloatFilter -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is IntFilter -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is LongFilter -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is ShortFilter -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is StringFilter -> FilterUtil.filterEquals(filter)
+        is BooleanFilter -> filterEquals(filter)
+        is DoubleFilter  -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+        is FloatFilter   -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+        is IntFilter     -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+        is LongFilter    -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+        is ShortFilter   -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+        is StringFilter  -> filterEquals(filter)
     }
     for (i in 1 until filters.size) {
         val sql2: Op<Boolean> = when (val filter = filters[i]) {
-            is BooleanFilter -> FilterUtil.filterEquals(filter)
-            is DoubleFilter -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-            is FloatFilter -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-            is IntFilter -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-            is LongFilter -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-            is ShortFilter -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-            is StringFilter -> FilterUtil.filterEquals(filter)
+            is BooleanFilter -> filterEquals(filter)
+            is DoubleFilter  -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+            is FloatFilter   -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+            is IntFilter     -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+            is LongFilter    -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+            is ShortFilter   -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+            is StringFilter  -> filterEquals(filter)
         }
         sql = sql and sql2
     }
@@ -52,13 +54,13 @@ fun Table.selectWithAllFilters(filters: List<Filter>): Query {
 
 fun Table.selectWithFilter(filter: Filter): Query {
     val sql: Op<Boolean> = when (filter) {
-        is BooleanFilter -> FilterUtil.filterEquals(filter)
-        is DoubleFilter  -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is FloatFilter   -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is IntFilter     -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is LongFilter    -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is ShortFilter   -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is StringFilter  -> FilterUtil.filterEquals(filter)
+        is BooleanFilter -> filterEquals(filter)
+        is DoubleFilter  -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+        is FloatFilter   -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+        is IntFilter     -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+        is LongFilter    -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+        is ShortFilter   -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+        is StringFilter  -> filterEquals(filter)
     }
     return select { sql }
 }
