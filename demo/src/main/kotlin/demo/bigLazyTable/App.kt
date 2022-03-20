@@ -12,10 +12,7 @@ import demo.bigLazyTable.data.database.SqliteDb
 import demo.bigLazyTable.model.AppState
 import demo.bigLazyTable.model.LazyTableController
 import demo.bigLazyTable.ui.BigLazyTableUI
-import java.awt.Cursor
 import java.awt.Dimension
-
-lateinit var frameWindowScope: FrameWindowScope
 
 /**
  * @author Marco Sprenger, Livio Näf
@@ -27,14 +24,11 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "ComposeLists"
     ) {
-
-        frameWindowScope = this
-
-        // Needs remember. Without it, the first language change in no full-screen leads to a full-screen window
-        remember { initializeWindowSize() }
-
-        // Needs remember. Without it, initializeConnection would be called again (f.e. on language change)
         remember {
+            // Needs remember. Without it, the first language change in no full-screen leads to a full-screen window
+            initializeWindowSize()
+
+            // Needs remember. Without it, initializeConnection would be called again (f.e. on language change)
             SqliteDb(
                 pathToDb = "./demo/src/main/resources/spotify_playlist_dataset.db",
                 caseSensitiveFiltering = true
@@ -64,8 +58,4 @@ fun FrameWindowScope.initializeWindowSize() {
         minimumSize = Dimension(1000, 800)
         placement = WindowPlacement.Maximized
     }
-}
-
-fun FrameWindowScope.getDefaultCursor() {
-    window.cursor = Cursor.getDefaultCursor()
 }
