@@ -113,7 +113,8 @@ abstract class BaseModel<L>(private val title: L,
     private val modelScope                                   = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     var startedUp                                            = false
 
-
+    abstract val displayedAttributesInTable: List<Attribute<*,*,*>>?
+    abstract val id: Attribute<*,*,*>
 
     init{
         if (getPossibleLanguages().isNotEmpty()) {

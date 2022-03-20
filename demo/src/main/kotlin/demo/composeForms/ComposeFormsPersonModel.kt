@@ -66,7 +66,7 @@ import javax.net.ssl.HttpsURLConnection
  * @author Louisa Reinger
  * @author Steve Vogel
  */
-class ComposeFormsPersonModel : BaseModel<ComposeFormsPersonLabels>(title = ComposeFormsPersonLabels.TITLE, smartphoneOption = true, wizardMode = false) {
+class ComposeFormsPersonModel(override val displayedAttributesInTable: List<Attribute<*, *, *>>? = null) : BaseModel<ComposeFormsPersonLabels>(title = ComposeFormsPersonLabels.TITLE, smartphoneOption = true, wizardMode = false) {
 
     //*****************************************************************************************************************
     // Create attributes: (required)
@@ -171,7 +171,7 @@ class ComposeFormsPersonModel : BaseModel<ComposeFormsPersonLabels>(title = Comp
     //*********************************
     //additional attributes (for header group)
 
-    val id              = IntegerAttribute(model = this, label = ComposeFormsPersonLabels.ID,
+    override val id              = IntegerAttribute(model = this, label = ComposeFormsPersonLabels.ID,
                             value = Random().nextInt(20), readOnly = true)
 
     val age             = LongAttribute(this, ComposeFormsPersonLabels.AGE,

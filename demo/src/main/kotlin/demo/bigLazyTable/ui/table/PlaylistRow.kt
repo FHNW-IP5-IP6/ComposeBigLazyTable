@@ -12,17 +12,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import composeForms.model.BaseModel
 import composeForms.ui.theme.*
 import demo.bigLazyTable.model.AppState
 import demo.bigLazyTable.model.LazyTableController
-import demo.bigLazyTable.model.PlaylistModel
 
-@Composable
-fun PlaylistRow(
-    controller: LazyTableController,
-    playlistModel: PlaylistModel,
+@Composable // TODO: Replace PlaylistModel with dynamic BaseModel
+fun <T: BaseModel<*>> PlaylistRow(
+    controller: LazyTableController<T>,
+    playlistModel: T,
     horizontalScrollState: ScrollState,
-    appState: AppState
+    appState: AppState<*>
 ) {
     val isSelected = appState.selectedTableModel.id.getValue() == playlistModel.id.getValue()
     val backgroundColor = if (isSelected) BackgroundColorGroups else BackgroundColorLight
@@ -39,16 +39,11 @@ fun PlaylistRow(
             .horizontalScroll(horizontalScrollState),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        for (attribute in playlistModel.displayedAttributesInTable) {
+        for (attribute in playlistModel.displayedAttributesInTable!!) {
             AttributeTableCell(
                 attribute = attribute,
                 backgroundColor = backgroundColor
             )
-//            TableCell(
-//                text = attribute.getValueAsText(),
-//                backgroundColor = backgroundColor,
-//                hasError = !attribute.isValid()
-//            )
         }
     }
 }
@@ -57,7 +52,7 @@ fun PlaylistRow(
 fun PlaylistRowPlaceholder(
     backgroundColor: Color = BackgroundColorLight,
     horizontalScrollState: ScrollState,
-    appState: AppState
+    appState: AppState<*>
 ) {
     val lazyListAttributes = appState.defaultTableModel.displayedAttributesInTable
 
@@ -69,7 +64,7 @@ fun PlaylistRowPlaceholder(
             .horizontalScroll(horizontalScrollState),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        for (attribute in lazyListAttributes) {
+        for (attribute in lazyListAttributes!!) {
             TableCell(
                 attribute = attribute,
                 text = "...",

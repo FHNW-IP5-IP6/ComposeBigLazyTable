@@ -6,14 +6,18 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import composeForms.model.BaseModel
+import composeForms.model.IModel
 import composeForms.ui.Form
 import demo.bigLazyTable.model.AppState
+import demo.bigLazyTable.model.BLTLabels
 import demo.bigLazyTable.model.PlaylistModel
 
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun RowScope.FormContainer(weight: Float, model: PlaylistModel, appState: AppState) {
+// TODO: Remove PlaylistModel & make dynamic
+fun <T: BaseModel<*>> RowScope.FormContainer(weight: Float, model: T, appState: AppState<T>) {
     Box(modifier = Modifier.weight(weight)) {
         Form().of(model, appState)
     }

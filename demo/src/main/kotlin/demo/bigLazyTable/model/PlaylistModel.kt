@@ -1,6 +1,7 @@
 package demo.bigLazyTable.model
 
 import androidx.compose.ui.unit.dp
+import com.codahale.metrics.MetricRegistryListener
 import composeForms.model.BaseModel
 import composeForms.model.attributes.*
 import composeForms.model.modelElements.Field
@@ -13,14 +14,14 @@ import org.jetbrains.exposed.sql.Column
 /**
  * @author Marco Sprenger, Livio Näf
  */
-class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTLabels>(title = BLTLabels.TITLE) {
+class PlaylistModel(playlist: Playlist, val appState: AppState<PlaylistModel>?) : BaseModel<BLTLabels>(title = BLTLabels.TITLE) {
 
     // Our Filter treats all values as Strings so
     // TODO: Add a floatingPointAttribute (Double/Float) to test if it works aswell with them
     // TODO: Add a DecisionAttribute to test (Is like BooleanAttri. a DualAttribute
     // TODO: Add a SelectionAttribute to test
 
-    val id = LongAttribute(
+    override val id = LongAttribute(
         model = this,
         label = BLTLabels.ID,
         value = playlist.id,
@@ -107,7 +108,7 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         databaseField = DatabasePlaylists.num_artists as Column<Float>
     )
 
-    val displayedAttributesInTable = listOf(
+    override val displayedAttributesInTable = listOf(
         id,
         numEdits,
         name,
@@ -299,7 +300,7 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
     )
 
     override fun updateChanges() {
-        if (!appState.changedTableModels.contains(this)) {
+        if (!appState!!.changedTableModels.contains(this)) {
             appState.changedTableModels.add(this)
         }
         super.updateChanges()

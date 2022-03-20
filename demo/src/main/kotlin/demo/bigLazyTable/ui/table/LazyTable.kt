@@ -12,15 +12,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import composeForms.model.BaseModel
 import demo.bigLazyTable.model.AppState
 import demo.bigLazyTable.model.LazyTableController
 import demo.bigLazyTable.ui.theme.CustomScrollbarStyle
 
-@Composable
-fun LazyTable(
-    controller: LazyTableController,
+@Composable // TODO: Replace PlaylistModel with dynamic Model
+fun <T: BaseModel<*>> LazyTable(
+    controller: LazyTableController<T>,
     horizontalScrollState: ScrollState,
-    appState: AppState
+    appState: AppState<*>
 ) {
     val verticalLazyListState = rememberLazyListState()
 
@@ -56,7 +57,7 @@ fun LazyTable(
                         )
                         else -> PlaylistRow(
                             controller = controller,
-                            playlistModel = playlistModel,
+                            playlistModel = playlistModel as T,
                             horizontalScrollState = horizontalScrollState,
                             appState = appState
                         )

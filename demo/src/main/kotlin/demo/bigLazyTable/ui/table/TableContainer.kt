@@ -17,8 +17,8 @@ import demo.bigLazyTable.ui.theme.*
 @Composable
 fun RowScope.TableContainer(
     weight: Float,
-    controller: LazyTableController,
-    appState: AppState
+    controller: LazyTableController<*>,
+    appState: AppState<*>
 ) {
     val horizontalScrollState = rememberScrollState()
 

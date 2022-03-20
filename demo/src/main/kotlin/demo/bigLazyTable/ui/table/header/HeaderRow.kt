@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import composeForms.model.BaseModel
 import composeForms.model.attributes.Attribute
 import composeForms.ui.theme.BackgroundColorHeader
 import demo.bigLazyTable.model.*
@@ -19,10 +20,10 @@ import demo.bigLazyTable.ui.table.AttributeTableCell
 import demo.bigLazyTable.ui.table.TableCell
 
 @Composable
-fun HeaderRow(
+fun <T: BaseModel<*>> HeaderRow(
     horizontalScrollState: ScrollState,
-    appState: AppState,
-    controller: LazyTableController
+    appState: AppState<T>,
+    controller: LazyTableController<*>
 ) {
     Row(
         modifier = Modifier
@@ -33,7 +34,7 @@ fun HeaderRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        for (attribute in appState.defaultTableModel.displayedAttributesInTable) {
+        for (attribute in appState.defaultTableModel.displayedAttributesInTable!!) {
             Column {
                 FilterTextField(
                     attribute = attribute,
