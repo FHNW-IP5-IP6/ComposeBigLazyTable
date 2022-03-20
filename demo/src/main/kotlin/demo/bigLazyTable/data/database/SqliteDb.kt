@@ -10,10 +10,11 @@ class SqliteDb(
     caseSensitiveFiltering: Boolean = true,
     listOfPragmas: List<String>? = null
 ) {
-
     private val makeSqliteCaseSensitive = "?case_sensitive_like=true"
 
-    private val handleCaseSensitive = { caseSensitive: Boolean -> if (caseSensitive) makeSqliteCaseSensitive else "" }
+    private val handleCaseSensitive = { caseSensitive: Boolean ->
+        if (caseSensitive) makeSqliteCaseSensitive else ""
+    }
     private val handlePragmas = { pragmas: List<String>? ->
         var params = ""
         pragmas?.onEach { param -> params += "&$param" }
@@ -30,5 +31,4 @@ class SqliteDb(
         Database.connect(url = url, driver = driver)
         TransactionManager.manager.defaultIsolationLevel = isolationLevel
     }
-
 }
