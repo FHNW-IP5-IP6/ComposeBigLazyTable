@@ -118,9 +118,9 @@ class LazyTableController(
             addPageToCache(pageNr = pageNr, pageOfModels = models)
         }
 
-        addNewModelsToAppState()
-
         forceRecompose()
+
+        addNewModelsToAppState()
     }
 
     /**
@@ -350,6 +350,7 @@ class LazyTableController(
                 // Loop over the whole page
                 for (i in startIndexOfKey until startIndexOfKey + pageSize) {
                     // Check if a specific element existing for the given key in the cache
+
                     if (cache[key]?.get(i % pageSize) != null) {
                         // Check if filtering is active, to differentiate between app state filtered list or full list
                         if (isFiltering) {

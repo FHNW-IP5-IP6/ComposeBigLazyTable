@@ -37,41 +37,6 @@ data class GenericFilter<T>(
     val operation: NumberFilterType
 )
 
-data class LongFilter(
-    val filter: Long,
-    val dbField: Column<Long>,
-    val filterType: NumberFilterType = NumberFilterType.EQUALS,
-    val between: Between<Long>? = null
-) : Filter()
-
-data class DoubleFilter(
-    val filter: Double,
-    val dbField: Column<Double>,
-    val filterType: NumberFilterType = NumberFilterType.EQUALS,
-    val between: Between<Double>? = null
-) : Filter()
-
-data class IntFilter(
-    val filter: Int,
-    val dbField: Column<Int>,
-    val filterType: NumberFilterType = NumberFilterType.EQUALS,
-    val between: Between<Int>? = null
-) : Filter()
-
-data class ShortFilter(
-    val filter: Short,
-    val dbField: Column<Short>,
-    val filterType: NumberFilterType = NumberFilterType.EQUALS,
-    val between: Between<Short>? = null
-) : Filter()
-
-data class FloatFilter(
-    val filter: Float,
-    val dbField: Column<Float>,
-    val filterType: NumberFilterType = NumberFilterType.EQUALS,
-    val between: Between<Float>? = null
-) : Filter()
-
 data class BooleanFilter(
     val filter: Boolean,
     val dbField: Column<Boolean>,
@@ -82,3 +47,42 @@ data class StringFilter(
     val dbField: Column<String>,
     var caseSensitive: Boolean
 ) : Filter()
+
+sealed class NumberFilter : Filter() {
+    abstract val filterType: NumberFilterType
+}
+
+data class LongFilter(
+    val filter: Long,
+    val dbField: Column<Long>,
+    override val filterType: NumberFilterType,
+    val between: Between<Long>? = null
+) : NumberFilter()
+
+data class DoubleFilter(
+    val filter: Double,
+    val dbField: Column<Double>,
+    override val filterType: NumberFilterType,
+    val between: Between<Double>? = null
+) : NumberFilter()
+
+data class IntFilter(
+    val filter: Int,
+    val dbField: Column<Int>,
+    override val filterType: NumberFilterType,
+    val between: Between<Int>? = null
+) : NumberFilter()
+
+data class ShortFilter(
+    val filter: Short,
+    val dbField: Column<Short>,
+    override val filterType: NumberFilterType,
+    val between: Between<Short>? = null
+) : NumberFilter()
+
+data class FloatFilter(
+    val filter: Float,
+    val dbField: Column<Float>,
+    override val filterType: NumberFilterType,
+    val between: Between<Float>? = null
+) : NumberFilter()

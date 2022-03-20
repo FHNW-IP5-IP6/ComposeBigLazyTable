@@ -30,18 +30,13 @@ fun Table.selectWithAllFilters(filters: List<Filter>): Query {
 object FilterUtil {
 
     fun retrieveSql(filter: Filter): Op<Boolean> = when (filter) {
-        is BooleanFilter -> filterEquals(filter)
-        is DoubleFilter  -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is FloatFilter   -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is IntFilter     -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is LongFilter    -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is ShortFilter   -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is StringFilter  -> filterEquals(filter)
+        is BooleanFilter, is StringFilter -> filterEquals(filter)
+        is NumberFilter -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
     }
 
-    private fun chooseCorrectFilterTypeMethod(filter: Filter, filterType: NumberFilterType): Op<Boolean> {
+    private fun chooseCorrectFilterTypeMethod(filter: NumberFilter, filterType: NumberFilterType): Op<Boolean> {
         return when (filterType) {
-            NumberFilterType.EQUALS  -> filterEquals(filter)
+            NumberFilterType.EQUALS -> filterEquals(filter)
             NumberFilterType.LESS    -> filterLess(filter)
             NumberFilterType.GREATER -> filterGreater(filter)
             NumberFilterType.NOT_EQUALS     -> filterNotEquals(filter)
