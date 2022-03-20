@@ -3,6 +3,7 @@ package demo.bigLazyTable.model // TODO: move to package controler
 import androidx.compose.runtime.*
 import bigLazyTable.paging.*
 import composeForms.model.attributes.*
+import demo.bigLazyTable.ui.table.header.NumberTextFieldUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -82,6 +83,7 @@ class LazyTableController(
         appState.defaultTableModel.displayedAttributesInTable.forEach { attribute ->
             if (attribute.canBeFiltered) {
                 displayedFilterStrings[attribute] = ""
+                attributeFilterNew[attribute] = null
             }
             attributeSort[attribute] = BLTSortOrder.None
             attributeCaseSensitive[attribute] = false
@@ -558,6 +560,14 @@ class LazyTableController(
     // TODO: Instead add member pagesLoaded: Boolean & Make a LaunchedEffect in LazyTable
     private fun forceRecompose() {
         recomposeStateChanger = !recomposeStateChanger
+    }
+
+    fun onNumberValueChange(newValue: String, attribute: NumberAttribute<*, *, *>) {
+        NumberTextFieldUtil.onValueChange(
+            newValue = newValue,
+            controller = this,
+            attribute = attribute
+        )
     }
 
 }

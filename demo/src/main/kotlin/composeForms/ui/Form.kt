@@ -35,12 +35,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.platform.LocalWindowInfo
 import composeForms.model.IModel
-import composeForms.model.attributes.DualAttribute
 import composeForms.model.modelElements.HeaderGroup
 import composeForms.ui.theme.BodyBackground
-import demo.bigLazyTable.frameWindowScope
 import demo.bigLazyTable.model.AppState
 
 

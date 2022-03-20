@@ -104,10 +104,8 @@ fun FilterEnabledTextField(
                 modifier = Modifier.width(attribute.tableColumnWidth),
                 value = controller.displayedFilterStrings[attribute].toString(),
                 onValueChange = { newValue ->
-                    // Controller.doit
-                    NumberTextFieldUtil.onValueChange(
+                    controller.onNumberValueChange(
                         newValue = newValue,
-                        controller = controller,
                         attribute = attribute
                     )
                 },
@@ -129,8 +127,7 @@ fun LeadingIcon(
     IconButton(
         enabled = controller.attributeFilterNew[attribute] != null,
         onClick = {
-            controller.attributeCaseSensitive[attribute] =
-                !controller.attributeCaseSensitive[attribute]!!
+            controller.attributeCaseSensitive[attribute] = !controller.attributeCaseSensitive[attribute]!!
 
             // Here we create a new StringFilter that caseSensitive changes are reflected
             controller.attributeFilterNew[attribute] = StringFilter(
