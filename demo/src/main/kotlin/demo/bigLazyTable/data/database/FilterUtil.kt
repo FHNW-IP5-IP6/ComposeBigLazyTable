@@ -1,10 +1,7 @@
 package demo.bigLazyTable.data.database
 
 import bigLazyTable.paging.*
-import demo.bigLazyTable.data.database.FilterUtil.chooseCorrectFilterTypeMethod
-import demo.bigLazyTable.data.database.FilterUtil.filterEquals
-import kotlinx.coroutines.selects.select
-//import demo.bigLazyTable.data.database.FilterUtil.selectWithFilter
+import demo.bigLazyTable.data.database.FilterUtil.retrieveSql
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.greater
@@ -30,19 +27,19 @@ fun Table.selectWithAllFilters(filters: List<Filter>): Query {
     return this.select { sql }
 }
 
-fun retrieveSql(filter: Filter): Op<Boolean> = when (filter) {
-    is BooleanFilter -> filterEquals(filter)
-    is DoubleFilter  -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-    is FloatFilter   -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-    is IntFilter     -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-    is LongFilter    -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-    is ShortFilter   -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-    is StringFilter  -> filterEquals(filter)
-}
-
 object FilterUtil {
 
-    fun chooseCorrectFilterTypeMethod(filter: Filter, filterType: NumberFilterType): Op<Boolean> {
+    fun retrieveSql(filter: Filter): Op<Boolean> = when (filter) {
+        is BooleanFilter -> filterEquals(filter)
+        is DoubleFilter  -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+        is FloatFilter   -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+        is IntFilter     -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+        is LongFilter    -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+        is ShortFilter   -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+        is StringFilter  -> filterEquals(filter)
+    }
+
+    private fun chooseCorrectFilterTypeMethod(filter: Filter, filterType: NumberFilterType): Op<Boolean> {
         return when (filterType) {
             NumberFilterType.EQUALS  -> filterEquals(filter)
             NumberFilterType.LESS    -> filterLess(filter)
@@ -57,7 +54,7 @@ object FilterUtil {
         }
     }
 
-    fun filterEquals(filter: Filter): Op<Boolean> = when (filter) {
+    private fun filterEquals(filter: Filter): Op<Boolean> = when (filter) {
         is LongFilter    -> filter.dbField eq filter.filter
         is IntFilter     -> filter.dbField eq filter.filter
         is DoubleFilter  -> filter.dbField eq filter.filter
