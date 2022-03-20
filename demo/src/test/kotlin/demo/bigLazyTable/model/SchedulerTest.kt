@@ -42,6 +42,7 @@ internal class SchedulerTest {
         }
     }
 
+    // TODO: Check why this fails when running all tests
     @Disabled("when running all tests this one doesn't work - but on its own it works")
     @Test
     fun processOnlyNewestTask() {
@@ -59,6 +60,7 @@ internal class SchedulerTest {
         assertEquals(1000, result)
     }
 
+    // TODO: Check why this fails when running all tests
     @Disabled("when running all tests this one doesn't work - but on its own it works")
     @Test
     fun processOnlyOneTaskInDelayTime() {
@@ -74,7 +76,11 @@ internal class SchedulerTest {
         assertEquals(1, result)
     }
 
-    @Disabled("Enable only after bigger changes in scheduler. Takes a lot of time to execute, because the scheduler is waiting 1mio times 10milliseconds and 1mio times a 5millisecond sleep before schedule a new task.")
+    // TODO: 1 Mio im Disabled Text aber unten sind nur 100_000?
+    @Disabled(
+        "Enable only after bigger changes in scheduler. Takes a lot of time to execute, because the scheduler " +
+        "is waiting 1mio times 10milliseconds and 1mio times a 5millisecond sleep before schedule a new task."
+    )
     @Test
     fun scheduleTaskOverflowWithDelay() {
         scheduler = Scheduler(10)
@@ -91,6 +97,7 @@ internal class SchedulerTest {
         assertEquals(1, result)
     }
 
+    // TODO: Check why this fails when running all tests
     @Disabled("when running all tests this one doesn't work - but on its own it works")
     @Test
     fun delayIsConsidered() {
