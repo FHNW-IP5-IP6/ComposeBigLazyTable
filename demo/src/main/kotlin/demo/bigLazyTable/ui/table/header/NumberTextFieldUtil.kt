@@ -8,7 +8,7 @@ object NumberTextFieldUtil {
 
     // TODO: Future improvement -> Add a FilterAttribute
     // TODO: Move to controller
-    fun onValueChange(
+    fun createConcreteNumberFilter(
         newValue: String,
         controller: LazyTableController,
         attribute: Attribute<*, *, *>

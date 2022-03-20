@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
+import org.jetbrains.exposed.sql.Column
 import org.junit.platform.commons.util.LruCache // TODO: Other LruCache (android.util.LruCache<K, V>)
 import java.util.*
 import java.util.logging.Logger
@@ -562,12 +563,32 @@ class LazyTableController(
         recomposeStateChanger = !recomposeStateChanger
     }
 
-    fun onNumberValueChange(newValue: String, attribute: NumberAttribute<*, *, *>) {
-        NumberTextFieldUtil.onValueChange(
-            newValue = newValue,
-            controller = this,
-            attribute = attribute
-        )
+    fun createConcreteNumberFilter(newValue: String, attribute: NumberAttribute<*, *, *>) {
+        when (newValue) {
+            "" -> {
+                attributeFilterNew[attribute] = null
+                displayedFilterStrings[attribute] = newValue
+            }
+            else -> NumberTextFieldUtil.createConcreteNumberFilter(
+                newValue = newValue,
+                controller = this,
+                attribute = attribute
+            )
+        }
+    }
+
+    fun createStringFilter(newValue: String, attribute: StringAttribute<*>) {
+        displayedFilterStrings[attribute] = newValue
+        when (newValue) {
+            "" -> attributeFilterNew[attribute] = null
+            else -> attributeFilterNew[attribute] = StringFilter(
+                filter = newValue,
+                dbField = attribute.databaseField as Column<String>,
+                // Case sensitive is not set again after first time! -> Workaround is that we create a new
+                // StringFilter everytime CaseSensitive icon is clicked [see below]
+                caseSensitive = attributeCaseSensitive[attribute]!!
+            )
+        }
     }
 
 }
