@@ -268,7 +268,7 @@ class LazyTableController(
                 // Replace the current model with the model containing changes
                 pageOfModels[i] = tableModel
                 // Remove the model with changes from the changedModels list
-                appState.changedTableModels.remove(tableModel)
+//                appState.changedTableModels.remove(tableModel)
             }
         }
 
