@@ -3,7 +3,6 @@ package demo.bigLazyTable.model // TODO: move to package controler
 import androidx.compose.runtime.*
 import bigLazyTable.paging.*
 import composeForms.model.attributes.*
-import demo.bigLazyTable.utils.PageUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -12,6 +11,7 @@ import org.junit.platform.commons.util.LruCache // TODO: Other LruCache (android
 import java.util.*
 import java.util.logging.Logger
 import kotlin.collections.ArrayList
+import kotlin.math.ceil
 import kotlin.properties.Delegates
 
 private val Log = KotlinLogging.logger {} // TODO: Why not below logger
@@ -41,7 +41,7 @@ class LazyTableController(
     // Variables for different calculations
     private val totalCount by lazy { pagingService.getTotalCount() }
     private var filteredCount by Delegates.notNull<Int>()
-    var totalPages = PageUtils.getTotalPages(totalCount = totalCount, pageSize = pageSize)
+    var totalPages = getTotalPages(totalCount = totalCount, pageSize = pageSize)
     private val firstPageNr = 0
 
 
@@ -92,6 +92,18 @@ class LazyTableController(
             selectFirstModel()
         }
     }
+
+    /**
+     * Just a Wrapper function around the Kotlin [ceil] function with two Int Parameters
+     * @param totalCount the total number of items which will be displayed
+     * @param pageSize the defined pageSize which will divide the [totalCount]
+     * @return the total pages for the defined [totalCount] & [pageSize] which is just the next bigger int of the
+     * division of those values - Example: 10 / 3 = 4, where [totalCount]=10 & [pageSize]=3
+     */
+    fun getTotalPages(
+        totalCount: Int,
+        pageSize: Int
+    ): Int = ceil(totalCount.toDouble() / pageSize).toInt()
 
     /**
      * Load the initial data for first start. Loads the first cache size pages.

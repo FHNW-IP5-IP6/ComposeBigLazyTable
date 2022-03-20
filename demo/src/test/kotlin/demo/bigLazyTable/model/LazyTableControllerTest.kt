@@ -359,4 +359,40 @@ internal class LazyTableControllerTest {
         assertEquals(false, isInCache)
     }
 
+    @Test
+    fun `getTotalPages with totalCount 1 and pageSize 1`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        assertEquals(1, controller.getTotalPages(totalCount = 1, pageSize = 1))
+    }
+
+    @Test
+    fun `getTotalPages with totalCount 10 and pageSize 3`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        assertEquals(4, controller.getTotalPages(totalCount = 10, pageSize = 3))
+    }
+
+    @Test
+    fun `getTotalPages with totalCount 1_000_000 and pageSize 40`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        assertEquals(25_000, controller.getTotalPages(totalCount = 1_000_000, pageSize = 40))
+    }
+
+    @Test
+    fun `getTotalPages with totalCount 516454 and pageSize 44`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        assertEquals(11_738, controller.getTotalPages(totalCount = 516454, pageSize = 44))
+    }
+
+    @Test
+    fun `getTotalPages with totalCount any number and pageSize 0 returns Int MAX_VALUE`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        assertEquals(Int.MAX_VALUE, controller.getTotalPages(totalCount = 516454, pageSize = 0))
+    }
+
+    @Test
+    fun `getTotalPages with totalCount any number and pageSize -1 returns that number as negative value`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        assertEquals(-516454, controller.getTotalPages(totalCount = 516454, pageSize = -1))
+    }
+
 }

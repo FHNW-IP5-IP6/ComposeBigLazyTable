@@ -5,16 +5,13 @@ import bigLazyTable.paging.IPagingService
 import bigLazyTable.paging.Sort
 import bigLazyTable.paging.StringFilter
 import demo.bigLazyTable.model.Playlist
-import demo.bigLazyTable.utils.PageUtils
+import kotlin.math.ceil
 import kotlin.reflect.full.memberProperties
 
 class FakePagingService(val numberOfPlaylists: Int, val pageSize: Int) : IPagingService<Playlist> {
 
     private val allData = mutableMapOf<Int, List<Playlist>>()
-    private val numberOfPages = PageUtils.getTotalPages(
-        totalCount = numberOfPlaylists,
-        pageSize = pageSize
-    )
+    private val numberOfPages = ceil(numberOfPlaylists.toDouble() / pageSize).toInt()
 
     init {
         for (pageNr in 0 until numberOfPages) {
