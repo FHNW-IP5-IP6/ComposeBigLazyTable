@@ -129,7 +129,7 @@ class LazyTableController<T: BaseModel<*>>(
      */
     private fun selectFirstModel() {
         val fullList = if (isFiltering) appState.filteredTableModelList else appState.tableModelList
-        fullList.first()?.let { firstModel -> selectModel(firstModel as T) }
+        fullList.first()?.let { firstModel -> selectModel(firstModel) }
     }
 
     /**
