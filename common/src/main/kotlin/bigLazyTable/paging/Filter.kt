@@ -14,7 +14,8 @@ import org.jetbrains.exposed.sql.Column
 //    }
 //}
 
-// TODO: Operation?
+// TODO: Name something which also matches for String
+// TODO: Operation? Operator?
 enum class NumberFilterType {
     EQUALS,
     NOT_EQUALS,
@@ -42,15 +43,17 @@ data class BooleanFilter(
     val dbField: Column<Boolean>,
 ) : Filter()
 
-data class StringFilter(
-    val filter: String,
-    val dbField: Column<String>,
-    var caseSensitive: Boolean
-) : Filter()
-
+// TODO: Name something which also matches for String -> ManyOperationFilter, MultipleOperationsFilter
 sealed class NumberFilter : Filter() {
     abstract val filterType: NumberFilterType
 }
+
+data class StringFilter(
+    val filter: String,
+    val dbField: Column<String>,
+    var caseSensitive: Boolean,
+    override val filterType: NumberFilterType = NumberFilterType.EQUALS
+) : NumberFilter() // TODO: Name something which also matches for String
 
 data class LongFilter(
     val filter: Long,

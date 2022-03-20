@@ -10,6 +10,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.less
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.neq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.notLike
 import java.util.*
 
 fun Table.selectWithAllFilters(filters: List<Filter>): Query {
@@ -30,7 +31,7 @@ fun Table.selectWithAllFilters(filters: List<Filter>): Query {
 object FilterUtil {
 
     fun retrieveSql(filter: Filter): Op<Boolean> = when (filter) {
-        is BooleanFilter, is StringFilter -> filterEquals(filter)
+        is BooleanFilter/*, is StringFilter*/ -> filterEquals(filter)
         is NumberFilter -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
     }
 
@@ -79,9 +80,20 @@ object FilterUtil {
         is DoubleFilter  -> filter.dbField neq filter.filter
         is FloatFilter   -> filter.dbField neq filter.filter
         is ShortFilter   -> filter.dbField neq filter.filter
-        is StringFilter  -> caseSensitiveLike(filter.caseSensitive, filter.dbField, filter.filter)
+        is StringFilter  -> caseSensitiveNotLike(filter.caseSensitive, filter.dbField, filter.filter) // TODO: Make accessible from UI
         else -> throw IllegalArgumentException("Only number & string filters can be called with this function, but received $filter")
     }
+
+    /**
+     * For future uses a NOT LIKE function
+     */
+    private fun caseSensitiveNotLike(
+        caseSensitive: Boolean,
+        dbField: Column<String>,
+        filter: String
+    ): Op<Boolean> =
+        if (caseSensitive) dbField notLike filter
+        else dbField.lowerCase() notLike filter.lowercase(Locale.getDefault())
 
     private fun filterGreater(filter: Filter): Op<Boolean> = when (filter) {
         is LongFilter   -> filter.dbField greater filter.filter

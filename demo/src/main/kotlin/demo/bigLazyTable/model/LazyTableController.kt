@@ -578,16 +578,17 @@ class LazyTableController(
         }
     }
 
-    fun createStringFilter(newValue: String, attribute: StringAttribute<*>) {
+    fun createStringFilter(newValue: String, attribute: StringAttribute<*>, notEqualsFilter: Boolean) {
         displayedFilterStrings[attribute] = newValue
         when (newValue) {
             "" -> attributeFilterNew[attribute] = null
             else -> attributeFilterNew[attribute] = StringFilter(
-                filter = newValue,
+                filter = if (notEqualsFilter) newValue.substringAfter('!') else newValue,
                 dbField = attribute.databaseField as Column<String>,
                 // Case sensitive is not set again after first time! -> Workaround is that we create a new
                 // StringFilter everytime CaseSensitive icon is clicked [see below]
-                caseSensitive = attributeCaseSensitive[attribute]!!
+                caseSensitive = attributeCaseSensitive[attribute]!!,
+                filterType = if (notEqualsFilter) NumberFilterType.NOT_EQUALS else NumberFilterType.EQUALS
             )
         }
     }

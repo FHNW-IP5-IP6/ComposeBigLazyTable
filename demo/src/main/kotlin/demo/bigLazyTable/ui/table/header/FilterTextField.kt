@@ -83,7 +83,8 @@ fun FilterEnabledTextField(
                 onValueChange = { newValue ->
                     controller.createStringFilter(
                         newValue = newValue,
-                        attribute = attribute
+                        attribute = attribute,
+                        notEqualsFilter = newValue.startsWith('!')
                     )
                     controller.onFilterChanged()
                 },
