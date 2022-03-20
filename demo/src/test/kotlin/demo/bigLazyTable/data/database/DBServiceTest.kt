@@ -1,5 +1,6 @@
 package demo.bigLazyTable.data.database
 
+import androidx.compose.runtime.Composable
 import bigLazyTable.paging.*
 import demo.bigLazyTable.model.Playlist
 import demo.bigLazyTable.utils.printTestMethodName
@@ -16,6 +17,7 @@ import java.util.NoSuchElementException
 
 private val Log = KotlinLogging.logger {}
 
+// TODO: Get rid of the printTestMethodName -> use gradle standard instead
 internal class DBServiceTest {
 
     private lateinit var dbService: DBService
@@ -75,6 +77,26 @@ internal class DBServiceTest {
     }
 
     @Test
+    fun `getPage with startIndex 989 returns a list of Playlist`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
+        runBlocking {
+            // when
+            val startIndex = 989
+            page = dbService.getPage(startIndex, pageSize)
+
+            // then
+            assertTrue(page.isNotEmpty())
+            assertEquals(startIndex, page.first().id.toInt())
+            assertEquals(lastTestDbIndice, page.last().id.toInt())
+
+            // result logs
+            Log.info { "page.size=${page.size}" }
+            Log.info { "page.first=${page.first().id}, page.last=${page.last().id}" }
+        }
+    }
+
+    @Test
     fun `getPage with random startIndex returns a list of Playlist`() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
         printFixedTestValues()
@@ -86,7 +108,9 @@ internal class DBServiceTest {
             // then
             assertTrue(randomPage.isNotEmpty())
             assertEquals(startIndexRandom, randomPage.first().id.toInt())
-            assertEquals(startIndexRandom + pageSize - 1, randomPage.last().id.toInt())
+            val lastIndex = startIndexRandom + pageSize -1
+            val lastIndexCheck = if (lastIndex > lastTestDbIndice) lastTestDbIndice else lastIndex
+            assertEquals(lastIndexCheck, randomPage.last().id.toInt())
 
             // result logs
             Log.info { "randomPage.size=${randomPage.size}" }

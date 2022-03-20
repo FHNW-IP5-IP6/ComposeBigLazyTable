@@ -210,7 +210,8 @@ abstract class BaseModel<L>(private val title: L,
      * @param lang : String
      */
     override fun setCurrentLanguage(lang: String){
-        println("setCurrentLanguage is called with lang $lang")
+        // TODO: Why is this function called twice when changing the language
+        //  println("setCurrentLanguage is called with lang $lang")
         currentLanguage.value = lang
         allGroups.forEach { it.getAttributes().forEach{ attribute -> attribute.setCurrentLanguage(lang) }}
         getCurrentFocusedAttribute()?.let { publishAll(it) }

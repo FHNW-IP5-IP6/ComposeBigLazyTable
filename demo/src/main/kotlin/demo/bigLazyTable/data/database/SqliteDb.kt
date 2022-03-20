@@ -7,7 +7,7 @@ import kotlin.system.exitProcess
 
 class SqliteDb(
     pathToDb: String,
-    caseSensitiveFiltering: Boolean,
+    caseSensitiveFiltering: Boolean = true,
     listOfPragmas: List<String>? = null
 ) {
 

@@ -1,7 +1,7 @@
 package demo.bigLazyTable.data.database
 
 import bigLazyTable.paging.*
-//import demo.bigLazyTable.data.database.FilterUtil.selectWithFilter
+import demo.bigLazyTable.data.database.FilterUtil.retrieveSql
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.greater
@@ -17,32 +17,9 @@ fun Table.selectWithAllFilters(filters: List<Filter>): Query {
     val start = System.currentTimeMillis()
     if (filters.isEmpty()) return Query(this, null)
 
-    // TODO: Could this be removed due to the below for loop?
-    if (filters.size == 1) {
-        val filter = filters.first()
-        return selectWithFilter(filter)
-    }
-
-    // TODO: Better way than this ugly code?
-    var sql = when (val filter = filters.first()) {
-        is BooleanFilter -> FilterUtil.filterEquals(filter)
-        is DoubleFilter -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is FloatFilter -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is IntFilter -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is LongFilter -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is ShortFilter -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is StringFilter -> FilterUtil.filterEquals(filter)
-    }
+    var sql = retrieveSql(filter = filters.first())
     for (i in 1 until filters.size) {
-        val sql2: Op<Boolean> = when (val filter = filters[i]) {
-            is BooleanFilter -> FilterUtil.filterEquals(filter)
-            is DoubleFilter -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-            is FloatFilter -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-            is IntFilter -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-            is LongFilter -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-            is ShortFilter -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-            is StringFilter -> FilterUtil.filterEquals(filter)
-        }
+        val sql2 = retrieveSql(filter = filters[i])
         sql = sql and sql2
     }
     val end = System.currentTimeMillis()
@@ -50,24 +27,16 @@ fun Table.selectWithAllFilters(filters: List<Filter>): Query {
     return this.select { sql }
 }
 
-fun Table.selectWithFilter(filter: Filter): Query {
-    val sql: Op<Boolean> = when (filter) {
-        is BooleanFilter -> FilterUtil.filterEquals(filter)
-        is DoubleFilter  -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is FloatFilter   -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is IntFilter     -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is LongFilter    -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is ShortFilter   -> FilterUtil.chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
-        is StringFilter  -> FilterUtil.filterEquals(filter)
-    }
-    return select { sql }
-}
-
 object FilterUtil {
 
-    fun chooseCorrectFilterTypeMethod(filter: Filter, filterType: NumberFilterType): Op<Boolean> {
+    fun retrieveSql(filter: Filter): Op<Boolean> = when (filter) {
+        is BooleanFilter, is StringFilter -> filterEquals(filter)
+        is NumberFilter -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+    }
+
+    private fun chooseCorrectFilterTypeMethod(filter: NumberFilter, filterType: NumberFilterType): Op<Boolean> {
         return when (filterType) {
-            NumberFilterType.EQUALS  -> filterEquals(filter)
+            NumberFilterType.EQUALS -> filterEquals(filter)
             NumberFilterType.LESS    -> filterLess(filter)
             NumberFilterType.GREATER -> filterGreater(filter)
             NumberFilterType.NOT_EQUALS     -> filterNotEquals(filter)
@@ -80,7 +49,7 @@ object FilterUtil {
         }
     }
 
-    fun filterEquals(filter: Filter): Op<Boolean> = when (filter) {
+    private fun filterEquals(filter: Filter): Op<Boolean> = when (filter) {
         is LongFilter    -> filter.dbField eq filter.filter
         is IntFilter     -> filter.dbField eq filter.filter
         is DoubleFilter  -> filter.dbField eq filter.filter
@@ -91,9 +60,16 @@ object FilterUtil {
     }
 
     /**
-     * Is implemented with the thinking that the database will use case sensitive like by default or with a pragma
+     * Is implemented with the thinking that the database will
+     * use case sensitive like by default or with a pragma
+     *
+     * [dbField] must be lowerCase() in the else case
      */
-    fun caseSensitiveLike(caseSensitive: Boolean, dbField: Column<String>, filter: String): Op<Boolean> =
+    private fun caseSensitiveLike(
+        caseSensitive: Boolean,
+        dbField: Column<String>,
+        filter: String
+    ): Op<Boolean> =
         if (caseSensitive) dbField like filter
         else dbField.lowerCase() like filter.lowercase(Locale.getDefault())
 
@@ -143,7 +119,6 @@ object FilterUtil {
         else -> throw IllegalArgumentException("Only number filters can be called with this function, but received $filter")
     }
 
-    // TODO: is there something like between?
     private fun filterBetweenBothIncluded(filter: Filter): Op<Boolean> = when (filter) {
         is LongFilter   -> filterGreaterEquals(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
         is IntFilter    -> filterGreaterEquals(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)

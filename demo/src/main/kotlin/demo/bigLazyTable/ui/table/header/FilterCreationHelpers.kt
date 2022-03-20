@@ -60,7 +60,6 @@ fun createFilter(
             to = to
         )
     }
-    controller.onFilterChanged()
 }
 
 fun createShortFilter(

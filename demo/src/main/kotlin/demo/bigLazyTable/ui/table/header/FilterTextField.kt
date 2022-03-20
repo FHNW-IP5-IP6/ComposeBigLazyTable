@@ -81,13 +81,9 @@ fun FilterEnabledTextField(
                 modifier = Modifier.width(attribute.tableColumnWidth),
                 value = controller.displayedFilterStrings[attribute].toString(),
                 onValueChange = { newValue ->
-                    controller.displayedFilterStrings[attribute] = newValue
-                    controller.attributeFilterNew[attribute] = StringFilter(
-                        filter = newValue,
-                        dbField = attribute.databaseField as Column<String>,
-                        // Case sensitive is not set again after first time! -> Workaround is that we create a new
-                        // StringFilter everytime CaseSensitive icon is clicked [see below]
-                        caseSensitive = controller.attributeCaseSensitive[attribute]!!
+                    controller.createStringFilter(
+                        newValue = newValue,
+                        attribute = attribute
                     )
                     controller.onFilterChanged()
                 },
@@ -104,12 +100,11 @@ fun FilterEnabledTextField(
                 modifier = Modifier.width(attribute.tableColumnWidth),
                 value = controller.displayedFilterStrings[attribute].toString(),
                 onValueChange = { newValue ->
-                    // Controller.doit
-                    NumberTextFieldUtil.onValueChange(
+                    controller.createConcreteNumberFilter(
                         newValue = newValue,
-                        controller = controller,
                         attribute = attribute
                     )
+                    controller.onFilterChanged()
                 },
                 textStyle = TextStyle(color = Color.White),
                 // TODO: Hardcoded strings oke oder .properties file oder sonst was?
@@ -129,8 +124,7 @@ fun LeadingIcon(
     IconButton(
         enabled = controller.attributeFilterNew[attribute] != null,
         onClick = {
-            controller.attributeCaseSensitive[attribute] =
-                !controller.attributeCaseSensitive[attribute]!!
+            controller.attributeCaseSensitive[attribute] = !controller.attributeCaseSensitive[attribute]!!
 
             // Here we create a new StringFilter that caseSensitive changes are reflected
             controller.attributeFilterNew[attribute] = StringFilter(

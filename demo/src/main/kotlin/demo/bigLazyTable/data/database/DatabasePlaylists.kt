@@ -6,7 +6,6 @@ import org.jetbrains.exposed.sql.Table
  * @author Marco Sprenger, Livio Näf
  */
 object DatabasePlaylists : Table() {
-    // The filtered ones - have all different types we have in our Table [long, int, bool, string]
     val id                  = long("id")
     val name                = varchar("name", length = 100)
     val modified_at         = integer("modified_at")

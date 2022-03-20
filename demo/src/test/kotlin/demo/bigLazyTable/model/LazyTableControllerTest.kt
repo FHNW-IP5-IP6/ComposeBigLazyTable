@@ -13,7 +13,7 @@ private val Log = KotlinLogging.logger {}
 
 internal class LazyTableControllerTest {
 
-    private lateinit var viewModel: LazyTableController
+    private lateinit var controller: LazyTableController
     private lateinit var appState: AppState
 
     private val numberOfPlaylists = 5_000 //1_000_000
@@ -27,7 +27,7 @@ internal class LazyTableControllerTest {
     @BeforeEach
     fun setUp() {
         appState = AppState(pagingService = pagingService)
-        viewModel = LazyTableController(
+        controller = LazyTableController(
             pagingService = pagingService,
             pageSize = pageSize,
             appState = appState
@@ -42,7 +42,7 @@ internal class LazyTableControllerTest {
         val firstVisibleItemIndex = 0
 
         // then
-        assertEquals(true, viewModel.isTimeToLoadPage(firstVisibleItemIndex = firstVisibleItemIndex))
+        assertEquals(true, controller.isTimeToLoadPage(firstVisibleItemIndex = firstVisibleItemIndex))
         Log.info { "testing with firstVisibleItemIndex $firstVisibleItemIndex" }
     }
 
@@ -54,11 +54,11 @@ internal class LazyTableControllerTest {
         val firstVisibleItemIndex = 0
 
         // when
-        assertEquals(true, viewModel.isTimeToLoadPage(firstVisibleItemIndex = firstVisibleItemIndex))
-        viewModel.loadNewPages(firstVisibleItemIndex = firstVisibleItemIndex)
+        assertEquals(true, controller.isTimeToLoadPage(firstVisibleItemIndex = firstVisibleItemIndex))
+        controller.loadNewPages(firstVisibleItemIndex = firstVisibleItemIndex)
 
         // then
-        assertEquals(false, viewModel.isTimeToLoadPage(firstVisibleItemIndex = firstVisibleItemIndex))
+        assertEquals(false, controller.isTimeToLoadPage(firstVisibleItemIndex = firstVisibleItemIndex))
         Log.info { "testing with firstVisibleItemIndex $firstVisibleItemIndex" }
     }
 
@@ -72,7 +72,7 @@ internal class LazyTableControllerTest {
         // then
         assertThrows<IllegalArgumentException> {
             // when
-            viewModel.isTimeToLoadPage(firstVisibleItemIndex = firstVisibleItemIndex)
+            controller.isTimeToLoadPage(firstVisibleItemIndex = firstVisibleItemIndex)
         }
     }
 
@@ -87,51 +87,57 @@ internal class LazyTableControllerTest {
         // then
         assertThrows<IllegalArgumentException> {
             // when
-            viewModel.isTimeToLoadPage(firstVisibleItemIndex = firstVisibleItemIndex)
+            controller.isTimeToLoadPage(firstVisibleItemIndex = firstVisibleItemIndex)
         }
     }
 
     @Test
     fun `nbrOfTotalPages is rounded to the next integer when numberOfPlaylists or pageSize are not even`() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
-        val isNumberOfPlaylistsAndPageSizeEven = numberOfPlaylists % 2 == 0 && viewModel.pageSize % 2 == 0
-        val numberDividedByPageSize = numberOfPlaylists / viewModel.pageSize
+        val isNumberOfPlaylistsAndPageSizeEven = numberOfPlaylists % 2 == 0 && controller.pageSize % 2 == 0
+        val numberDividedByPageSize = numberOfPlaylists / controller.pageSize
         val expected = if (isNumberOfPlaylistsAndPageSizeEven) numberDividedByPageSize else numberDividedByPageSize + 1
-        assertEquals(expected, viewModel.totalPages)
-        Log.info { "expected: $expected == actual ${viewModel.totalPages}" }
+        assertEquals(expected, controller.totalPages)
+        Log.info { "expected: $expected == actual ${controller.totalPages}" }
     }
 
     @Test
-    fun `selectPlaylist sets the given playlistModel as selected`() {
+    fun `selectModel sets the given playlistModel as selected`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         // given
         val playlistModel = PlaylistModel(Playlist(name = "test"), appState)
 
         // when
-        viewModel.selectModel(tableModel = playlistModel)
+        controller.selectModel(tableModel = playlistModel)
 
         // then
         assertEquals(playlistModel, appState.selectedTableModel)
     }
 
     @Test
-    fun `selectPlaylist does not throw an Exception`() {
+    fun `selectModel does not throw an Exception`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         // given
         val playlistModel = PlaylistModel(Playlist(name = "test"), appState)
 
         // then
         assertDoesNotThrow {
             // when
-            viewModel.selectModel(tableModel = playlistModel)
+            controller.selectModel(tableModel = playlistModel)
         }
     }
 
     @Test
     fun `what happens if we pass an empty playlistModel`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         // given
         val playlistModel = PlaylistModel(Playlist(), appState)
 
         // when
-        viewModel.selectModel(tableModel = playlistModel)
+        controller.selectModel(tableModel = playlistModel)
 
         // then
         assertEquals(playlistModel, appState.selectedTableModel)
@@ -139,170 +145,254 @@ internal class LazyTableControllerTest {
 
     @Test
     fun `addPageToCache works with page 0`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         val playlistModels = listOf(
             PlaylistModel(playlist = Playlist(), appState = appState)
         )
-        viewModel.addPageToCache(pageNr = 0, pageOfModels = playlistModels)
+        controller.addPageToCache(pageNr = 0, pageOfModels = playlistModels)
 
-        assertTrue(viewModel.isPageInCache(0))
+        assertTrue(controller.isPageInCache(0))
     }
 
     @Test
     fun `addPageToCache works with page 1`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         val playlistModels = listOf(
             PlaylistModel(playlist = Playlist(), appState = appState)
         )
-        viewModel.addPageToCache(pageNr = 1, pageOfModels = playlistModels)
+        controller.addPageToCache(pageNr = 1, pageOfModels = playlistModels)
 
-        assertTrue(viewModel.isPageInCache(1))
+        assertTrue(controller.isPageInCache(1))
     }
 
     @Test
     fun `addPageToCache doesnt work with different pages in load & check if it is in cache`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         val playlistModels = listOf(
             PlaylistModel(playlist = Playlist(), appState = appState)
         )
-        viewModel.addPageToCache(pageNr = 1, pageOfModels = playlistModels)
+        controller.addPageToCache(pageNr = 1, pageOfModels = playlistModels)
 
-        assertFalse(viewModel.isPageInCache(45))
+        assertFalse(controller.isPageInCache(45))
     }
 
     @Test
-    fun `loadPage works with pageNrToLoad 0`() {
+    fun `loadSinglePage works with pageNrToLoad 0`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         assertDoesNotThrow {
-            viewModel.loadSinglePage(pageNrToLoad = 0)
+            controller.loadSinglePage(pageNrToLoad = 0)
         }
     }
 
     @Test
-    fun `loadPage works with pageNrToLoad 100`() {
+    fun `loadSinglePage works with pageNrToLoad 100`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         assertDoesNotThrow {
-            viewModel.loadSinglePage(pageNrToLoad = 100)
+            controller.loadSinglePage(pageNrToLoad = 100)
         }
     }
 
     @Test
     fun `updateAppStateList works with currentVisiblePageNr=0`() {
-        viewModel.loadNewPages(0)
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
+        controller.loadNewPages(0)
         assertDoesNotThrow {
-            viewModel.updateAppStateList(currentVisiblePageNr = 0)
+            controller.updateAppStateList(currentVisiblePageNr = 0)
         }
     }
 
     @Test
-    fun `addToAppStateList works`() {
-        viewModel.loadNewPages(0)
+    fun `addNewModelsToAppState works`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
+        controller.loadNewPages(0)
         assertDoesNotThrow {
-            viewModel.addNewModelsToAppState()
+            controller.addNewModelsToAppState()
         }
     }
 
     @Test
-    fun `removeFromAppStateList works with index=0`() {
+    fun `removeOldModelsFromAppState works with index=0`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         assertDoesNotThrow {
-            viewModel.removeOldModelsFromAppState(pageNr = 0)
+            controller.removeOldModelsFromAppState(pageNr = 0)
         }
     }
 
     @Test
-    fun `removeFromAppStateList works with index=24960`() {
+    fun `removeOldModelsFromAppState works with index=24960`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         assertDoesNotThrow {
-            viewModel.removeOldModelsFromAppState(pageNr = 24_960)
+            controller.removeOldModelsFromAppState(pageNr = 24_960)
         }
     }
 
     @Test
     fun `calculateStartIndexToRemove works with index 0`() {
-        val oldStartIndex = viewModel.calculateStartIndexToRemove(pageNr = 0,)
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
+        val oldStartIndex = controller.calculateStartIndexToRemove(pageNr = 0,)
         assertEquals(0, oldStartIndex)
     }
 
     @Disabled("Enable when testing with numberOfPlaylists = 1_000_000")
     @Test
     fun `calculateStartIndexToRemove works with index 25000`() {
-        val oldStartIndex = viewModel.calculateStartIndexToRemove(pageNr = 25000)
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
+        val oldStartIndex = controller.calculateStartIndexToRemove(pageNr = 25000)
         assertEquals(999_920, oldStartIndex)
     }
 
     @Test
     fun `removeOldPagesFromList works with startIndexToRemove=0`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         assertDoesNotThrow {
-            viewModel.removeOldPagesFromList(startIndexToRemove = 0)
+            controller.removeOldPagesFromList(startIndexToRemove = 0)
         }
     }
 
     @Test
-    fun `calculatePageNumberForListIndex works with list index 0`() {
-        val pageNumber = viewModel.getVisiblePageNr(firstVisibleItemIndex = 0)
+    fun `getVisiblePageNr works with list index 0`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
+        val pageNumber = controller.getVisiblePageNr(firstVisibleItemIndex = 0)
         assertEquals(0, pageNumber)
     }
 
     @Test
-    fun `calculatePageNumberForListIndex works with list index 40`() {
-        val pageNumber = viewModel.getVisiblePageNr(firstVisibleItemIndex = 40)
+    fun `getVisiblePageNr works with list index 40`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
+        val pageNumber = controller.getVisiblePageNr(firstVisibleItemIndex = 40)
         assertEquals(1, pageNumber)
     }
 
     @Test
-    fun `calculatePageNumberForListIndex works with list index 25_000`() {
-        val pageNumber = viewModel.getVisiblePageNr(firstVisibleItemIndex = 25_000)
+    fun `getVisiblePageNr works with list index 25_000`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
+        val pageNumber = controller.getVisiblePageNr(firstVisibleItemIndex = 25_000)
         assertEquals(625, pageNumber)
     }
 
     @Test
-    fun `calculatePageNumberForListIndex works with list index 999_960`() {
-        val pageNumber = viewModel.getVisiblePageNr(firstVisibleItemIndex = 999_960)
+    fun `getVisiblePageNr works with list index 999_960`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
+        val pageNumber = controller.getVisiblePageNr(firstVisibleItemIndex = 999_960)
         assertEquals(24_999, pageNumber)
     }
 
     @Test
-    fun `calculatePageNumberForListIndex works with list index 999_961`() {
-        val pageNumber = viewModel.getVisiblePageNr(firstVisibleItemIndex = 999_961)
+    fun `getVisiblePageNr works with list index 999_961`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
+        val pageNumber = controller.getVisiblePageNr(firstVisibleItemIndex = 999_961)
         assertEquals(24_999, pageNumber)
     }
 
     @Test
-    fun `calculatePageNumberForListIndex works with list index 1_000_000`() {
-        val pageNumber = viewModel.getVisiblePageNr(firstVisibleItemIndex = 1_000_000)
+    fun `getVisiblePageNr works with list index 1_000_000`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
+        val pageNumber = controller.getVisiblePageNr(firstVisibleItemIndex = 1_000_000)
         assertEquals(25_000, pageNumber)
     }
 
     @Test
-    fun `calculatePageStartIndexToLoad works with pageNr 0`() {
-        val startIndexToLoad = viewModel.getFirstIndexOfPage(pageNr = 0)
+    fun `getFirstIndexOfPage works with pageNr 0`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
+        val startIndexToLoad = controller.getFirstIndexOfPage(pageNr = 0)
         assertEquals(0, startIndexToLoad)
     }
 
     @Test
-    fun `calculatePageStartIndexToLoad works with pageNr 1`() {
-        val startIndexToLoad = viewModel.getFirstIndexOfPage(pageNr = 1)
+    fun `getFirstIndexOfPage works with pageNr 1`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
+        val startIndexToLoad = controller.getFirstIndexOfPage(pageNr = 1)
         assertEquals(40, startIndexToLoad)
     }
 
     @Test
-    fun `calculatePageStartIndexToLoad works with pageNr 2`() {
-        val startIndexToLoad = viewModel.getFirstIndexOfPage(pageNr = 2)
+    fun `getFirstIndexOfPage works with pageNr 2`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
+        val startIndexToLoad = controller.getFirstIndexOfPage(pageNr = 2)
         assertEquals(80, startIndexToLoad)
     }
 
     @Test
-    fun `calculatePageStartIndexToLoad works with pageNr 625`() {
-        val startIndexToLoad = viewModel.getFirstIndexOfPage(pageNr = 625)
+    fun `getFirstIndexOfPage works with pageNr 625`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
+        val startIndexToLoad = controller.getFirstIndexOfPage(pageNr = 625)
         assertEquals(25_000, startIndexToLoad)
     }
 
     @Test
     fun `isPageInCache works with pageNr 1`() {
-        viewModel.loadNewPages(0)
-        val isInCache = viewModel.isPageInCache(1)
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
+        controller.loadNewPages(0)
+        val isInCache = controller.isPageInCache(1)
         assertEquals(true, isInCache)
     }
 
     @Test
     fun `isPageInCache doesnt work with pageNr 5345`() {
-        viewModel.loadNewPages(0)
-        val isInCache = viewModel.isPageInCache(5345)
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
+        controller.loadNewPages(0)
+        val isInCache = controller.isPageInCache(5345)
         assertEquals(false, isInCache)
+    }
+
+    @Test
+    fun `getTotalPages with totalCount 1 and pageSize 1`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        assertEquals(1, controller.getTotalPages(totalCount = 1, pageSize = 1))
+    }
+
+    @Test
+    fun `getTotalPages with totalCount 10 and pageSize 3`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        assertEquals(4, controller.getTotalPages(totalCount = 10, pageSize = 3))
+    }
+
+    @Test
+    fun `getTotalPages with totalCount 1_000_000 and pageSize 40`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        assertEquals(25_000, controller.getTotalPages(totalCount = 1_000_000, pageSize = 40))
+    }
+
+    @Test
+    fun `getTotalPages with totalCount 516454 and pageSize 44`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        assertEquals(11_738, controller.getTotalPages(totalCount = 516454, pageSize = 44))
+    }
+
+    @Test
+    fun `getTotalPages with totalCount any number and pageSize 0 returns Int MAX_VALUE`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        assertEquals(Int.MAX_VALUE, controller.getTotalPages(totalCount = 516454, pageSize = 0))
+    }
+
+    @Test
+    fun `getTotalPages with totalCount any number and pageSize -1 returns that number as negative value`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+        assertEquals(-516454, controller.getTotalPages(totalCount = 516454, pageSize = -1))
     }
 
 }
