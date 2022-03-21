@@ -42,6 +42,8 @@ class LazyTableController<T: BaseModel<*>>(
     private val mapToModels: (List<Any?>, AppState<T>) -> List<T>,
     private val pageSize: Int = 40, // TODO: make dynamic
 ) {
+    var isLoading by mutableStateOf(false)
+
     // Variables for different calculations
     private val totalCount by lazy { pagingService.getTotalCount() }
     private var filteredCount by Delegates.notNull<Int>()
@@ -113,11 +115,13 @@ class LazyTableController<T: BaseModel<*>>(
      * Load the initial data for first start. Loads the first cache size pages.
      */
     private fun initialDataLoading() {
+        isLoading = true
         for (pageNr in firstPageNr until cacheSize) {
             val startIndexOfPage = pageNr * pageSize
             val models = getPageFromService(startIndex = startIndexOfPage)
             addPageToCache(pageNr = pageNr, pageOfModels = models)
         }
+        isLoading = false
 
         forceRecompose()
 
