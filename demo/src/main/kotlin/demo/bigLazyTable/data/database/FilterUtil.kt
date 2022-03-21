@@ -80,7 +80,7 @@ object FilterUtil {
         is DoubleFilter  -> filter.dbField neq filter.filter
         is FloatFilter   -> filter.dbField neq filter.filter
         is ShortFilter   -> filter.dbField neq filter.filter
-        is StringFilter  -> caseSensitiveNotLike(filter.caseSensitive, filter.dbField, filter.filter) // TODO: Make accessible from UI
+        is StringFilter  -> caseSensitiveNotLike(filter.caseSensitive, filter.dbField, filter.filter)
         else -> throw IllegalArgumentException("Only number & string filters can be called with this function, but received $filter")
     }
 

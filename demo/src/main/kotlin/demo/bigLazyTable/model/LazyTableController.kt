@@ -410,7 +410,6 @@ class LazyTableController<T: BaseModel<*>>(
         }
     }
 
-    // TODO: Spinner?
     fun onFilterChanged() {
         println("Inside onFiltersChanged")
         val start = System.currentTimeMillis()
