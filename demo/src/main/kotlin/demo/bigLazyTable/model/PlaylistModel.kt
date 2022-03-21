@@ -16,11 +16,6 @@ import org.jetbrains.exposed.sql.Column
  */
 class PlaylistModel(playlist: Playlist, val appState: AppState<PlaylistModel>?) : BaseModel<BLTLabels>(title = BLTLabels.TITLE) {
 
-    // Our Filter treats all values as Strings so
-    // TODO: Add a floatingPointAttribute (Double/Float) to test if it works aswell with them
-    // TODO: Add a DecisionAttribute to test (Is like BooleanAttri. a DualAttribute
-    // TODO: Add a SelectionAttribute to test
-
     override val id = LongAttribute(
         model = this,
         label = BLTLabels.ID,

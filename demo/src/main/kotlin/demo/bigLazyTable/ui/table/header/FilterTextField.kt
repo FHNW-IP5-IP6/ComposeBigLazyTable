@@ -43,57 +43,7 @@ fun FilterEnabledTextField(
             val toggleState = remember { mutableStateOf(ToggleableState.Indeterminate) }
             TriStateCheckbox(
                 state = toggleState.value,
-                onClick = {
-                    // TODO: Move complete when into controller
-                    when (toggleState.value) {
-                        ToggleableState.Indeterminate -> {
-                            toggleState.value = ToggleableState.On
-                            val value = true
-                            controller.displayedFilterStrings[attribute] = value.toString()
-                            controller.attributeFilterNew[attribute] = BooleanFilter(
-                                filter = value,
-                                dbField = attribute.databaseField as Column<Boolean>
-                            )
-                            controller.onFilterChanged()
-                        }
-                        ToggleableState.On -> {
-                            toggleState.value = ToggleableState.Off
-                            val value = false
-                            controller.displayedFilterStrings[attribute] = value.toString()
-                            controller.attributeFilterNew[attribute] = BooleanFilter(
-                                filter = value,
-                                dbField = attribute.databaseField as Column<Boolean>
-                            )
-                            controller.onFilterChanged()
-                        }
-                        else -> {
-                            toggleState.value = ToggleableState.Indeterminate
-                            controller.displayedFilterStrings[attribute] = ""
-                            controller.attributeFilterNew[attribute] = null
-                            controller.onFilterChanged()
-                        }
-                    }
-                }
-            )
-        }
-        is StringAttribute -> {
-            TextField(
-                modifier = Modifier.width(attribute.tableColumnWidth),
-                value = controller.displayedFilterStrings[attribute].toString(),
-                onValueChange = { newValue ->
-                    controller.createStringFilter(
-                        newValue = newValue,
-                        attribute = attribute,
-                        notEqualsFilter = newValue.startsWith('!')
-                    )
-                    controller.onFilterChanged()
-                },
-                textStyle = TextStyle(color = Color.White),
-                // TODO: Hardcoded strings oke oder .properties file oder sonst was? recherche falls einfach sonst oke so
-                label = { Text(text = FilterLabel, color = Color.White) },
-                singleLine = true,
-                leadingIcon  = { LeadingIcon(controller = controller, attribute = attribute) },
-                trailingIcon = { TrailingIcon(controller = controller, attribute = attribute) }
+                onClick = { controller.onBooleanFilterChanged(toggleState, attribute) }
             )
         }
         is NumberAttribute -> {
@@ -101,11 +51,10 @@ fun FilterEnabledTextField(
                 modifier = Modifier.width(attribute.tableColumnWidth),
                 value = controller.displayedFilterStrings[attribute].toString(),
                 onValueChange = { newValue ->
-                    controller.createConcreteNumberFilter(
+                    controller.onNumberFilterChanged(
                         newValue = newValue,
                         attribute = attribute
                     )
-                    controller.onFilterChanged()
                 },
                 textStyle = TextStyle(color = Color.White),
                 // TODO: Hardcoded strings oke oder .properties file oder sonst was?
@@ -114,6 +63,27 @@ fun FilterEnabledTextField(
                 trailingIcon = { TrailingIcon(controller = controller, attribute = attribute) }
             )
         }
+        is StringAttribute -> {
+            TextField(
+                modifier = Modifier.width(attribute.tableColumnWidth),
+                value = controller.displayedFilterStrings[attribute].toString(),
+                onValueChange = { newValue ->
+                    controller.onStringFilterChanged(
+                        newValue = newValue,
+                        attribute = attribute,
+                        notEqualsFilter = newValue.startsWith('!')
+                    )
+                },
+                textStyle = TextStyle(color = Color.White),
+                label = { Text(text = FilterLabel, color = Color.White) },
+                singleLine = true,
+                leadingIcon  = { LeadingIcon(controller = controller, attribute = attribute) },
+                trailingIcon = { TrailingIcon(controller = controller, attribute = attribute) }
+            )
+        }
+        // TODO: Define a specific UI Element for SelectionAttribute & DecisionAttribute
+        //  SelectionAttribute could have a DropdownMenu
+        //  DecisionAttribute  could have a DropdownMenu or something like BooleanAttribute
     }
 }
 
@@ -166,14 +136,12 @@ fun TrailingIcon(
     }
 }
 
-// TODO: Should we write something when a field can not be filtered?
 @Composable
 fun FilterDisabledTextField(attribute: Attribute<*, *, *>) {
     TextField(
         modifier = Modifier.width(attribute.tableColumnWidth),
         value = "",
         onValueChange = {},
-        textStyle = TextStyle(color = Color.White), // TODO: Needed?
         singleLine = true,
         enabled = false
     )

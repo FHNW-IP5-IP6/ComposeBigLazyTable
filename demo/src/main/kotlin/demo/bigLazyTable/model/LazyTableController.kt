@@ -1,6 +1,7 @@
 package demo.bigLazyTable.model // TODO: move to package controler
 
 import androidx.compose.runtime.*
+import androidx.compose.ui.state.ToggleableState
 import bigLazyTable.paging.*
 import composeForms.model.BaseModel
 import composeForms.model.attributes.*
@@ -562,7 +563,7 @@ class LazyTableController<T: BaseModel<*>>(
         recomposeStateChanger = !recomposeStateChanger
     }
 
-    fun createConcreteNumberFilter(newValue: String, attribute: NumberAttribute<*, *, *>) {
+    fun onNumberFilterChanged(newValue: String, attribute: NumberAttribute<*, *, *>) {
         when (newValue) {
             "" -> {
                 attributeFilterNew[attribute] = null
@@ -574,9 +575,10 @@ class LazyTableController<T: BaseModel<*>>(
                 attribute = attribute
             )
         }
+        onFilterChanged()
     }
 
-    fun createStringFilter(newValue: String, attribute: StringAttribute<*>, notEqualsFilter: Boolean) {
+    fun onStringFilterChanged(newValue: String, attribute: StringAttribute<*>, notEqualsFilter: Boolean) {
         displayedFilterStrings[attribute] = newValue
         when (newValue) {
             "" -> attributeFilterNew[attribute] = null
@@ -589,6 +591,31 @@ class LazyTableController<T: BaseModel<*>>(
                 filterType = if (notEqualsFilter) NumberFilterType.NOT_EQUALS else NumberFilterType.EQUALS
             )
         }
+        onFilterChanged()
+    }
+
+    fun onBooleanFilterChanged(toggleState: MutableState<ToggleableState>, attribute: BooleanAttribute<*>) {
+        when (toggleState.value) {
+            ToggleableState.Indeterminate -> {
+                toggleState.value = ToggleableState.On
+                attributeFilterNew[attribute] = BooleanFilter(
+                    filter = true,
+                    dbField = attribute.databaseField as Column<Boolean>
+                )
+            }
+            ToggleableState.On -> {
+                toggleState.value = ToggleableState.Off
+                attributeFilterNew[attribute] = BooleanFilter(
+                    filter = false,
+                    dbField = attribute.databaseField as Column<Boolean>
+                )
+            }
+            else -> {
+                toggleState.value = ToggleableState.Indeterminate
+                attributeFilterNew[attribute] = null
+            }
+        }
+        onFilterChanged()
     }
 
 }
