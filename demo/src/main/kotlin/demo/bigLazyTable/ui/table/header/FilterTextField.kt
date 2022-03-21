@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.FilterNone
 import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +31,7 @@ fun FilterTextField(
             attribute = attribute,
             controller = controller
         )
-    } else FilterDisabledTextField(attribute)
+    } else FilterDisabledTextField(attribute) // TODO: Blank textfield or just show nothing?
 }
 
 @Composable
