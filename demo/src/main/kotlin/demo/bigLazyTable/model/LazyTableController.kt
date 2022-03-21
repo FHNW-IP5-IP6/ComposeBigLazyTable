@@ -43,7 +43,7 @@ class LazyTableController<T: BaseModel<*>>(
     private val mapToModels: (List<Any?>, AppState<T>) -> List<T>,
     private val pageSize: Int = 40, // TODO: make dynamic
 ) {
-    var isLoading by mutableStateOf(false)
+    val appState = AppState(pagingService, defaultModel)
 
     // Variables for different calculations
     private val totalCount by lazy { pagingService.getTotalCount() }
@@ -51,7 +51,7 @@ class LazyTableController<T: BaseModel<*>>(
     var totalPages = getTotalPages(totalCount = totalCount, pageSize = pageSize)
     private val firstPageNr = 0
 
-    val appState = AppState(pagingService, defaultModel)
+    var isLoading by mutableStateOf(false)
 
     // Sorting variables
     var isSorting by mutableStateOf(false)
@@ -107,7 +107,7 @@ class LazyTableController<T: BaseModel<*>>(
      * @return the total pages for the defined [totalCount] & [pageSize] which is just the next bigger int of the
      * division of those values - Example: 10 / 3 = 4, where [totalCount]=10 & [pageSize]=3
      */
-    fun getTotalPages(
+    internal fun getTotalPages(
         totalCount: Int,
         pageSize: Int
     ): Int = ceil(totalCount.toDouble() / pageSize).toInt()
@@ -369,22 +369,6 @@ class LazyTableController<T: BaseModel<*>>(
         }
     }
 
-//        fun onSortChanged(attribute: Attribute<*, *, *>, newSortOrder: BLTSortOrder) {
-//            resetPreviousSortedAttribute(newAttribute = attribute)
-//
-//            lastSortedAttribute = attribute
-//            attributeSort[attribute] = newSortOrder
-//            sort = newSortOrder.sortAttribute(attribute)
-//
-//            scheduler.scheduleTask { loadFirstPagesToFillCacheAndAddToAppStateList() }
-//        }
-//
-//        private fun resetPreviousSortedAttribute(newAttribute: Attribute<*, *, *>) {
-//            if (lastSortedAttribute != null && lastSortedAttribute != newAttribute) {
-//                attributeSort[lastSortedAttribute!!] = BLTSortOrder.None
-//            }
-//        }
-
     /**
      * TODO: Add description
      * @param attribute TODO: Add description
@@ -442,39 +426,6 @@ class LazyTableController<T: BaseModel<*>>(
         val end = System.currentTimeMillis()
         println("onFiltersChanged needed ${end - start} ms")
     }
-
-//    /**
-//     * TODO: Add description
-//     * @param attribute TODO: Add description
-//     * @param newFilter TODO: Add description
-//     */
-//    fun onFiltersChanged(attribute: Attribute<*, *, *>, newFilter: String) {
-//        attributeFilter[attribute] = newFilter
-//
-//        if (newFilter == "") filteredAttributes.remove(attribute)
-//        else filteredAttributes.add(attribute)
-//
-//        filters = filteredAttributes.map { a ->
-//            Filter(
-//                filter = attributeFilter[a] ?: "",
-//                dbField = a.databaseField as Column<String>,
-//                caseSensitive = false
-//            )
-//        }
-//
-//        isFiltering = filters.isNotEmpty()
-//        if (isFiltering) {
-//            filterScheduler.scheduleTask {
-//                filteredCount = pagingService.getFilteredCount(filters = filters)
-//                totalPages = PageUtils.getTotalPages(totalCount = filteredCount, pageSize = pageSize)
-//                appState.filteredTableModelList = ArrayList(Collections.nCopies(filteredCount, null))
-//
-//                initialDataLoading()
-//            }
-//        } else {
-//            totalPages = PageUtils.getTotalPages(totalCount = totalCount, pageSize = pageSize)
-//        }
-//    }
 
     /**
      * Select a model from the table.
