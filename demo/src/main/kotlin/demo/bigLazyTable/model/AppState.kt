@@ -1,4 +1,4 @@
-package demo.bigLazyTable.model
+package demo.bigLazyTable.model // TODO: Welches package? Controller?
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf

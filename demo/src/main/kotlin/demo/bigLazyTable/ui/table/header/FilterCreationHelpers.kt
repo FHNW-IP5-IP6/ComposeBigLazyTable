@@ -71,7 +71,7 @@ fun createShortFilter(
     from: String = "",
     to: String = ""
 ) {
-    controller.attributeFilterNew[attribute] = ShortFilter(
+    controller.attributeFilter[attribute] = ShortFilter(
         filter = if (isBetween) 0 else value.toShort(),
         dbField = attribute.databaseField!!,
         filterType = filterType,
@@ -101,7 +101,7 @@ fun createIntFilter(
     from: String = "",
     to: String = ""
 ) {
-    controller.attributeFilterNew[attribute] = IntFilter(
+    controller.attributeFilter[attribute] = IntFilter(
         filter = if (isBetween) 0 else value.toInt(),
         dbField = attribute.databaseField!!,
         filterType = filterType,
@@ -131,7 +131,7 @@ fun createLongFilter(
     from: String = "",
     to: String = ""
 ) {
-    controller.attributeFilterNew[attribute] = LongFilter(
+    controller.attributeFilter[attribute] = LongFilter(
         filter = if (isBetween) 0 else value.toLong(),
         dbField = attribute.databaseField!!,
         filterType = filterType,
@@ -161,7 +161,7 @@ fun createFloatFilter(
     from: String = "",
     to: String = ""
 ) {
-    controller.attributeFilterNew[attribute] = FloatFilter(
+    controller.attributeFilter[attribute] = FloatFilter(
         filter = if (isBetween) 0f else value.toFloat(),
         dbField = attribute.databaseField!!,
         filterType = filterType,
@@ -191,7 +191,7 @@ fun createDoubleFilter(
     from: String = "",
     to: String = ""
 ) {
-    controller.attributeFilterNew[attribute] = DoubleFilter(
+    controller.attributeFilter[attribute] = DoubleFilter(
         filter = if (isBetween) 0.0 else value.toDouble(),
         dbField = attribute.databaseField!!,
         filterType = filterType,

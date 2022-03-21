@@ -22,8 +22,8 @@ private val LightColorPalette = lightColors(
 )
 
 val CustomScrollbarStyle = ScrollbarStyle(
-    minimalHeight = 16.dp,
-    thickness = 12.dp,
+    minimalHeight = ScrollbarMinimumHeight,
+    thickness = ScrollbarThickness,
     shape = RoundedCornerShape(4.dp),
     hoverDurationMillis = 1000,
     hoverColor = HoverColor,

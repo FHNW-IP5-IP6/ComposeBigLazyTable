@@ -16,6 +16,7 @@ import composeForms.model.BaseModel
 import demo.bigLazyTable.model.AppState
 import demo.bigLazyTable.model.LazyTableController
 import demo.bigLazyTable.ui.theme.CustomScrollbarStyle
+import demo.bigLazyTable.ui.theme.ScrollbarThickness
 
 @Composable // TODO: Replace PlaylistModel with dynamic Model
 fun <T: BaseModel<*>> LazyTable(
@@ -37,7 +38,7 @@ fun <T: BaseModel<*>> LazyTable(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 14.dp)
+                .padding(bottom = 14.dp) // TODO: Auf ScrollbarMinimumHeight bezogen?
         ) {
             val firstVisibleItemIndex = verticalLazyListState.firstVisibleItemIndex
             if (isTimeToLoadPage(firstVisibleItemIndex)) {
@@ -50,7 +51,7 @@ fun <T: BaseModel<*>> LazyTable(
             }
 
             LazyColumn(
-                modifier = Modifier.padding(end = 12.dp),
+                modifier = Modifier.padding(end = ScrollbarThickness),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 state = verticalLazyListState
             ) {

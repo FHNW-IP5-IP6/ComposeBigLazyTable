@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.FilterNone
 import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -94,12 +93,12 @@ fun LeadingIcon(
     attribute: Attribute<*, *, *>
 ) {
     IconButton(
-        enabled = controller.attributeFilterNew[attribute] != null,
+        enabled = controller.attributeFilter[attribute] != null,
         onClick = {
             controller.attributeCaseSensitive[attribute] = !controller.attributeCaseSensitive[attribute]!!
 
             // Here we create a new StringFilter that caseSensitive changes are reflected
-            controller.attributeFilterNew[attribute] = StringFilter(
+            controller.attributeFilter[attribute] = StringFilter(
                 filter = controller.displayedFilterStrings[attribute]!!,
                 dbField = attribute.databaseField as Column<String>,
                 caseSensitive = controller.attributeCaseSensitive[attribute]!!
@@ -124,7 +123,7 @@ fun TrailingIcon(
         IconButton(
             onClick = {
                 controller.displayedFilterStrings[attribute] = ""
-                controller.attributeFilterNew[attribute] = null
+                controller.attributeFilter[attribute] = null
                 controller.onFilterChanged()
             }
         ) {

@@ -16,6 +16,7 @@ import composeForms.model.BaseModel
 import composeForms.ui.theme.*
 import demo.bigLazyTable.model.AppState
 import demo.bigLazyTable.model.LazyTableController
+import demo.bigLazyTable.ui.theme.HorizontalPadding
 
 @Composable // TODO: Replace PlaylistModel with dynamic BaseModel
 fun <T: BaseModel<*>> PlaylistRow(
@@ -31,7 +32,7 @@ fun <T: BaseModel<*>> PlaylistRow(
         modifier = Modifier
             .background(backgroundColor)
             .fillMaxWidth()
-            .padding(horizontal = 5.dp)
+            .padding(horizontal = HorizontalPadding)
             .selectable(
                 selected = isSelected,
                 onClick = { controller.selectModel(playlistModel) }
@@ -60,7 +61,7 @@ fun PlaylistRowPlaceholder(
         modifier = Modifier
             .background(backgroundColor)
             .fillMaxWidth()
-            .padding(horizontal = 5.dp)
+            .padding(horizontal = HorizontalPadding)
             .horizontalScroll(horizontalScrollState),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {

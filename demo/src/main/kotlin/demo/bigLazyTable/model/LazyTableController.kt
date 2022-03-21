@@ -21,6 +21,13 @@ import kotlin.properties.Delegates
 private val Log = KotlinLogging.logger {} // TODO: Why not below logger
 val log2 = Logger.getLogger("classname")
 
+// TODO: Add log
+class LRUCache<key, value> (val maxSize: Int) : LinkedHashMap<key, value>(maxSize, 0.75f, true){
+    override fun removeEldestEntry(eldest: MutableMap.MutableEntry<key, value>?): Boolean {
+        return size > maxSize
+    }
+}
+
 /**
  * TODO: Add class documentation
  * @param pagingService TODO: Add description for param
@@ -29,14 +36,6 @@ val log2 = Logger.getLogger("classname")
  *
  * @author Marco Sprenger, Livio Näf
  */
-
-// TODO: Add log
-class LRUCache<key, value> (val maxSize: Int) : LinkedHashMap<key, value>(maxSize, 0.75f, true){
-    override fun removeEldestEntry(eldest: MutableMap.MutableEntry<key, value>?): Boolean {
-        return size > maxSize
-    }
-}
-
 class LazyTableController<T: BaseModel<*>>(
     private val pagingService: IPagingService<*>,
     defaultModel: T,
@@ -54,15 +53,17 @@ class LazyTableController<T: BaseModel<*>>(
     var isLoading by mutableStateOf(false)
 
     // Sorting variables
-    var isSorting by mutableStateOf(false)
-    var lastSortedAttribute: Attribute<*, *, *>? = null
-    var attributeSort = mutableStateMapOf<Attribute<*, *, *>, BLTSortOrder>()
     var sort: Sort? by mutableStateOf(null)
+    var attributeSort = mutableStateMapOf<Attribute<*, *, *>, BLTSortOrder>()
+    var lastSortedAttribute: Attribute<*, *, *>? = null
+    // Could be used for future improvements with multiple sorts
+    var isSorting by mutableStateOf(false)
+        private set
 
     // Filtering variables
     var filters = listOf<Filter>()
-    var displayedFilterStrings: MutableMap<Attribute<*, *, *>, String> = mutableStateMapOf()
-    var attributeFilterNew: MutableMap<Attribute<*, *, *>, Filter?> = mutableStateMapOf()
+    var attributeFilter = mutableStateMapOf<Attribute<*, *, *>, Filter?>()
+    var displayedFilterStrings = mutableStateMapOf<Attribute<*, *, *>, String>()
     var attributeCaseSensitive = mutableStateMapOf<Attribute<*, *, *>, Boolean>()
     var isFiltering by mutableStateOf(false)
         private set
@@ -73,7 +74,7 @@ class LazyTableController<T: BaseModel<*>>(
 
     // Cache variables
     private val cacheSize = 5
-    private val cache: LruCache<Int, List<T>> = LruCache(cacheSize)
+    private val cache = LruCache<Int, List<T>>(cacheSize)
 
     // Needed to force a recomposition
     var recomposeStateChanger by mutableStateOf(false)
@@ -88,7 +89,7 @@ class LazyTableController<T: BaseModel<*>>(
         appState.defaultTableModel.displayedAttributesInTable!!.forEach { attribute ->
             if (attribute.canBeFiltered) {
                 displayedFilterStrings[attribute] = ""
-                attributeFilterNew[attribute] = null
+                attributeFilter[attribute] = null
             }
             attributeSort[attribute] = BLTSortOrder.None
             attributeCaseSensitive[attribute] = false
@@ -399,7 +400,7 @@ class LazyTableController<T: BaseModel<*>>(
         println("Inside onFiltersChanged")
         val start = System.currentTimeMillis()
 
-        filters = attributeFilterNew.values.filterNotNull()
+        filters = attributeFilter.values.filterNotNull()
         println("Filters in onNumberFilterChanged: $filters")
 
         isFiltering = filters.isNotEmpty()
@@ -517,7 +518,7 @@ class LazyTableController<T: BaseModel<*>>(
     fun onNumberFilterChanged(newValue: String, attribute: NumberAttribute<*, *, *>) {
         when (newValue) {
             "" -> {
-                attributeFilterNew[attribute] = null
+                attributeFilter[attribute] = null
                 displayedFilterStrings[attribute] = newValue
             }
             else -> NumberTextFieldUtil.createConcreteNumberFilter(
@@ -532,8 +533,8 @@ class LazyTableController<T: BaseModel<*>>(
     fun onStringFilterChanged(newValue: String, attribute: StringAttribute<*>, notEqualsFilter: Boolean) {
         displayedFilterStrings[attribute] = newValue
         when (newValue) {
-            "" -> attributeFilterNew[attribute] = null
-            else -> attributeFilterNew[attribute] = StringFilter(
+            "" -> attributeFilter[attribute] = null
+            else -> attributeFilter[attribute] = StringFilter(
                 filter = if (notEqualsFilter) newValue.substringAfter('!') else newValue,
                 dbField = attribute.databaseField as Column<String>,
                 // Case sensitive is not set again after first time! -> Workaround is that we create a new
@@ -549,21 +550,21 @@ class LazyTableController<T: BaseModel<*>>(
         when (toggleState.value) {
             ToggleableState.Indeterminate -> {
                 toggleState.value = ToggleableState.On
-                attributeFilterNew[attribute] = BooleanFilter(
+                attributeFilter[attribute] = BooleanFilter(
                     filter = true,
                     dbField = attribute.databaseField as Column<Boolean>
                 )
             }
             ToggleableState.On -> {
                 toggleState.value = ToggleableState.Off
-                attributeFilterNew[attribute] = BooleanFilter(
+                attributeFilter[attribute] = BooleanFilter(
                     filter = false,
                     dbField = attribute.databaseField as Column<Boolean>
                 )
             }
             else -> {
                 toggleState.value = ToggleableState.Indeterminate
-                attributeFilterNew[attribute] = null
+                attributeFilter[attribute] = null
             }
         }
         onFilterChanged()

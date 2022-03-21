@@ -18,6 +18,7 @@ import composeForms.ui.theme.BackgroundColorHeader
 import demo.bigLazyTable.model.*
 import demo.bigLazyTable.ui.table.AttributeTableCell
 import demo.bigLazyTable.ui.table.TableCell
+import demo.bigLazyTable.ui.theme.HorizontalPadding
 
 @Composable
 fun <T: BaseModel<*>> HeaderRow(
@@ -29,7 +30,7 @@ fun <T: BaseModel<*>> HeaderRow(
         modifier = Modifier
             .background(BackgroundColorHeader)
             .fillMaxWidth()
-            .padding(horizontal = 5.dp)
+            .padding(horizontal = HorizontalPadding)
             .horizontalScroll(horizontalScrollState),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically

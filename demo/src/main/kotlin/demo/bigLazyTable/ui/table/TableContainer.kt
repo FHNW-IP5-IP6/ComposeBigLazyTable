@@ -24,7 +24,7 @@ fun RowScope.TableContainer(
 
     Box(modifier = Modifier.weight(weight)) {
         Column(
-            modifier = Modifier.padding(horizontal = 5.dp),
+            modifier = Modifier.padding(horizontal = HorizontalPadding),
             verticalArrangement = Arrangement.Top
         ) {
             HeaderRow(
