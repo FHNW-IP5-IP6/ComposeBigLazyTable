@@ -25,7 +25,6 @@ object DBService : IPagingService<Playlist> {
         filters: List<Filter>,
         sort: Sort?
     ): List<Playlist> {
-        // TODO: check if lazy is working correctly without any downside
         if (startIndex > lastIndex) throw IllegalArgumentException("startIndex must be smaller than/equal to the lastIndex and not $startIndex")
         if (startIndex < 0) throw IllegalArgumentException("only positive values are allowed for startIndex")
 
@@ -56,7 +55,7 @@ object DBService : IPagingService<Playlist> {
             val rv = transaction {
                 DatabasePlaylists
                     .selectWithAllFilters(filters)
-                    .orderBy(sort.dbField as Column<String> to sort.sortOrder) // TODO: Remove Column<String> cast
+                    .orderBy(sort.dbField as Column<String> to sort.sortOrder) // TODO-Future: Remove Column<String> cast
                     .limit(n = pageSize, offset = start)
                     .map {
                         println("Inside map of getPage with sort")

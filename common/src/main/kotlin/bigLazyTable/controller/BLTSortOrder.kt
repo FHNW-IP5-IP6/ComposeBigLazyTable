@@ -1,4 +1,4 @@
-package bigLazyTable.controller // TODO: move to package controler
+package bigLazyTable.controller
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -31,7 +31,7 @@ sealed class BLTSortOrder(
 //        override fun nextSortIcon(): ImageVector = nextSortState().icon
 
         override fun sortAttribute(attribute: Attribute<*, *, *>): Sort = Sort(
-            dbField = attribute.databaseField, // TODO: Mit genauem Typ! Check!
+            dbField = attribute.databaseField,
             sortOrder = sortOrder!!
         )
     }

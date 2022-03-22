@@ -1,6 +1,6 @@
 package bigLazyTable.view.theme
 
-// TODO: Find a Kotlin solution to internationalisation Problem
+// TODO-Future: Find a Kotlin solution to internationalisation Problem
 //  that these hardcoded values are updated for multiple languages
 const val FilterLabel = "Filter"
 const val ContentDescriptionSortIcon = "Sort"

@@ -40,7 +40,7 @@ class LazyTableController<T: BaseModel<*>>(
     private val pagingService: IPagingService<*>,
     defaultModel: T,
     private val mapToModels: (List<Any?>, AppState<BaseModel<*>>) -> List<T>,
-    internal val pageSize: Int = 40, // TODO: make dynamic
+    internal val pageSize: Int = 40, // TODO-Future: make dynamic
 ) {
     val appState = AppState(pagingService, defaultModel, pageSize)
 
@@ -540,7 +540,7 @@ class LazyTableController<T: BaseModel<*>>(
                 // Case sensitive is not set again after first time! -> Workaround is that we create a new
                 // StringFilter everytime CaseSensitive icon is clicked [see below]
                 caseSensitive = attributeCaseSensitive[attribute]!!,
-                filterType = if (notEqualsFilter) NumberFilterType.NOT_EQUALS else NumberFilterType.EQUALS
+                filterOperation = if (notEqualsFilter) FilterOperation.NOT_EQUALS else FilterOperation.EQUALS
             )
         }
         onFilterChanged()

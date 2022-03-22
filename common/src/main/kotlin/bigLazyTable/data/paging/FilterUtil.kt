@@ -31,21 +31,21 @@ object FilterUtil {
 
     fun retrieveSql(filter: Filter): Op<Boolean> = when (filter) {
         is BooleanFilter/*, is StringFilter*/ -> filterEquals(filter)
-        is NumberFilter -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterType)
+        is MultipleOperationsFilter -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterOperation)
     }
 
-    private fun chooseCorrectFilterTypeMethod(filter: NumberFilter, filterType: NumberFilterType): Op<Boolean> {
+    private fun chooseCorrectFilterTypeMethod(filter: MultipleOperationsFilter, filterType: FilterOperation): Op<Boolean> {
         return when (filterType) {
-            NumberFilterType.EQUALS -> filterEquals(filter)
-            NumberFilterType.LESS    -> filterLess(filter)
-            NumberFilterType.GREATER -> filterGreater(filter)
-            NumberFilterType.NOT_EQUALS     -> filterNotEquals(filter)
-            NumberFilterType.LESS_EQUALS    -> filterLessEquals(filter)
-            NumberFilterType.GREATER_EQUALS -> filterGreaterEquals(filter)
-            NumberFilterType.BETWEEN_TO_INCLUDED        -> filterBetweenToIncluded(filter)
-            NumberFilterType.BETWEEN_FROM_INCLUDED      -> filterBetweenFromIncluded(filter)
-            NumberFilterType.BETWEEN_BOTH_INCLUDED      -> filterBetweenBothIncluded(filter)
-            NumberFilterType.BETWEEN_BOTH_NOT_INCLUDED  -> filterBetweenBothNotIncluded(filter)
+            FilterOperation.EQUALS -> filterEquals(filter)
+            FilterOperation.LESS    -> filterLess(filter)
+            FilterOperation.GREATER -> filterGreater(filter)
+            FilterOperation.NOT_EQUALS     -> filterNotEquals(filter)
+            FilterOperation.LESS_EQUALS    -> filterLessEquals(filter)
+            FilterOperation.GREATER_EQUALS -> filterGreaterEquals(filter)
+            FilterOperation.BETWEEN_TO_INCLUDED        -> filterBetweenToIncluded(filter)
+            FilterOperation.BETWEEN_FROM_INCLUDED      -> filterBetweenFromIncluded(filter)
+            FilterOperation.BETWEEN_BOTH_INCLUDED      -> filterBetweenBothIncluded(filter)
+            FilterOperation.BETWEEN_BOTH_NOT_INCLUDED  -> filterBetweenBothNotIncluded(filter)
         }
     }
 

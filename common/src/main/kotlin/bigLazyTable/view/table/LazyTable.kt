@@ -18,7 +18,7 @@ import bigLazyTable.controller.LazyTableController
 import bigLazyTable.view.theme.CustomScrollbarStyle
 import bigLazyTable.view.theme.ScrollbarThickness
 
-@Composable // TODO: Replace PlaylistModel with dynamic Model
+@Composable
 fun <T: BaseModel<*>> LazyTable(
     controller: LazyTableController<T>,
     horizontalScrollState: ScrollState,

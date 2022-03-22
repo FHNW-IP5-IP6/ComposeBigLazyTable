@@ -17,7 +17,7 @@ import bigLazyTable.controller.AppState
 import bigLazyTable.controller.LazyTableController
 import bigLazyTable.view.theme.HorizontalPadding
 
-@Composable // TODO: Replace PlaylistModel with dynamic BaseModel
+@Composable
 fun <T: BaseModel<*>> PlaylistRow(
     controller: LazyTableController<T>,
     playlistModel: T,
@@ -52,7 +52,7 @@ fun <T: BaseModel<*>> PlaylistRow(
 fun PlaylistRowPlaceholder(
     backgroundColor: Color = BackgroundColorLight,
     horizontalScrollState: ScrollState,
-    appState: bigLazyTable.controller.AppState<*>
+    appState: AppState<*>
 ) {
     val lazyListAttributes = appState.defaultTableModel.displayedAttributesInTable
 

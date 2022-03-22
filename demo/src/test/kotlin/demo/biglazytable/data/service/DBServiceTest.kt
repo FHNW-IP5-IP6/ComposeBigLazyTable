@@ -18,7 +18,6 @@ import java.util.NoSuchElementException
 
 private val Log = KotlinLogging.logger {}
 
-// TODO: Get rid of the printTestMethodName -> use gradle standard instead
 internal class DBServiceTest {
 
     private lateinit var dbService: DBService
@@ -448,7 +447,7 @@ internal class DBServiceTest {
     @Test
     fun `greater filter works`() {
         // given
-        val filter = IntFilter(1, DatabasePlaylists.num_edits, NumberFilterType.GREATER_EQUALS)
+        val filter = IntFilter(1, DatabasePlaylists.num_edits, FilterOperation.GREATER_EQUALS)
 
         // when
         page = dbService.getPage(
@@ -468,7 +467,7 @@ internal class DBServiceTest {
     @Test
     fun `greater equals filter works`() {
         // given
-        val filter = IntFilter(1, DatabasePlaylists.num_edits, NumberFilterType.GREATER)
+        val filter = IntFilter(1, DatabasePlaylists.num_edits, FilterOperation.GREATER)
 
         // when
         page = dbService.getPage(
@@ -488,7 +487,7 @@ internal class DBServiceTest {
     @Test
     fun `less filter works`() {
         // given
-        val filter = IntFilter(1, DatabasePlaylists.num_edits, NumberFilterType.LESS)
+        val filter = IntFilter(1, DatabasePlaylists.num_edits, FilterOperation.LESS)
 
         // when
         page = dbService.getPage(
@@ -508,7 +507,7 @@ internal class DBServiceTest {
     @Test
     fun `less equals filter works`() {
         // given
-        val filter = IntFilter(1, DatabasePlaylists.num_edits, NumberFilterType.LESS_EQUALS)
+        val filter = IntFilter(1, DatabasePlaylists.num_edits, FilterOperation.LESS_EQUALS)
 
         // when
         page = dbService.getPage(
@@ -528,7 +527,7 @@ internal class DBServiceTest {
     @Test
     fun `equals filter works`() {
         // given
-        val filter = IntFilter(6, DatabasePlaylists.num_edits, NumberFilterType.EQUALS)
+        val filter = IntFilter(6, DatabasePlaylists.num_edits, FilterOperation.EQUALS)
 
         // when
         page = dbService.getPage(
@@ -548,7 +547,7 @@ internal class DBServiceTest {
     @Test
     fun `not equals filter works`() {
         // given
-        val filter = IntFilter(1, DatabasePlaylists.num_edits, NumberFilterType.NOT_EQUALS)
+        val filter = IntFilter(1, DatabasePlaylists.num_edits, FilterOperation.NOT_EQUALS)
 
         // when
         page = dbService.getPage(
@@ -568,12 +567,12 @@ internal class DBServiceTest {
     @Test
     fun `between both included filter works`() {
         // given
-        val fromFilter = IntFilter(1, DatabasePlaylists.num_edits, NumberFilterType.BETWEEN_BOTH_INCLUDED)
-        val toFilter = IntFilter(10, DatabasePlaylists.num_edits, NumberFilterType.BETWEEN_BOTH_INCLUDED)
+        val fromFilter = IntFilter(1, DatabasePlaylists.num_edits, FilterOperation.BETWEEN_BOTH_INCLUDED)
+        val toFilter = IntFilter(10, DatabasePlaylists.num_edits, FilterOperation.BETWEEN_BOTH_INCLUDED)
         val filter = IntFilter(
             6,
             DatabasePlaylists.num_edits,
-            NumberFilterType.BETWEEN_BOTH_INCLUDED,
+            FilterOperation.BETWEEN_BOTH_INCLUDED,
             between = Between(fromFilter, toFilter)
         )
 
@@ -595,12 +594,12 @@ internal class DBServiceTest {
     @Test
     fun `between both not included filter works`() {
         // given
-        val fromFilter = IntFilter(1, DatabasePlaylists.num_edits, NumberFilterType.BETWEEN_BOTH_NOT_INCLUDED)
-        val toFilter = IntFilter(10, DatabasePlaylists.num_edits, NumberFilterType.BETWEEN_BOTH_NOT_INCLUDED)
+        val fromFilter = IntFilter(1, DatabasePlaylists.num_edits, FilterOperation.BETWEEN_BOTH_NOT_INCLUDED)
+        val toFilter = IntFilter(10, DatabasePlaylists.num_edits, FilterOperation.BETWEEN_BOTH_NOT_INCLUDED)
         val filter = IntFilter(
             6,
             DatabasePlaylists.num_edits,
-            NumberFilterType.BETWEEN_BOTH_NOT_INCLUDED,
+            FilterOperation.BETWEEN_BOTH_NOT_INCLUDED,
             between = Between(fromFilter, toFilter)
         )
 
@@ -622,12 +621,12 @@ internal class DBServiceTest {
     @Test
     fun `between from included filter works`() {
         // given
-        val fromFilter = IntFilter(1, DatabasePlaylists.num_edits, NumberFilterType.BETWEEN_FROM_INCLUDED)
-        val toFilter = IntFilter(10, DatabasePlaylists.num_edits, NumberFilterType.BETWEEN_FROM_INCLUDED)
+        val fromFilter = IntFilter(1, DatabasePlaylists.num_edits, FilterOperation.BETWEEN_FROM_INCLUDED)
+        val toFilter = IntFilter(10, DatabasePlaylists.num_edits, FilterOperation.BETWEEN_FROM_INCLUDED)
         val filter = IntFilter(
             6,
             DatabasePlaylists.num_edits,
-            NumberFilterType.BETWEEN_FROM_INCLUDED,
+            FilterOperation.BETWEEN_FROM_INCLUDED,
             between = Between(fromFilter, toFilter)
         )
 
@@ -649,12 +648,12 @@ internal class DBServiceTest {
     @Test
     fun `between to included filter works`() {
         // given
-        val fromFilter = IntFilter(1, DatabasePlaylists.num_edits, NumberFilterType.BETWEEN_TO_INCLUDED)
-        val toFilter = IntFilter(10, DatabasePlaylists.num_edits, NumberFilterType.BETWEEN_TO_INCLUDED)
+        val fromFilter = IntFilter(1, DatabasePlaylists.num_edits, FilterOperation.BETWEEN_TO_INCLUDED)
+        val toFilter = IntFilter(10, DatabasePlaylists.num_edits, FilterOperation.BETWEEN_TO_INCLUDED)
         val filter = IntFilter(
             6,
             DatabasePlaylists.num_edits,
-            NumberFilterType.BETWEEN_TO_INCLUDED,
+            FilterOperation.BETWEEN_TO_INCLUDED,
             between = Between(fromFilter, toFilter)
         )
 

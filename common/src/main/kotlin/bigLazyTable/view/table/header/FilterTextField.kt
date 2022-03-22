@@ -57,7 +57,6 @@ fun FilterEnabledTextField(
                     )
                 },
                 textStyle = TextStyle(color = Color.White),
-                // TODO: Hardcoded strings oke oder .properties file oder sonst was?
                 label = { Text(text = FilterLabel, color = Color.White) },
                 singleLine = true,
                 trailingIcon = { TrailingIcon(controller = controller, attribute = attribute) }
@@ -81,7 +80,7 @@ fun FilterEnabledTextField(
                 trailingIcon = { TrailingIcon(controller = controller, attribute = attribute) }
             )
         }
-        // TODO: Define a specific UI Element for SelectionAttribute & DecisionAttribute
+        // TODO-Future: Define a specific UI Element for SelectionAttribute & DecisionAttribute
         //  SelectionAttribute could have a DropdownMenu
         //  DecisionAttribute  could have a DropdownMenu or something like BooleanAttribute
     }

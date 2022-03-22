@@ -1,13 +1,12 @@
 package bigLazyTable.view.table.header
 
 import bigLazyTable.controller.LazyTableController
-import bigLazyTable.data.paging.NumberFilterType
+import bigLazyTable.data.paging.FilterOperation
 import composeForms.model.attributes.Attribute
 
 object NumberTextFieldUtil {
 
-    // TODO: Future improvement -> Add a FilterAttribute
-    // TODO: Move to controller
+    // TODO-Future: Add a FilterAttribute
     fun createConcreteNumberFilter(
         newValue: String,
         controller: LazyTableController<*>,
@@ -30,7 +29,7 @@ object NumberTextFieldUtil {
                                         controller = controller,
                                         attribute = attribute,
                                         value = value,
-                                        filterType = NumberFilterType.NOT_EQUALS
+                                        filterType = FilterOperation.NOT_EQUALS
                                     )
                                 }
                             }
@@ -45,7 +44,7 @@ object NumberTextFieldUtil {
                                         controller = controller,
                                         attribute = attribute,
                                         value = value,
-                                        filterType = NumberFilterType.NOT_EQUALS
+                                        filterType = FilterOperation.NOT_EQUALS
                                     )
                                 }
                             }
@@ -56,7 +55,7 @@ object NumberTextFieldUtil {
                                     controller = controller,
                                     attribute = attribute,
                                     value = value,
-                                    filterType = NumberFilterType.EQUALS
+                                    filterType = FilterOperation.EQUALS
                                 )
                             }
                         }
@@ -71,7 +70,7 @@ object NumberTextFieldUtil {
                                             controller = controller,
                                             attribute = attribute,
                                             value = value,
-                                            filterType = NumberFilterType.GREATER_EQUALS
+                                            filterType = FilterOperation.GREATER_EQUALS
                                         )
                                     }
                                 }
@@ -83,7 +82,7 @@ object NumberTextFieldUtil {
                                         controller = controller,
                                         attribute = attribute,
                                         value = value,
-                                        filterType = NumberFilterType.GREATER
+                                        filterType = FilterOperation.GREATER
                                     )
                                 }
                             }
@@ -99,7 +98,7 @@ object NumberTextFieldUtil {
                                             controller = controller,
                                             attribute = attribute,
                                             value = value,
-                                            filterType = NumberFilterType.LESS_EQUALS
+                                            filterType = FilterOperation.LESS_EQUALS
                                         )
                                     }
                                 }
@@ -111,7 +110,7 @@ object NumberTextFieldUtil {
                                         controller = controller,
                                         attribute = attribute,
                                         value = value,
-                                        filterType = NumberFilterType.LESS
+                                        filterType = FilterOperation.LESS
                                     )
                                 }
                             }
@@ -132,7 +131,7 @@ object NumberTextFieldUtil {
                                             controller = controller,
                                             attribute = attribute,
                                             value = "",
-                                            filterType = NumberFilterType.BETWEEN_BOTH_INCLUDED,
+                                            filterType = FilterOperation.BETWEEN_BOTH_INCLUDED,
                                             isBetween = true,
                                             from = from,
                                             to = to
@@ -142,7 +141,7 @@ object NumberTextFieldUtil {
                                             controller = controller,
                                             attribute = attribute,
                                             value = "",
-                                            filterType = NumberFilterType.BETWEEN_FROM_INCLUDED,
+                                            filterType = FilterOperation.BETWEEN_FROM_INCLUDED,
                                             isBetween = true,
                                             from = from,
                                             to = to
@@ -167,7 +166,7 @@ object NumberTextFieldUtil {
                                             controller = controller,
                                             attribute = attribute,
                                             value = "",
-                                            filterType = NumberFilterType.BETWEEN_TO_INCLUDED,
+                                            filterType = FilterOperation.BETWEEN_TO_INCLUDED,
                                             isBetween = true,
                                             from = from,
                                             to = to
@@ -177,7 +176,7 @@ object NumberTextFieldUtil {
                                             controller = controller,
                                             attribute = attribute,
                                             value = "",
-                                            filterType = NumberFilterType.BETWEEN_BOTH_NOT_INCLUDED,
+                                            filterType = FilterOperation.BETWEEN_BOTH_NOT_INCLUDED,
                                             isBetween = true,
                                             from = from,
                                             to = to
@@ -190,7 +189,7 @@ object NumberTextFieldUtil {
                 }
             }
         } catch (e: Exception) {
-            // TODO: Give User hint what went wrong & how to do it right
+            // TODO-Future: Give User hint what went wrong & how to do it right
             // for now we just ignore any occurring exception
         }
     }
