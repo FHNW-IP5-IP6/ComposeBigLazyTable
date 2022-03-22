@@ -25,6 +25,9 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation(project(":common"))
 
+                // Logging Library
+                implementation("io.github.microutils:kotlin-logging:1.12.5")
+
                 // SQLite Database & Exposed Library
                 implementation("org.xerial:sqlite-jdbc:3.36.0.3")
                 implementation("org.jetbrains.exposed:exposed-core:0.37.3")
@@ -37,6 +40,7 @@ kotlin {
         }
         named("test") {
             dependencies {
+                implementation(project(":common"))
 
                 // Mock Library
                 implementation("org.mockito.kotlin:mockito-kotlin:4.0.0")

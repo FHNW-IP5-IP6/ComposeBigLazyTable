@@ -1,10 +1,10 @@
 package bigLazyTable.data.database
 
+import bigLazyTable.Playlist
 import bigLazyTable.data.paging.Filter
 import bigLazyTable.data.paging.IPagingService
 import bigLazyTable.data.paging.Sort
 import bigLazyTable.data.paging.StringFilter
-import demo.bigLazyTable.data.service.Playlist
 import kotlin.math.ceil
 import kotlin.reflect.full.memberProperties
 

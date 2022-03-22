@@ -7,11 +7,13 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
+import bigLazyTable.controller.AppState
 import bigLazyTable.controller.LazyTableController
 import bigLazyTable.data.database.SqliteDb
 import demo.bigLazyTable.data.service.DBService
 import demo.bigLazyTable.model.PlaylistModel
 import bigLazyTable.view.BigLazyTableUI
+import composeForms.model.BaseModel
 import demo.bigLazyTable.data.service.Playlist
 import java.awt.Dimension
 
@@ -38,14 +40,14 @@ fun main() = application {
 
         val service = DBService
 
-        val mapToPlaylistModels: (List<Any?>, bigLazyTable.controller.AppState<PlaylistModel>) -> List<PlaylistModel> = { page, appState ->
-            page.map { PlaylistModel(it as Playlist, appState) }
+        val mapToPlaylistModels: (List<Any?>, AppState<BaseModel<*>>) -> List<PlaylistModel> = { page, appState ->
+            page.map { PlaylistModel(it as Playlist).apply { this.appState = appState } }
         }
 
         val controller = remember {
             LazyTableController(
                 pagingService = service,
-                defaultModel = Playlist().toPlaylistModel(null),
+                defaultModel = PlaylistModel(Playlist()),
                 mapToModels = mapToPlaylistModels
             ) // side effect: init loads first data to display
         }

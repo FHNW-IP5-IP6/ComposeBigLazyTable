@@ -4,6 +4,7 @@ import bigLazyTable.data.paging.*
 import demo.bigLazyTable.data.database.DatabasePlaylists
 import demo.bigLazyTable.data.service.DBService
 import demo.bigLazyTable.data.service.Playlist
+import demo.biglazytable.utils.printTestMethodName
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.Database
@@ -16,11 +17,6 @@ import java.sql.Connection
 import java.util.NoSuchElementException
 
 private val Log = KotlinLogging.logger {}
-
-/**
- * Pass `object {}.javaClass.enclosingMethod.name` as [testMethodName] to get the test method name
- */
-fun printTestMethodName(testMethodName: String) = println("------ ### $testMethodName ### ------")
 
 // TODO: Get rid of the printTestMethodName -> use gradle standard instead
 internal class DBServiceTest {

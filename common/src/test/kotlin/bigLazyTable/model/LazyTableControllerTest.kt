@@ -1,10 +1,12 @@
 package bigLazyTable.model
 
+import bigLazyTable.Playlist
+import bigLazyTable.PlaylistModel
 import bigLazyTable.controller.AppState
-import demo.bigLazyTable.controller.LazyTableController
+import bigLazyTable.controller.LazyTableController
 import bigLazyTable.data.database.FakePagingService
-import demo.bigLazyTable.data.service.Playlist
-import bigLazyTable.utils.printTestMethodName
+import composeForms.model.BaseModel
+import demo.biglazytable.utils.printTestMethodName
 import mu.KotlinLogging
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -16,8 +18,7 @@ private val Log = KotlinLogging.logger {}
 
 internal class LazyTableControllerTest {
 
-    private lateinit var controller: LazyTableController
-    private lateinit var appState: bigLazyTable.controller.AppState
+    private lateinit var controller: LazyTableController<PlaylistModel>
 
     private val numberOfPlaylists = 5_000 //1_000_000
     private val pageSize = 40
@@ -29,11 +30,15 @@ internal class LazyTableControllerTest {
 
     @BeforeEach
     fun setUp() {
-        appState = bigLazyTable.controller.AppState(pagingService = pagingService)
+        val mapToPlaylistModels: (List<Any?>, AppState<BaseModel<*>>) -> List<PlaylistModel> = { page, appState ->
+            page.map { PlaylistModel(it as Playlist).apply { this.appState = appState } }
+        }
+        
         controller = LazyTableController(
             pagingService = pagingService,
             pageSize = pageSize,
-            appState = appState
+            defaultModel = PlaylistModel(Playlist()),
+            mapToModels = mapToPlaylistModels
         )
     }
 
@@ -109,13 +114,13 @@ internal class LazyTableControllerTest {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
 
         // given
-        val playlistModel = PlaylistModel(Playlist(name = "test"), appState)
+        val playlistModel = PlaylistModel(Playlist(name = "test"))
 
         // when
         controller.selectModel(tableModel = playlistModel)
 
         // then
-        assertEquals(playlistModel, appState.selectedTableModel)
+        assertEquals(playlistModel, controller.appState.selectedTableModel)
     }
 
     @Test
@@ -123,7 +128,7 @@ internal class LazyTableControllerTest {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
 
         // given
-        val playlistModel = PlaylistModel(Playlist(name = "test"), appState)
+        val playlistModel = PlaylistModel(Playlist(name = "test"))
 
         // then
         assertDoesNotThrow {
@@ -137,13 +142,13 @@ internal class LazyTableControllerTest {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
 
         // given
-        val playlistModel = PlaylistModel(Playlist(), appState)
+        val playlistModel = PlaylistModel(Playlist())
 
         // when
         controller.selectModel(tableModel = playlistModel)
 
         // then
-        assertEquals(playlistModel, appState.selectedTableModel)
+        assertEquals(playlistModel, controller.appState.selectedTableModel)
     }
 
     @Test
@@ -151,7 +156,7 @@ internal class LazyTableControllerTest {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
 
         val playlistModels = listOf(
-            PlaylistModel(playlist = Playlist(), appState = appState)
+            PlaylistModel(playlist = Playlist())
         )
         controller.addPageToCache(pageNr = 0, pageOfModels = playlistModels)
 
@@ -163,7 +168,7 @@ internal class LazyTableControllerTest {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
 
         val playlistModels = listOf(
-            PlaylistModel(playlist = Playlist(), appState = appState)
+            PlaylistModel(playlist = Playlist())
         )
         controller.addPageToCache(pageNr = 1, pageOfModels = playlistModels)
 
@@ -175,7 +180,7 @@ internal class LazyTableControllerTest {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
 
         val playlistModels = listOf(
-            PlaylistModel(playlist = Playlist(), appState = appState)
+            PlaylistModel(playlist = Playlist())
         )
         controller.addPageToCache(pageNr = 1, pageOfModels = playlistModels)
 
@@ -242,7 +247,7 @@ internal class LazyTableControllerTest {
     fun `calculateStartIndexToRemove works with index 0`() {
         printTestMethodName(object {}.javaClass.enclosingMethod.name)
 
-        val oldStartIndex = controller.calculateStartIndexToRemove(pageNr = 0,)
+        val oldStartIndex = controller.calculateStartIndexToRemove(pageNr = 0)
         assertEquals(0, oldStartIndex)
     }
 

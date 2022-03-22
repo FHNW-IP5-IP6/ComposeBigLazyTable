@@ -1,4 +1,4 @@
-package demo.bigLazyTable.model
+package bigLazyTable
 
 import androidx.compose.ui.unit.dp
 import composeForms.model.BaseModel
@@ -7,9 +7,6 @@ import composeForms.model.modelElements.Field
 import composeForms.model.modelElements.FieldSize
 import composeForms.model.modelElements.Group
 import composeForms.model.modelElements.HeaderGroup
-import bigLazyTable.controller.AppState
-import demo.bigLazyTable.data.database.DatabasePlaylists
-import demo.bigLazyTable.data.service.Playlist
 import org.jetbrains.exposed.sql.Column
 
 /**

@@ -3,7 +3,6 @@ package bigLazyTable.controller
 import androidx.compose.runtime.*
 import androidx.compose.ui.state.ToggleableState
 import bigLazyTable.data.paging.*
-import bigLazyTable.paging.*
 import bigLazyTable.view.table.header.NumberTextFieldUtil
 import composeForms.model.BaseModel
 import composeForms.model.attributes.*
@@ -40,10 +39,10 @@ class LRUCache<key, value> (val maxSize: Int) : LinkedHashMap<key, value>(maxSiz
 class LazyTableController<T: BaseModel<*>>(
     private val pagingService: IPagingService<*>,
     defaultModel: T,
-    private val mapToModels: (List<Any?>, bigLazyTable.controller.AppState<T>) -> List<T>,
-    private val pageSize: Int = 40, // TODO: make dynamic
+    private val mapToModels: (List<Any?>, AppState<BaseModel<*>>) -> List<T>,
+    internal val pageSize: Int = 40, // TODO: make dynamic
 ) {
-    val appState = bigLazyTable.controller.AppState(pagingService, defaultModel, pageSize)
+    val appState = AppState(pagingService, defaultModel, pageSize)
 
     // Variables for different calculations
     private val totalCount by lazy { pagingService.getTotalCount() }
@@ -235,7 +234,7 @@ class LazyTableController<T: BaseModel<*>>(
         val end = System.currentTimeMillis()
         Log.info("The request took ${end - start} milliseconds.")
 
-        return mapToModels(page, appState)
+        return mapToModels(page, appState as AppState<BaseModel<*>>)
     }
 
     /**

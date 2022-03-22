@@ -2,6 +2,7 @@ package composeForms.model.formatter
 
 import composeForms.model.BaseModel
 import composeForms.model.Labels
+import composeForms.model.attributes.Attribute
 import composeForms.model.attributes.StringAttribute
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -13,7 +14,12 @@ class DateFormatterTest {
     @Test
     fun testDateFormatter(){
         //given
-        var model = object: BaseModel<Labels>(title = Labels.TEST) {}
+        var model = object: BaseModel<Labels>(title = Labels.TEST) {
+            override val displayedAttributesInTable: List<Attribute<*, *, *>>?
+                get() = TODO("Not yet implemented")
+            override val id: Attribute<*, *, *>
+                get() = TODO("Not yet implemented")
+        }
         val dateAttribute = StringAttribute(model, Labels.TEST, formatter = DateFormatter())
         val today = LocalDate.now()
         val tomorrow = LocalDate.now().plusDays(1)

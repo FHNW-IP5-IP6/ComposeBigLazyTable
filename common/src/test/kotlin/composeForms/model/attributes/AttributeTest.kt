@@ -39,7 +39,12 @@ import java.util.*
  */
 abstract class AttributeTest<T : Any>{
 
-    var model = object: BaseModel<Labels>(title = Labels.TEST) {}
+    var model = object: BaseModel<Labels>(title = Labels.TEST) {
+        override val displayedAttributesInTable: List<Attribute<*, *, *>>?
+            get() = TODO("Not yet implemented")
+        override val id: Attribute<*, *, *>
+            get() = TODO("Not yet implemented")
+    }
 
     lateinit var validValue1Uneven : T
     lateinit var validValue2 : T

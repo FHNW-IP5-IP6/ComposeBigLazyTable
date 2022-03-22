@@ -46,11 +46,7 @@ data class Playlist(
     val track4TrackName: String = loadingPlaceholderString,
     val track4DurationMs: Int = loadingPlaceholderNumber,
     val track4AlbumName: String = loadingPlaceholderString
-) {
-
-    fun toPlaylistModel(appState: AppState<PlaylistModel>?): PlaylistModel =
-        PlaylistModel(playlist = this, appState = appState)
-}
+)
 
 data class PlaylistDto(val resultRow: ResultRow) {
 

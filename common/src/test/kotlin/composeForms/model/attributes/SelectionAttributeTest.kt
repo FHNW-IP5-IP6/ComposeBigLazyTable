@@ -36,12 +36,22 @@ import org.junit.jupiter.api.Test
 class SelectionAttributeTest {
 
     lateinit var selAtr : SelectionAttribute<Labels>
-    var model = object: BaseModel<Labels>(Labels.TEST) {}
+    var model = object: BaseModel<Labels>(Labels.TEST) {
+        override val displayedAttributesInTable: List<Attribute<*, *, *>>?
+            get() = TODO("Not yet implemented")
+        override val id: Attribute<*, *, *>
+            get() = TODO("Not yet implemented")
+    }
 
     @BeforeEach
     fun setUpSelectionAttribute(){
         //given
-        model = object: BaseModel<Labels>(Labels.TEST) {}
+        model = object: BaseModel<Labels>(Labels.TEST) {
+            override val displayedAttributesInTable: List<Attribute<*, *, *>>?
+                get() = TODO("Not yet implemented")
+            override val id: Attribute<*, *, *>
+                get() = TODO("Not yet implemented")
+        }
         selAtr = SelectionAttribute(model = model, possibleSelections = listOf(Labels.ELEMENT1, Labels.ELEMENT2), label = Labels.TEST)
     }
 

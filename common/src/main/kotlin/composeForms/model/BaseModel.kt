@@ -25,6 +25,7 @@ package composeForms.model
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import bigLazyTable.controller.AppState
 import composeForms.communication.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.decodeFromString
@@ -113,6 +114,7 @@ abstract class BaseModel<L>(private val title: L,
     private val modelScope                                   = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     var startedUp                                            = false
 
+    var appState: AppState<BaseModel<*>>? = null
     abstract val displayedAttributesInTable: List<Attribute<*,*,*>>?
     abstract val id: Attribute<*,*,*>
 
@@ -287,6 +289,12 @@ abstract class BaseModel<L>(private val title: L,
      * In addition, allChangedAttributesAreValid and if changesExist are updated.
      */
     override fun updateChanges(){
+        // BLT
+        if (appState?.changedTableModels?.contains(this) == false) {
+            appState?.changedTableModels?.add(this)
+        }
+
+        // Forms
         allChangedAttributes.value = allGroups.flatMap { it.getAttributes() }.filter { it.isChanged() }
         allChangedAttributesAreValid.value = getListOfChangedAttributes().all{it.isValid()}
         changesExist.value = allGroups.flatMap{it.getAttributes()}.any(Attribute<*,*,*>::isChanged)
