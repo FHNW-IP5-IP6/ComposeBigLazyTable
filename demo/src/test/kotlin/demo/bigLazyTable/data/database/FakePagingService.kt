@@ -4,7 +4,7 @@ import bigLazyTable.paging.Filter
 import bigLazyTable.paging.IPagingService
 import bigLazyTable.paging.Sort
 import bigLazyTable.paging.StringFilter
-import demo.bigLazyTable.model.Playlist
+import demo.bigLazyTable.data.service.Playlist
 import kotlin.math.ceil
 import kotlin.reflect.full.memberProperties
 

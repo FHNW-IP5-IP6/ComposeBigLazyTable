@@ -30,7 +30,7 @@ import composeForms.model.formatter.IFormatter
 import composeForms.model.meanings.Default
 import composeForms.model.meanings.SemanticMeaning
 import composeForms.model.validators.semanticValidators.SemanticValidator
-import demo.bigLazyTable.ui.theme.MinTableCellWidth
+import demo.bigLazyTable.view.theme.MinTableCellWidth
 import org.jetbrains.exposed.sql.Column
 
 /**

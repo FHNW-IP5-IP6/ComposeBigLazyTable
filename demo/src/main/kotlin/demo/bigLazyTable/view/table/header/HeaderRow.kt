@@ -1,24 +1,19 @@
-package demo.bigLazyTable.ui.table.header
+package demo.bigLazyTable.view.table.header
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import composeForms.model.BaseModel
-import composeForms.model.attributes.Attribute
 import composeForms.ui.theme.BackgroundColorHeader
-import demo.bigLazyTable.model.*
-import demo.bigLazyTable.ui.table.AttributeTableCell
-import demo.bigLazyTable.ui.table.TableCell
-import demo.bigLazyTable.ui.theme.HorizontalPadding
+import demo.bigLazyTable.controller.AppState
+import demo.bigLazyTable.controller.LazyTableController
+import demo.bigLazyTable.view.table.AttributeTableCell
+import demo.bigLazyTable.view.theme.HorizontalPadding
 
 @Composable
 fun <T: BaseModel<*>> HeaderRow(
@@ -41,7 +36,7 @@ fun <T: BaseModel<*>> HeaderRow(
                     attribute = attribute,
                     controller = controller
                 )
-                Box {
+                Box(contentAlignment = Alignment.Center) {
                     AttributeTableCell(
                         isTitle = true,
                         attribute = attribute,

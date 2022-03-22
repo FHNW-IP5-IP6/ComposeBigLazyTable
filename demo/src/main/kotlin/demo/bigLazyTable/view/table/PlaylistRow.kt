@@ -1,4 +1,4 @@
-package demo.bigLazyTable.ui.table
+package demo.bigLazyTable.view.table
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -11,12 +11,11 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import composeForms.model.BaseModel
 import composeForms.ui.theme.*
-import demo.bigLazyTable.model.AppState
-import demo.bigLazyTable.model.LazyTableController
-import demo.bigLazyTable.ui.theme.HorizontalPadding
+import demo.bigLazyTable.controller.AppState
+import demo.bigLazyTable.controller.LazyTableController
+import demo.bigLazyTable.view.theme.HorizontalPadding
 
 @Composable // TODO: Replace PlaylistModel with dynamic BaseModel
 fun <T: BaseModel<*>> PlaylistRow(

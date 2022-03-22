@@ -1,4 +1,4 @@
-package demo.bigLazyTable.ui.theme
+package demo.bigLazyTable.view.theme
 
 // TODO: Find a Kotlin solution to internationalisation Problem
 //  that these hardcoded values are updated for multiple languages

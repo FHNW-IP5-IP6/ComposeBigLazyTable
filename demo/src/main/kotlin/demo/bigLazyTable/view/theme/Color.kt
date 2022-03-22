@@ -1,4 +1,4 @@
-package demo.bigLazyTable.ui.theme
+package demo.bigLazyTable.view.theme
 
 import composeForms.ui.theme.BackgroundColorHeader
 

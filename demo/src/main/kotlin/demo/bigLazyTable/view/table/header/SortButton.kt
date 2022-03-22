@@ -1,4 +1,4 @@
-package demo.bigLazyTable.ui.table.header
+package demo.bigLazyTable.view.table.header
 
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -7,8 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import composeForms.model.attributes.Attribute
 import demo.bigLazyTable.model.BLTSortOrder
-import demo.bigLazyTable.model.LazyTableController
-import demo.bigLazyTable.ui.theme.ContentDescriptionSortIcon
+import demo.bigLazyTable.controller.LazyTableController
+import demo.bigLazyTable.view.theme.ContentDescriptionSortIcon
 
 @Composable
 fun SortButton(

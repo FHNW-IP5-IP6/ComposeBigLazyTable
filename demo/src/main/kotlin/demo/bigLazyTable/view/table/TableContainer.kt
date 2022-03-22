@@ -1,4 +1,4 @@
-package demo.bigLazyTable.ui.table
+package demo.bigLazyTable.view.table
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -6,10 +6,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import demo.bigLazyTable.model.AppState
-import demo.bigLazyTable.model.LazyTableController
-import demo.bigLazyTable.ui.table.header.HeaderRow
-import demo.bigLazyTable.ui.theme.*
+import demo.bigLazyTable.controller.AppState
+import demo.bigLazyTable.controller.LazyTableController
+import demo.bigLazyTable.view.table.header.HeaderRow
+import demo.bigLazyTable.view.theme.*
 
 /**
  * @author Marco Sprenger, Livio Näf

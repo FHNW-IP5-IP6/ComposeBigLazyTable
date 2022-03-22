@@ -1,4 +1,4 @@
-package demo.bigLazyTable.ui.form
+package demo.bigLazyTable.view.form
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import composeForms.model.BaseModel
 import composeForms.ui.Form
-import demo.bigLazyTable.model.AppState
+import demo.bigLazyTable.controller.AppState
 
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi

@@ -1,8 +1,8 @@
-package demo.bigLazyTable.ui.table.header
+package demo.bigLazyTable.view.table.header
 
 import bigLazyTable.paging.*
 import composeForms.model.attributes.*
-import demo.bigLazyTable.model.LazyTableController
+import demo.bigLazyTable.controller.LazyTableController
 
 fun createFilter(
     controller: LazyTableController<*>,

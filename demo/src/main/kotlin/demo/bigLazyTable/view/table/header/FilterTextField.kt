@@ -1,4 +1,4 @@
-package demo.bigLazyTable.ui.table.header
+package demo.bigLazyTable.view.table.header
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -14,10 +14,10 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.TextStyle
 import bigLazyTable.paging.*
 import composeForms.model.attributes.*
-import demo.bigLazyTable.model.LazyTableController
-import demo.bigLazyTable.ui.theme.ContentDescriptionCaseSensitiveIcon
-import demo.bigLazyTable.ui.theme.ContentDescriptionClearFilterIcon
-import demo.bigLazyTable.ui.theme.FilterLabel
+import demo.bigLazyTable.controller.LazyTableController
+import demo.bigLazyTable.view.theme.ContentDescriptionCaseSensitiveIcon
+import demo.bigLazyTable.view.theme.ContentDescriptionClearFilterIcon
+import demo.bigLazyTable.view.theme.FilterLabel
 import org.jetbrains.exposed.sql.Column
 
 @Composable

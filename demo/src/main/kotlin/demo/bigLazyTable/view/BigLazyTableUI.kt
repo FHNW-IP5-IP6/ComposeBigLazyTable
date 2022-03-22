@@ -1,14 +1,14 @@
-package demo.bigLazyTable.ui
+package demo.bigLazyTable.view
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import demo.bigLazyTable.model.LazyTableController
-import demo.bigLazyTable.ui.form.FormContainer
-import demo.bigLazyTable.ui.table.TableContainer
-import demo.bigLazyTable.ui.theme.BigLazyTableTheme
+import demo.bigLazyTable.controller.LazyTableController
+import demo.bigLazyTable.view.form.FormContainer
+import demo.bigLazyTable.view.table.TableContainer
+import demo.bigLazyTable.view.theme.BigLazyTableTheme
 
 /**
  * @author Marco Sprenger, Livio Näf

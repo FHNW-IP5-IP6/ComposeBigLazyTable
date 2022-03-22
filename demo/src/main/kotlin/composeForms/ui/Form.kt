@@ -38,7 +38,7 @@ import androidx.compose.ui.input.key.Key
 import composeForms.model.IModel
 import composeForms.model.modelElements.HeaderGroup
 import composeForms.ui.theme.BodyBackground
-import demo.bigLazyTable.model.AppState
+import demo.bigLazyTable.controller.AppState
 
 
 /**

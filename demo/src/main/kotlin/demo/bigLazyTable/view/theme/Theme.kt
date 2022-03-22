@@ -1,4 +1,4 @@
-package demo.bigLazyTable.ui.theme
+package demo.bigLazyTable.view.theme
 
 import androidx.compose.foundation.ScrollbarStyle
 import androidx.compose.foundation.shape.RoundedCornerShape

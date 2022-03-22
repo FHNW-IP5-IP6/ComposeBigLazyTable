@@ -1,9 +1,8 @@
-package demo.bigLazyTable.data.database
+package demo.bigLazyTable.data.service
 
 import bigLazyTable.paging.*
-//import demo.bigLazyTable.data.database.FilterUtil.selectWithAllFilters
-import demo.bigLazyTable.model.Playlist
-import demo.bigLazyTable.model.PlaylistDto
+import demo.bigLazyTable.data.database.DatabasePlaylists
+//import demo.bigLazyTable.data.service.FilterUtil.selectWithAllFilters
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 

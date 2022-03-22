@@ -49,7 +49,7 @@ import androidx.compose.ui.window.application
 import composeForms.model.IModel
 import composeForms.server.QRCodeService
 import composeForms.ui.theme.*
-import demo.bigLazyTable.model.AppState
+import demo.bigLazyTable.controller.AppState
 import java.awt.Dimension
 
 /**

@@ -1,8 +1,8 @@
 package demo.bigLazyTable.data.database
 
-import androidx.compose.runtime.Composable
 import bigLazyTable.paging.*
-import demo.bigLazyTable.model.Playlist
+import demo.bigLazyTable.data.service.DBService
+import demo.bigLazyTable.data.service.Playlist
 import demo.bigLazyTable.utils.printTestMethodName
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging

@@ -1,4 +1,4 @@
-package demo.bigLazyTable.ui.table
+package demo.bigLazyTable.view.table
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.VerticalScrollbar
@@ -13,10 +13,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import composeForms.model.BaseModel
-import demo.bigLazyTable.model.AppState
-import demo.bigLazyTable.model.LazyTableController
-import demo.bigLazyTable.ui.theme.CustomScrollbarStyle
-import demo.bigLazyTable.ui.theme.ScrollbarThickness
+import demo.bigLazyTable.controller.AppState
+import demo.bigLazyTable.controller.LazyTableController
+import demo.bigLazyTable.view.theme.CustomScrollbarStyle
+import demo.bigLazyTable.view.theme.ScrollbarThickness
 
 @Composable // TODO: Replace PlaylistModel with dynamic Model
 fun <T: BaseModel<*>> LazyTable(

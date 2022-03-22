@@ -2,7 +2,7 @@ package demo.bigLazyTable.data.csv
 
 import com.opencsv.CSVParserBuilder
 import com.opencsv.CSVReaderBuilder
-import demo.bigLazyTable.model.Playlist
+import demo.bigLazyTable.data.service.Playlist
 import java.io.FileReader
 
 /**

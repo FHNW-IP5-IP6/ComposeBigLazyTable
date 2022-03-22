@@ -1,8 +1,8 @@
-package demo.bigLazyTable.ui.table.header
+package demo.bigLazyTable.view.table.header
 
 import bigLazyTable.paging.NumberFilterType
 import composeForms.model.attributes.Attribute
-import demo.bigLazyTable.model.LazyTableController
+import demo.bigLazyTable.controller.LazyTableController
 
 object NumberTextFieldUtil {
 

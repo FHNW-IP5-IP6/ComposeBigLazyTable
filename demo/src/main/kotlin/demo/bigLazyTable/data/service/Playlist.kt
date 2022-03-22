@@ -1,6 +1,8 @@
-package demo.bigLazyTable.model
+package demo.bigLazyTable.data.service
 
+import demo.bigLazyTable.controller.AppState
 import demo.bigLazyTable.data.database.DatabasePlaylists
+import demo.bigLazyTable.model.PlaylistModel
 import org.jetbrains.exposed.sql.ResultRow
 
 /**

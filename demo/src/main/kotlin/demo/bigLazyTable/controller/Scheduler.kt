@@ -1,4 +1,4 @@
-package demo.bigLazyTable.model
+package demo.bigLazyTable.controller
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

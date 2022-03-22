@@ -1,11 +1,12 @@
-package demo.bigLazyTable.model // TODO: move to package controler
+package demo.bigLazyTable.controller
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.state.ToggleableState
 import bigLazyTable.paging.*
 import composeForms.model.BaseModel
 import composeForms.model.attributes.*
-import demo.bigLazyTable.ui.table.header.NumberTextFieldUtil
+import demo.bigLazyTable.model.BLTSortOrder
+import demo.bigLazyTable.view.table.header.NumberTextFieldUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -42,7 +43,7 @@ class LazyTableController<T: BaseModel<*>>(
     private val mapToModels: (List<Any?>, AppState<T>) -> List<T>,
     private val pageSize: Int = 40, // TODO: make dynamic
 ) {
-    val appState = AppState(pagingService, defaultModel)
+    val appState = AppState(pagingService, defaultModel, pageSize)
 
     // Variables for different calculations
     private val totalCount by lazy { pagingService.getTotalCount() }

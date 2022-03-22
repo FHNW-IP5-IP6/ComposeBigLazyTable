@@ -27,7 +27,7 @@ import composeForms.model.ILabel
 import composeForms.model.IModel
 import composeForms.model.meanings.Default
 import composeForms.model.meanings.SemanticMeaning
-import demo.bigLazyTable.ui.theme.MinTableCellWidth
+import demo.bigLazyTable.view.theme.MinTableCellWidth
 import org.jetbrains.exposed.sql.Column
 
 /**

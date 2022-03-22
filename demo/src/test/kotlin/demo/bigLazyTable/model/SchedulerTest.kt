@@ -1,5 +1,6 @@
 package demo.bigLazyTable.model
 
+import demo.bigLazyTable.controller.Scheduler
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
