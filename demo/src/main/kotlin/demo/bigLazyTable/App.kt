@@ -7,13 +7,12 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
+import bigLazyTable.controller.LazyTableController
+import bigLazyTable.data.database.SqliteDb
 import demo.bigLazyTable.data.service.DBService
-import demo.bigLazyTable.data.database.SqliteDb
-import demo.bigLazyTable.controller.AppState
-import demo.bigLazyTable.controller.LazyTableController
-import demo.bigLazyTable.data.service.Playlist
 import demo.bigLazyTable.model.PlaylistModel
-import demo.bigLazyTable.view.BigLazyTableUI
+import bigLazyTable.view.BigLazyTableUI
+import demo.bigLazyTable.data.service.Playlist
 import java.awt.Dimension
 
 /**
@@ -39,7 +38,7 @@ fun main() = application {
 
         val service = DBService
 
-        val mapToPlaylistModels: (List<Any?>, AppState<PlaylistModel>) -> List<PlaylistModel> = { page, appState ->
+        val mapToPlaylistModels: (List<Any?>, bigLazyTable.controller.AppState<PlaylistModel>) -> List<PlaylistModel> = { page, appState ->
             page.map { PlaylistModel(it as Playlist, appState) }
         }
 
