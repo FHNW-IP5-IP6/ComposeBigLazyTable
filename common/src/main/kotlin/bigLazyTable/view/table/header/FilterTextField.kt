@@ -14,7 +14,6 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.TextStyle
 import bigLazyTable.controller.LazyTableController
 import bigLazyTable.data.paging.StringFilter
-import bigLazyTable.paging.*
 import bigLazyTable.view.theme.ContentDescriptionCaseSensitiveIcon
 import bigLazyTable.view.theme.ContentDescriptionClearFilterIcon
 import bigLazyTable.view.theme.FilterLabel
