@@ -14,7 +14,7 @@ import bigLazyTable.controller.AppState
 @ExperimentalMaterialApi
 @Composable
 // TODO: Remove PlaylistModel & make dynamic
-fun <T: BaseModel<*>> RowScope.FormContainer(weight: Float, model: T, appState: bigLazyTable.controller.AppState<out BaseModel<*>>) {
+fun <T: BaseModel<*>> RowScope.FormContainer(weight: Float, model: T, appState: AppState<out BaseModel<*>>) {
     Box(modifier = Modifier.weight(weight)) {
         Form().of(model, appState)
     }

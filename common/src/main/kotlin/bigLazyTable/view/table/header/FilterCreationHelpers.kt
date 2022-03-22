@@ -2,7 +2,6 @@ package bigLazyTable.view.table.header
 
 import bigLazyTable.controller.LazyTableController
 import bigLazyTable.data.paging.*
-import bigLazyTable.paging.*
 import composeForms.model.attributes.*
 
 fun createFilter(
