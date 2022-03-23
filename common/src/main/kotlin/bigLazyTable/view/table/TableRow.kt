@@ -18,13 +18,13 @@ import bigLazyTable.controller.LazyTableController
 import bigLazyTable.view.theme.HorizontalPadding
 
 @Composable
-fun <T: BaseModel<*>> PlaylistRow(
+fun <T: BaseModel<*>> TableRow(
     controller: LazyTableController<T>,
-    playlistModel: T,
+    tableModel: T,
     horizontalScrollState: ScrollState,
     appState: AppState<*>
 ) {
-    val isSelected = appState.selectedTableModel.id.getValue() == playlistModel.id.getValue()
+    val isSelected = appState.selectedTableModel.id.getValue() == tableModel.id.getValue()
     val backgroundColor = if (isSelected) BackgroundColorGroups else BackgroundColorLight
 
     Row(
@@ -34,12 +34,12 @@ fun <T: BaseModel<*>> PlaylistRow(
             .padding(horizontal = HorizontalPadding)
             .selectable(
                 selected = isSelected,
-                onClick = { controller.selectModel(playlistModel) }
+                onClick = { controller.selectModel(tableModel) }
             )
             .horizontalScroll(horizontalScrollState),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        for (attribute in playlistModel.displayedAttributesInTable!!) {
+        for (attribute in tableModel.displayedAttributesInTable!!) {
             AttributeTableCell(
                 attribute = attribute,
                 backgroundColor = backgroundColor
@@ -49,7 +49,7 @@ fun <T: BaseModel<*>> PlaylistRow(
 }
 
 @Composable
-fun PlaylistRowPlaceholder(
+fun TableRowPlaceholder(
     backgroundColor: Color = BackgroundColorLight,
     horizontalScrollState: ScrollState,
     appState: AppState<*>

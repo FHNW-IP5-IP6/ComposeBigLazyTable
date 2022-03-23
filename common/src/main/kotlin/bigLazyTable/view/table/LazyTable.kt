@@ -56,15 +56,15 @@ fun <T: BaseModel<*>> LazyTable(
                 state = verticalLazyListState
             ) {
                 val lazyListItems = if (isFiltering) appState.filteredTableModelList else appState.tableModelList
-                items(items = lazyListItems) { playlistModel ->
-                    when (playlistModel) {
-                        null -> PlaylistRowPlaceholder(
+                items(items = lazyListItems) { tableModel ->
+                    when (tableModel) {
+                        null -> TableRowPlaceholder(
                             horizontalScrollState = horizontalScrollState,
                             appState = appState
                         )
-                        else -> PlaylistRow(
+                        else -> TableRow(
                             controller = controller,
-                            playlistModel = playlistModel as T,
+                            tableModel = tableModel as T,
                             horizontalScrollState = horizontalScrollState,
                             appState = appState
                         )
