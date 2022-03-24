@@ -11,16 +11,13 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.junit.jupiter.api.*
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import java.sql.Connection
 import java.util.NoSuchElementException
 
 private val Log = KotlinLogging.logger {}
 
 internal class DBServiceTest {
-
-    private lateinit var dbService: DBService
 
     private val sizeTestDb = 1_001
     private val lastTestDbIndice = sizeTestDb - 1
@@ -31,20 +28,18 @@ internal class DBServiceTest {
 
     private val pageSize = 20
 
-    private lateinit var page: List<Playlist>
     private lateinit var randomPage: List<Playlist>
     private lateinit var negativePage: List<Playlist>
 
     @BeforeEach
     fun setupDatabase() {
-        dbService = DBService
         val makeSqliteCaseSensitive = "?case_sensitive_like=true"
         Database.connect(
             "jdbc:sqlite:./src/test/resources/test_spotify_playlist_dataset.db$makeSqliteCaseSensitive",
             "org.sqlite.JDBC"
         )
         TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
-        println("total count ${dbService.getTotalCount()}")
+        println("total count ${DBService.getTotalCount()}")
     }
 
     private fun printFixedTestValues() = Log.info {
@@ -63,7 +58,7 @@ internal class DBServiceTest {
 
         runBlocking {
             // when
-            page = dbService.getPage(startIndex, pageSize)
+            val page = DBService.getPage(startIndex, pageSize)
 
             // then
             assertTrue(page.isNotEmpty())
@@ -83,7 +78,7 @@ internal class DBServiceTest {
         runBlocking {
             // when
             val startIndex = 989
-            page = dbService.getPage(startIndex, pageSize)
+            val page = DBService.getPage(startIndex, pageSize)
 
             // then
             assertTrue(page.isNotEmpty())
@@ -103,12 +98,12 @@ internal class DBServiceTest {
 
         runBlocking {
             // when
-            randomPage = dbService.getPage(startIndexRandom, pageSize)
+            randomPage = DBService.getPage(startIndexRandom, pageSize)
 
             // then
             assertTrue(randomPage.isNotEmpty())
             assertEquals(startIndexRandom, randomPage.first().id.toInt())
-            val lastIndex = startIndexRandom + pageSize -1
+            val lastIndex = startIndexRandom + pageSize - 1
             val lastIndexCheck = if (lastIndex > lastTestDbIndice) lastTestDbIndice else lastIndex
             assertEquals(lastIndexCheck, randomPage.last().id.toInt())
 
@@ -125,7 +120,7 @@ internal class DBServiceTest {
 
         runBlocking {
             assertThrows<IllegalArgumentException> {
-                negativePage = dbService.getPage(startIndexNegative, pageSize)
+                negativePage = DBService.getPage(startIndexNegative, pageSize)
                 Log.info { "Has not thrown Exception!" }
             }
             Log.info { "Has thrown Exception!" }
@@ -140,7 +135,7 @@ internal class DBServiceTest {
         runBlocking {
             assertThrows<IllegalArgumentException> {
                 Log.info { "Try to call getPage with negative startIndex $startIndexNegative" }
-                dbService.getPage(startIndexNegative, pageSize)
+                DBService.getPage(startIndexNegative, pageSize)
                 Log.info { "Has not thrown Exception!" }
             }
             Log.info { "Has thrown Exception!" }
@@ -155,7 +150,7 @@ internal class DBServiceTest {
         Log.info { "Try to call getPage with last index - pageSize($pageSize) ${lastTestDbIndice - pageSize}" }
         assertDoesNotThrow {
             runBlocking {
-                dbService.getPage(lastTestDbIndice - pageSize, pageSize)
+                DBService.getPage(lastTestDbIndice - pageSize, pageSize)
             }
         }
         Log.info { "Has not thrown Exception!" }
@@ -170,7 +165,7 @@ internal class DBServiceTest {
         Log.info { "Try to call getPage with second last index & pageSize=1 $secondLastIndex" }
         assertDoesNotThrow {
             runBlocking {
-                dbService.getPage(secondLastIndex, 1)
+                DBService.getPage(secondLastIndex, 1)
             }
         }
         Log.info { "Has not thrown Exception!" }
@@ -184,7 +179,7 @@ internal class DBServiceTest {
         Log.info { "Try to call getPage with last index $lastTestDbIndice" }
         assertDoesNotThrow {
             runBlocking {
-                dbService.getPage(lastTestDbIndice, pageSize)
+                DBService.getPage(lastTestDbIndice, pageSize)
             }
         }
         Log.info { "Has not thrown Exception!" }
@@ -199,7 +194,7 @@ internal class DBServiceTest {
             assertThrows<IllegalArgumentException> {
                 // when
                 Log.info { "Try to call getPage with too big startIndex $sizeTestDb" }
-                dbService.getPage(sizeTestDb, pageSize)
+                DBService.getPage(sizeTestDb, pageSize)
                 Log.info { "Has not thrown Exception!" }
             }
             Log.info { "Has thrown Exception!" }
@@ -216,7 +211,7 @@ internal class DBServiceTest {
             assertThrows<IllegalArgumentException> {
                 // when
                 Log.info { "Try to call getPage with too big startIndex $moreThanMax" }
-                dbService.getPage(moreThanMax, pageSize)
+                DBService.getPage(moreThanMax, pageSize)
                 Log.info { "Has not thrown Exception!" }
             }
             Log.info { "Has thrown Exception!" }
@@ -230,8 +225,8 @@ internal class DBServiceTest {
 
         runBlocking {
             // when
-            page = dbService.getPage(startIndex, pageSize)
-            randomPage = dbService.getPage(startIndexRandom, pageSize)
+            val page = DBService.getPage(startIndex, pageSize)
+            randomPage = DBService.getPage(startIndexRandom, pageSize)
 
             // then
             assertEquals(startIndex, page.first().id.toInt())
@@ -250,8 +245,8 @@ internal class DBServiceTest {
 
         runBlocking {
             // when
-            page = dbService.getPage(startIndex, pageSize)
-            randomPage = dbService.getPage(startIndexRandom, pageSize)
+            val page = DBService.getPage(startIndex, pageSize)
+            val randomPage = DBService.getPage(startIndexRandom, pageSize)
 
             // then
             assertEquals(pageSize, page.size)
@@ -274,12 +269,12 @@ internal class DBServiceTest {
 
             // then
             for (i in filters.indices) {
-                val stringFilters = listOf(StringFilter(filters[i], DatabasePlaylists.name, caseSensitive = false))
+                val stringFilters = listOf(StringFilter("%${filters[i]}%", DatabasePlaylists.name, caseSensitive = false))
 
                 Log.info { "With filter$i=${filters[i]}" }
 
-                val filteredCount = dbService.getFilteredCount(stringFilters)
-                page = dbService.getPage(startIndex, filteredCount, stringFilters)
+                val filteredCount = DBService.getFilteredCount(stringFilters)
+                val page = DBService.getPage(startIndex, filteredCount, stringFilters)
                 assertEquals(filteredCount, page.size)
 
                 if (filteredCount != 0) {
@@ -306,12 +301,12 @@ internal class DBServiceTest {
 
             // then
             for (i in filters.indices) {
-                val stringFilters = listOf(StringFilter(filters[i], DatabasePlaylists.name, caseSensitive = true))
+                val stringFilters = listOf(StringFilter("%${filters[i]}%", DatabasePlaylists.name, caseSensitive = true))
 
                 Log.info { "With filter$i=${filters[i]}" }
 
-                val filteredCount = dbService.getFilteredCount(stringFilters)
-                page = dbService.getPage(startIndex, filteredCount, stringFilters)
+                val filteredCount = DBService.getFilteredCount(stringFilters)
+                val page = DBService.getPage(startIndex, filteredCount, stringFilters)
                 assertEquals(filteredCount, page.size)
 
                 if (filteredCount != 0) {
@@ -338,12 +333,12 @@ internal class DBServiceTest {
 
             // then
             for (i in filters.indices) {
-                val stringFilters = listOf(StringFilter(filters[i], DatabasePlaylists.name, caseSensitive = true))
+                val stringFilters = listOf(StringFilter("%${filters[i]}%", DatabasePlaylists.name, caseSensitive = true))
 
                 Log.info { "With filter$i=${filters[i]}" }
 
-                val filteredCount = dbService.getFilteredCount(stringFilters)
-                page = dbService.getPage(startIndex, filteredCount, stringFilters)
+                val filteredCount = DBService.getFilteredCount(stringFilters)
+                val page = DBService.getPage(startIndex, filteredCount, stringFilters)
 
                 assertEquals(filteredCount, page.size)
 
@@ -368,7 +363,7 @@ internal class DBServiceTest {
 
             assertThrows<IllegalArgumentException> {
                 // when
-                dbService.getFilteredCount(stringFilters)
+                DBService.getFilteredCount(stringFilters)
                 Log.info { "Has not thrown Exception!" }
             }
             Log.info { "Has thrown Exception!" }
@@ -382,7 +377,7 @@ internal class DBServiceTest {
         printFixedTestValues()
 
         // when
-        val totalCount = dbService.getTotalCount()
+        val totalCount = DBService.getTotalCount()
 
         // then
         assertEquals(sizeTestDb, totalCount)
@@ -396,15 +391,15 @@ internal class DBServiceTest {
 
         runBlocking {
             // given
-            page = dbService.getPage(startIndex, pageSize)
+            val page = DBService.getPage(startIndex, pageSize)
 
             // when
             for (i in page.indices) {
 
                 // then
-                assertEquals(page[i], dbService.get(i.toLong()))
+                assertEquals(page[i], DBService.get(i.toLong()))
                 Log.info {
-                    "${page[i].id} == ${dbService.get(i.toLong()).id}"
+                    "${page[i].id} == ${DBService.get(i.toLong()).id}"
                 }
             }
         }
@@ -422,7 +417,7 @@ internal class DBServiceTest {
         assertThrows<NoSuchElementException> {
             // when
             Log.info { "DB Service to get $invalidId" }
-            dbService.get(invalidId)
+            DBService.get(invalidId)
             Log.info { "Has not thrown Exception!" }
         }
         Log.info { "Has thrown Exception!" }
@@ -437,238 +432,272 @@ internal class DBServiceTest {
 
         // then
         assertThrows<IllegalArgumentException> {
-            dbService.indexOf(invalidIndex)
+            DBService.indexOf(invalidIndex)
             Log.info { "Has not thrown Exception!" }
         }
         Log.info { "Has thrown Exception!" }
     }
 
-    @Disabled("Page is empty")
     @Test
     fun `greater filter works`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         // given
-        val filter = IntFilter(1, DatabasePlaylists.num_edits, FilterOperation.GREATER_EQUALS)
+        val value = 2L
+        val filter = LongFilter(value, DatabasePlaylists.id, FilterOperation.GREATER)
 
         // when
-        page = dbService.getPage(
+        val page = DBService.getPage(
             startIndex,
             pageSize,
             filters = listOf(filter),
-            sort = Sort(DatabasePlaylists.num_edits, SortOrder.ASC)
+            sort = null
         )
 
         // then
+        Log.info { "first ${page.first().id} last ${page.last().id}" }
         assertTrue(page.isNotEmpty())
-        assertEquals(1, page.first())
-        assertEquals(1, page.last())
+        assertTrue(page.first().id > value)
+        assertTrue(page.last().id > value)
     }
 
-    @Disabled("Page is empty")
     @Test
     fun `greater equals filter works`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         // given
-        val filter = IntFilter(1, DatabasePlaylists.num_edits, FilterOperation.GREATER)
+        val value = 2
+        val filter = LongFilter(2, DatabasePlaylists.id, FilterOperation.GREATER_EQUALS)
 
         // when
-        page = dbService.getPage(
+        val page = DBService.getPage(
             startIndex,
             pageSize,
             filters = listOf(filter),
-            sort = Sort(DatabasePlaylists.num_edits, SortOrder.ASC)
+            sort = null
         )
 
         // then
+        Log.info { "first ${page.first().id} last ${page.last().id}" }
         assertTrue(page.isNotEmpty())
-        assertEquals(1, page.first())
-        assertEquals(1, page.last())
+        assertTrue(page.first().id >= value)
+        assertTrue(page.last().id >= value)
     }
 
-    @Disabled("Page is empty")
     @Test
     fun `less filter works`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         // given
-        val filter = IntFilter(1, DatabasePlaylists.num_edits, FilterOperation.LESS)
+        val value = 40L
+        val filter = LongFilter(value, DatabasePlaylists.id, FilterOperation.LESS)
 
         // when
-        page = dbService.getPage(
-            startIndex,
+        val page = DBService.getPage(
+            value.toInt()-3, // must be smaller than defined value
             pageSize,
             filters = listOf(filter),
-            sort = Sort(DatabasePlaylists.num_edits, SortOrder.ASC)
+            sort = null
         )
 
         // then
+        Log.info { "first ${page.first().id} last ${page.last().id}" }
         assertTrue(page.isNotEmpty())
-        assertEquals(1, page.first())
-        assertEquals(1, page.last())
+        assertTrue(page.first().id < value)
+        assertTrue(page.last().id < value)
     }
 
-    @Disabled("Page is empty")
     @Test
     fun `less equals filter works`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         // given
-        val filter = IntFilter(1, DatabasePlaylists.num_edits, FilterOperation.LESS_EQUALS)
+        val value = 40L
+        val filter = LongFilter(value, DatabasePlaylists.id, FilterOperation.LESS_EQUALS)
 
         // when
-        page = dbService.getPage(
-            startIndex,
+        val page = DBService.getPage(
+            value.toInt()-3,
             pageSize,
             filters = listOf(filter),
-            sort = Sort(DatabasePlaylists.num_edits, SortOrder.ASC)
+            sort = null
         )
 
         // then
+        Log.info { "first ${page.first().id} last ${page.last().id}" }
         assertTrue(page.isNotEmpty())
-        assertEquals(1, page.first())
-        assertEquals(1, page.last())
+        assertTrue(page.first().id <= value)
+        assertTrue(page.last().id <= value)
     }
 
-    @Disabled("Page is empty")
     @Test
     fun `equals filter works`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         // given
-        val filter = IntFilter(6, DatabasePlaylists.num_edits, FilterOperation.EQUALS)
+        val value = 40L
+        val filter = LongFilter(value, DatabasePlaylists.id, FilterOperation.EQUALS)
 
         // when
-        page = dbService.getPage(
+        val page = DBService.getPage(
             startIndex,
             pageSize,
             filters = listOf(filter),
-            sort = Sort(DatabasePlaylists.num_edits, SortOrder.ASC)
+            sort = null
         )
 
         // then
+        Log.info { "first ${page.first().id} last ${page.last().id}" }
         assertTrue(page.isNotEmpty())
-        assertEquals(1, page.first())
-        assertEquals(1, page.last())
+        assertEquals(value, page.first().id)
+        assertEquals(value, page.last().id)
     }
 
-    @Disabled("Page is empty")
     @Test
     fun `not equals filter works`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         // given
-        val filter = IntFilter(1, DatabasePlaylists.num_edits, FilterOperation.NOT_EQUALS)
+        val value = 40L
+        val filter = LongFilter(value, DatabasePlaylists.id, FilterOperation.NOT_EQUALS)
 
         // when
-        page = dbService.getPage(
-            startIndex,
+        val page = DBService.getPage(
+            value.toInt(),
             pageSize,
             filters = listOf(filter),
-            sort = Sort(DatabasePlaylists.num_edits, SortOrder.ASC)
+            sort = null
         )
 
         // then
+        Log.info { "first ${page.first().id} last ${page.last().id}" }
         assertTrue(page.isNotEmpty())
-        assertEquals(1, page.first())
-        assertEquals(1, page.last())
+        assertNotEquals(value, page.first().id)
+        assertNotEquals(value, page.last().id)
     }
 
-    @Disabled("Page is empty")
     @Test
     fun `between both included filter works`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         // given
-        val fromFilter = IntFilter(1, DatabasePlaylists.num_edits, FilterOperation.BETWEEN_BOTH_INCLUDED)
-        val toFilter = IntFilter(10, DatabasePlaylists.num_edits, FilterOperation.BETWEEN_BOTH_INCLUDED)
-        val filter = IntFilter(
-            6,
-            DatabasePlaylists.num_edits,
+        val from = 1L
+        val to = 10L
+        val fromFilter = LongFilter(from, DatabasePlaylists.id, FilterOperation.BETWEEN_BOTH_INCLUDED)
+        val toFilter = LongFilter(to, DatabasePlaylists.id, FilterOperation.BETWEEN_BOTH_INCLUDED)
+        val filter = LongFilter(
+            0,
+            DatabasePlaylists.id,
             FilterOperation.BETWEEN_BOTH_INCLUDED,
             between = Between(fromFilter, toFilter)
         )
 
         // when
-        page = dbService.getPage(
+        val page = DBService.getPage(
             startIndex,
             pageSize,
             filters = listOf(filter),
-            sort = Sort(DatabasePlaylists.num_edits, SortOrder.ASC)
+            sort = Sort(DatabasePlaylists.id, SortOrder.ASC)
         )
 
         // then
+        Log.info { "first ${page.first().id} last ${page.last().id}" }
         assertTrue(page.isNotEmpty())
-        assertEquals(1, page.first())
-        assertEquals(1, page.last())
+        assertEquals(from, page.first().id)
+        assertEquals(to, page.last().id)
     }
 
-    @Disabled("Page is empty")
     @Test
     fun `between both not included filter works`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         // given
-        val fromFilter = IntFilter(1, DatabasePlaylists.num_edits, FilterOperation.BETWEEN_BOTH_NOT_INCLUDED)
-        val toFilter = IntFilter(10, DatabasePlaylists.num_edits, FilterOperation.BETWEEN_BOTH_NOT_INCLUDED)
-        val filter = IntFilter(
+        val from = 1L
+        val to = 10L
+        val fromFilter = LongFilter(from, DatabasePlaylists.id, FilterOperation.BETWEEN_BOTH_NOT_INCLUDED)
+        val toFilter = LongFilter(to, DatabasePlaylists.id, FilterOperation.BETWEEN_BOTH_NOT_INCLUDED)
+        val filter = LongFilter(
             6,
-            DatabasePlaylists.num_edits,
+            DatabasePlaylists.id,
             FilterOperation.BETWEEN_BOTH_NOT_INCLUDED,
             between = Between(fromFilter, toFilter)
         )
 
         // when
-        page = dbService.getPage(
+        val page = DBService.getPage(
             startIndex,
             pageSize,
             filters = listOf(filter),
-            sort = Sort(DatabasePlaylists.num_edits, SortOrder.ASC)
+            sort = Sort(DatabasePlaylists.id, SortOrder.ASC)
         )
 
         // then
+        Log.info { "first ${page.first().id} last ${page.last().id}" }
         assertTrue(page.isNotEmpty())
-        assertEquals(1, page.first())
-        assertEquals(1, page.last())
+        assertTrue(from < page.first().id)
+        assertTrue(to > page.last().id)
     }
 
-    @Disabled("Page is empty")
     @Test
     fun `between from included filter works`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         // given
-        val fromFilter = IntFilter(1, DatabasePlaylists.num_edits, FilterOperation.BETWEEN_FROM_INCLUDED)
-        val toFilter = IntFilter(10, DatabasePlaylists.num_edits, FilterOperation.BETWEEN_FROM_INCLUDED)
-        val filter = IntFilter(
+        val from = 1L
+        val to = 10L
+        val fromFilter = LongFilter(from, DatabasePlaylists.id, FilterOperation.BETWEEN_FROM_INCLUDED)
+        val toFilter = LongFilter(to, DatabasePlaylists.id, FilterOperation.BETWEEN_FROM_INCLUDED)
+        val filter = LongFilter(
             6,
-            DatabasePlaylists.num_edits,
+            DatabasePlaylists.id,
             FilterOperation.BETWEEN_FROM_INCLUDED,
             between = Between(fromFilter, toFilter)
         )
 
         // when
-        page = dbService.getPage(
+        val page = DBService.getPage(
             startIndex,
             pageSize,
             filters = listOf(filter),
-            sort = Sort(DatabasePlaylists.num_edits, SortOrder.ASC)
+            sort = Sort(DatabasePlaylists.id, SortOrder.ASC)
         )
 
         // then
+        Log.info { "first ${page.first().id} last ${page.last().id}" }
         assertTrue(page.isNotEmpty())
-        assertEquals(1, page.first())
-        assertEquals(1, page.last())
+        assertEquals(from, page.first().id)
+        assertTrue(to > page.last().id)
     }
 
-    @Disabled("Page is empty")
     @Test
     fun `between to included filter works`() {
+        printTestMethodName(object {}.javaClass.enclosingMethod.name)
+
         // given
-        val fromFilter = IntFilter(1, DatabasePlaylists.num_edits, FilterOperation.BETWEEN_TO_INCLUDED)
-        val toFilter = IntFilter(10, DatabasePlaylists.num_edits, FilterOperation.BETWEEN_TO_INCLUDED)
-        val filter = IntFilter(
+        val from = 1L
+        val to = 10L
+        val fromFilter = LongFilter(from, DatabasePlaylists.id, FilterOperation.BETWEEN_TO_INCLUDED)
+        val toFilter = LongFilter(to, DatabasePlaylists.id, FilterOperation.BETWEEN_TO_INCLUDED)
+        val filter = LongFilter(
             6,
-            DatabasePlaylists.num_edits,
+            DatabasePlaylists.id,
             FilterOperation.BETWEEN_TO_INCLUDED,
             between = Between(fromFilter, toFilter)
         )
 
         // when
-        page = dbService.getPage(
+        val page = DBService.getPage(
             startIndex,
             pageSize,
             filters = listOf(filter),
-            sort = Sort(DatabasePlaylists.num_edits, SortOrder.ASC)
+            sort = Sort(DatabasePlaylists.id, SortOrder.ASC)
         )
 
         // then
+        Log.info { "first ${page.first().id} last ${page.last().id}" }
         assertTrue(page.isNotEmpty())
-        assertEquals(1, page.first())
-        assertEquals(1, page.last())
+        assertTrue(from < page.first().id)
+        assertEquals(to, page.last().id)
     }
 
 }
