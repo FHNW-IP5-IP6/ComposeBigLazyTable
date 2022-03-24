@@ -103,7 +103,7 @@ class FakePagingService(val numberOfPlaylists: Int, val pageSize: Int) : IPaging
     }
 
     override fun indexOf(id: Long, filter: String): Int {
-        TODO("Not yet implemented -> first implement the real method!")
+        TODO("Not yet implemented")
     }
 
     @Throws(IllegalAccessException::class, ClassCastException::class)

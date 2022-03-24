@@ -7,11 +7,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import composeForms.ui.theme.*
 
-// TODO: Dark/Light Switch works for TextFields -> what colors should we use?
 private val DarkColorPalette = darkColors(
     primary = BackgroundColorGroups,
     primaryVariant = BackgroundColorGroups,
@@ -38,10 +36,8 @@ fun BigLazyTableTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
+    // TODO-Future: Configure Dark/Light Colors & make UI completely respond to it (not just TextFields)
     val colors = if (darkTheme) DarkColorPalette else LightColorPalette
 
-    MaterialTheme(
-//        colors = colors, TODO: Could be added if the defined colors look good
-        content = content
-    )
+    MaterialTheme(content = content)
 }
