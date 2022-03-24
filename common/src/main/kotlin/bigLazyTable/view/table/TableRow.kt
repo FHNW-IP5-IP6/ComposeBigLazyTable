@@ -40,10 +40,7 @@ fun <T: BaseModel<*>> TableRow(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         for (attribute in tableModel.displayedAttributesInTable!!) {
-            AttributeTableCell(
-                attribute = attribute,
-                backgroundColor = backgroundColor
-            )
+            TableCell(attribute = attribute)
         }
     }
 }
@@ -65,11 +62,7 @@ fun TableRowPlaceholder(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         for (attribute in lazyListAttributes!!) {
-            TableCell(
-                attribute = attribute,
-                text = "...",
-                backgroundColor = backgroundColor
-            )
+            LoadingCell(attribute = attribute)
         }
     }
 }

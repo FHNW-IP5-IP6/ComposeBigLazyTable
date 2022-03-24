@@ -7,12 +7,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import composeForms.model.BaseModel
 import composeForms.ui.theme.BackgroundColorHeader
 import bigLazyTable.controller.AppState
 import bigLazyTable.controller.LazyTableController
-import bigLazyTable.view.table.AttributeTableCell
+import bigLazyTable.view.table.HeaderCell
 import bigLazyTable.view.theme.HorizontalPadding
 
 @Composable
@@ -37,12 +36,7 @@ fun <T: BaseModel<*>> HeaderRow(
                     controller = controller
                 )
                 Box(contentAlignment = Alignment.Center) {
-                    AttributeTableCell(
-                        isTitle = true,
-                        attribute = attribute,
-                        color = Color.White,
-                        backgroundColor = BackgroundColorHeader
-                    )
+                    HeaderCell(attribute = attribute)
                     SortButton(
                         modifier = Modifier.align(Alignment.CenterEnd),
                         attribute = attribute,

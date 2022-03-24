@@ -11,32 +11,28 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.Column
-import org.junit.platform.commons.util.LruCache // TODO: Other LruCache (android.util.LruCache<K, V>)
+import org.junit.platform.commons.util.LruCache
 import java.util.*
-import java.util.logging.Logger
 import kotlin.collections.ArrayList
 import kotlin.math.ceil
 import kotlin.properties.Delegates
 
-private val Log = KotlinLogging.logger {} // TODO: Why not below logger
-val log2 = Logger.getLogger("classname")
-
-// TODO: Add log
-class LRUCache<key, value> (val maxSize: Int) : LinkedHashMap<key, value>(maxSize, 0.75f, true){
-    override fun removeEldestEntry(eldest: MutableMap.MutableEntry<key, value>?): Boolean {
-        return size > maxSize
-    }
-}
+private val Log = KotlinLogging.logger {}
 
 /**
- * TODO: Add class documentation
- * @param pagingService TODO: Add description for param
- * @param pageSize TODO: Add description for param
- * @param appState TODO: Add description for param
+ * TODO: Guet so?
+ * This class manages everything that happens in the BigLazyTable.
+ * It loads ned Pages, caches loaded Pages, merges changed models, handles all filter input and
+ * controls the sort mechanism.
+ *
+ * @param pagingService used to load Pages
+ * @param defaultModel needed to pass it to the AppState to control global data (language)
+ * @param mapToModels lambda which tells how to map Pages to models
+ * @param pageSize default Page Size used to load Pages
  *
  * @author Marco Sprenger, Livio Näf
  */
-class LazyTableController<T: BaseModel<*>>(
+class LazyTableController<T : BaseModel<*>>(
     private val pagingService: IPagingService<*>,
     defaultModel: T,
     private val mapToModels: (List<Any?>, AppState<BaseModel<*>>) -> List<T>,
@@ -56,6 +52,7 @@ class LazyTableController<T: BaseModel<*>>(
     var sort: Sort? by mutableStateOf(null)
     var attributeSort = mutableStateMapOf<Attribute<*, *, *>, BLTSortOrder>()
     var lastSortedAttribute: Attribute<*, *, *>? = null
+
     // Could be used for future improvements with multiple sorts
     var isSorting by mutableStateOf(false)
         private set
@@ -266,7 +263,8 @@ class LazyTableController<T: BaseModel<*>>(
     internal fun mergeModels(pageOfModels: MutableList<T>): MutableList<T> {
         for (i in firstPageNr until pageSize) {
             // Check if a changed model is existing for the current iteration model
-            val tableModel = appState.changedTableModels.find { tableModel -> tableModel.id.getValue() == pageOfModels[i].id.getValue() }
+            val tableModel =
+                appState.changedTableModels.find { tableModel -> tableModel.id.getValue() == pageOfModels[i].id.getValue() }
 
             // If tableModel is not null, the same model with changes exists
             if (tableModel != null) {
@@ -374,9 +372,11 @@ class LazyTableController<T: BaseModel<*>>(
     }
 
     /**
-     * TODO: Add description
-     * @param attribute TODO: Add description
-     * @param newSortOrder TODO: Add description
+     * TODO: Guet so?
+     * Handles click on sort icon and sets the [newSortOrder] to the [attribute].
+     *
+     * @param attribute the attribute on which the sort changed
+     * @param newSortOrder the new sort order for the given [attribute]
      */
     fun onSortChanged(attribute: Attribute<*, *, *>, newSortOrder: BLTSortOrder) {
         resetPreviousSortedAttribute(newAttribute = attribute)
@@ -390,10 +390,13 @@ class LazyTableController<T: BaseModel<*>>(
     }
 
     /**
-     * TODO: Add description
-     * @param newAttribute TODO: Add description
+     * TODO: Guet so?
+     * Checks if the [newAttribute] is different from the [lastSortedAttribute]
+     * and resets the sort order of the [lastSortedAttribute].
+     *
+     * @param newAttribute the newly set attribute
      */
-    private fun resetPreviousSortedAttribute(newAttribute: Attribute<*,*,*>) {
+    private fun resetPreviousSortedAttribute(newAttribute: Attribute<*, *, *>) {
         if (lastSortedAttribute != null && lastSortedAttribute != newAttribute) {
             attributeSort[lastSortedAttribute!!] = BLTSortOrder.None
         }
@@ -401,7 +404,7 @@ class LazyTableController<T: BaseModel<*>>(
 
     fun onFilterChanged() {
         filters = attributeFilter.values.filterNotNull()
-        Log.info {"Filters in onNumberFilterChanged: $filters" }
+        Log.info { "Filters in onNumberFilterChanged: $filters" }
 
         isFiltering = filters.isNotEmpty()
         if (isFiltering) {
@@ -502,7 +505,6 @@ class LazyTableController<T: BaseModel<*>>(
     internal fun isPageInCache(pageNr: Int): Boolean =
         cache.containsKey(pageNr)
 
-    // TODO: Instead add member pagesLoaded: Boolean & Make a LaunchedEffect in LazyTable
     private fun forceRecompose() {
         recomposeStateChanger = !recomposeStateChanger
     }
@@ -562,4 +564,11 @@ class LazyTableController<T: BaseModel<*>>(
         onFilterChanged()
     }
 
+}
+
+// TODO-Future: Add this or other LRUCache
+class LRUCache<key, value>(val maxSize: Int) : LinkedHashMap<key, value>(maxSize, 0.75f, true) {
+    override fun removeEldestEntry(eldest: MutableMap.MutableEntry<key, value>?): Boolean {
+        return size > maxSize
+    }
 }

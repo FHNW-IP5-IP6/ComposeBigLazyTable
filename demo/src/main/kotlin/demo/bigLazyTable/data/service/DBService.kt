@@ -75,7 +75,7 @@ object DBService : IPagingService<Playlist> {
     override fun indexOf(id: Long, filter: String): Int {
         if (id < 0) throw IllegalArgumentException("only positive id as parameter is allowed")
         transaction {
-            // TODO: How can we determine what the gui index is of a given index?
+            // TODO-Future: How can we determine what the gui index is of a given index?
         }
         return -1
     }

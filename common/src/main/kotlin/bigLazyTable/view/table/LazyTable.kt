@@ -27,7 +27,7 @@ fun <T: BaseModel<*>> LazyTable(
     val verticalLazyListState = rememberLazyListState()
 
     with(controller) {
-        val recomposeTrigger = recomposeStateChanger // must be here for recompose! TODO: better solution
+        val recomposeTrigger = recomposeStateChanger // must be here for recompose! TODO-Future: better solution
 
         if (isLoading) {
             Box(Modifier.fillMaxWidth().padding(16.dp)) {
@@ -38,7 +38,7 @@ fun <T: BaseModel<*>> LazyTable(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 14.dp) // TODO: Auf ScrollbarMinimumHeight bezogen?
+                .padding(bottom = 14.dp) // TODO@Marco: Auf ScrollbarMinimumHeight bezogen?
         ) {
             val firstVisibleItemIndex = verticalLazyListState.firstVisibleItemIndex
             if (isTimeToLoadPage(firstVisibleItemIndex)) {

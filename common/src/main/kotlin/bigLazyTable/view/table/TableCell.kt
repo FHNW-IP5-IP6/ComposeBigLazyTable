@@ -1,6 +1,5 @@
 package bigLazyTable.view.table
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -11,41 +10,52 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import composeForms.model.attributes.Attribute
 
-// TODO: Attribute- HeaderCell & TableCell
 @Composable
-fun AttributeTableCell(
-    attribute: Attribute<*, *, *>,
-    isTitle: Boolean = false,
-    color: Color = Color.Black,
-    backgroundColor: Color
-) {
-    TableCell(
-        attribute = attribute,
-        text = if (isTitle) attribute.getLabel() else attribute.getValueAsText(),
+fun HeaderCell(attribute: Attribute<*, *, *>) {
+    Cell(
+        text = attribute.getLabel(),
         width = attribute.tableColumnWidth,
-        color = color,
-        backgroundColor = backgroundColor,
+        color = Color.White,
         hasError = !attribute.isValid(),
-        fontWeight = if (isTitle) FontWeight.Bold else FontWeight.Normal
+        fontWeight = FontWeight.Bold
     )
 }
 
 @Composable
-fun TableCell(
-    attribute: Attribute<*, *, *>,
+fun TableCell(attribute: Attribute<*, *, *>) {
+    Cell(
+        text = attribute.getValueAsText(),
+        width = attribute.tableColumnWidth,
+        color = Color.Black,
+        hasError = !attribute.isValid(),
+        fontWeight = FontWeight.Normal
+    )
+}
+
+@Composable
+fun LoadingCell(attribute: Attribute<*, *, *>) {
+    Cell(
+        text = "...",
+        width = attribute.tableColumnWidth,
+        color = Color.Black,
+        hasError = !attribute.isValid(),
+        fontWeight = FontWeight.Normal
+    )
+}
+
+@Composable
+private fun Cell(
     text: String,
-    width: Dp = attribute.tableColumnWidth,
-    color: Color = Color.Black,
-    backgroundColor: Color,
-    fontWeight: FontWeight = FontWeight.Normal,
-    hasError: Boolean = false
+    width: Dp,
+    color: Color,
+    fontWeight: FontWeight,
+    hasError: Boolean
 ) {
     Text(
         text = text,
         color = if (hasError) Color.Red else color,
-        fontWeight = if (hasError) FontWeight.Bold else fontWeight,
+        fontWeight = fontWeight,
         modifier = Modifier
-            .background(backgroundColor)
             .width(width)
             .padding(8.dp)
     )
