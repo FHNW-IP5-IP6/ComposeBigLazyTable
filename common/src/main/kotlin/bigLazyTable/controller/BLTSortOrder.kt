@@ -14,22 +14,13 @@ sealed class BLTSortOrder(
     var isSorting: Boolean,
     var icon: ImageVector
 ) {
-    // TODO: Decide for function or member approach: I would delete functions because it makes more sense to me to have
-    //  a member declared which knows what next is instead of a function which always returns the same value which is
-    //  not really the idea of a function
     abstract val nextSortState: BLTSortOrder
     abstract val nextSortIcon: ImageVector
-//    abstract fun nextSortState(): BLTSortOrder
-//    abstract fun nextSortIcon(): ImageVector
     abstract fun sortAttribute(attribute: Attribute<*, *, *>): Sort?
 
     object Asc : BLTSortOrder(sortOrder = SortOrder.ASC, isSorting = true, icon = Icons.Default.KeyboardArrowUp) {
         override val nextSortState: BLTSortOrder = Desc
         override val nextSortIcon: ImageVector = nextSortState.icon
-
-//        override fun nextSortState(): BLTSortOrder = Desc
-//        override fun nextSortIcon(): ImageVector = nextSortState().icon
-
         override fun sortAttribute(attribute: Attribute<*, *, *>): Sort = Sort(
             dbField = attribute.databaseField,
             sortOrder = sortOrder!!
@@ -39,9 +30,6 @@ sealed class BLTSortOrder(
     object Desc : BLTSortOrder(sortOrder = SortOrder.DESC, isSorting = true, icon = Icons.Default.KeyboardArrowDown) {
         override val nextSortState: BLTSortOrder = None
         override val nextSortIcon: ImageVector = nextSortState.icon
-
-//        override fun nextSortState(): BLTSortOrder = None
-//        override fun nextSortIcon(): ImageVector = nextSortState().icon
         override fun sortAttribute(attribute: Attribute<*, *, *>): Sort = Sort(
             dbField = attribute.databaseField,
             sortOrder = sortOrder!!
@@ -51,9 +39,6 @@ sealed class BLTSortOrder(
     object None : BLTSortOrder(sortOrder = null, isSorting = false, icon = Icons.Default.Close) {
         override val nextSortState: BLTSortOrder = Asc
         override val nextSortIcon: ImageVector = nextSortState.icon
-
-//        override fun nextSortState(): BLTSortOrder = Asc
-//        override fun nextSortIcon(): ImageVector = nextSortState().icon
         override fun sortAttribute(attribute: Attribute<*, *, *>): Sort? = null
     }
 }

@@ -13,8 +13,6 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.notLike
 import java.util.*
 
 fun Table.selectWithAllFilters(filters: List<Filter>): Query {
-    println("Inside selectWithAllFilters")
-    val start = System.currentTimeMillis()
     if (filters.isEmpty()) return Query(this, null)
 
     var sql = retrieveSql(filter = filters.first())
@@ -22,15 +20,13 @@ fun Table.selectWithAllFilters(filters: List<Filter>): Query {
         val sql2 = retrieveSql(filter = filters[i])
         sql = sql and sql2
     }
-    val end = System.currentTimeMillis()
-    println("Just before return: selectWithAllFilters needed ${end - start} ms")
     return this.select { sql }
 }
 
 object FilterUtil {
 
     fun retrieveSql(filter: Filter): Op<Boolean> = when (filter) {
-        is BooleanFilter/*, is StringFilter*/ -> filterEquals(filter)
+        is BooleanFilter            -> filterEquals(filter)
         is MultipleOperationsFilter -> chooseCorrectFilterTypeMethod(filter = filter, filterType = filter.filterOperation)
     }
 

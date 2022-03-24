@@ -3,10 +3,8 @@ package demo.bigLazyTable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.remember
-import androidx.compose.ui.window.FrameWindowScope
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowPlacement
-import androidx.compose.ui.window.application
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.*
 import bigLazyTable.controller.AppState
 import bigLazyTable.controller.LazyTableController
 import bigLazyTable.data.database.SqliteDb
@@ -22,42 +20,32 @@ import java.awt.Dimension
  */
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
-fun main() = application {
-    Window(
-        onCloseRequest = ::exitApplication,
-        title = "ComposeLists"
-    ) {
-        remember {
-            // Needs remember. Without it, the first language change in no full-screen leads to a full-screen window
-            initializeWindowSize()
+fun main() {
 
-            // Needs remember. Without it, initializeConnection would be called again (f.e. on language change)
-            SqliteDb(
-                pathToDb = "./demo/src/main/resources/spotify_playlist_dataset.db",
-                caseSensitiveFiltering = true
-            ).initializeConnection()
-        }
+    SqliteDb(
+        pathToDb = "./demo/src/main/resources/spotify_playlist_dataset.db",
+        caseSensitiveFiltering = true
+    ).initializeConnection()
 
-        val service = DBService
-
-        val mapToPlaylistModels: (List<Any?>, AppState<BaseModel<*>>) -> List<PlaylistModel> = { page, appState ->
-            page.map { PlaylistModel(it as Playlist).apply { this.appState = appState } }
-        }
-
-        val controller = remember {
-            LazyTableController(
-                pagingService = service,
-                defaultModel = PlaylistModel(Playlist()),
-                mapToModels = mapToPlaylistModels
-            ) // side effect: init loads first data to display
-        }
-        BigLazyTableUI(controller = controller)
+    val mapToPlaylistModels: (List<Any?>, AppState<BaseModel<*>>) -> List<PlaylistModel> = { page, appState ->
+        page.map { PlaylistModel(it as Playlist).apply { this.appState = appState } }
     }
-}
 
-fun FrameWindowScope.initializeWindowSize() {
-    window.apply {
-        minimumSize = Dimension(1000, 800)
-        placement = WindowPlacement.Maximized
+    val controller = LazyTableController(
+        pagingService = DBService,
+        defaultModel = PlaylistModel(Playlist()),
+        mapToModels = mapToPlaylistModels
+    ) // side effect: init loads first data to display
+
+    application {
+        Window(
+            onCloseRequest = ::exitApplication,
+            state = rememberWindowState(placement = WindowPlacement.Maximized),
+            title = "ComposeLists"
+        ) {
+            window.minimumSize = Dimension(1000, 800)
+
+            BigLazyTableUI(controller = controller)
+        }
     }
 }

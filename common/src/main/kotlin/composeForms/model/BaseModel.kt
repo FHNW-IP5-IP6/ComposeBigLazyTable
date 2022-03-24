@@ -114,6 +114,7 @@ abstract class BaseModel<L>(private val title: L,
     private val modelScope                                   = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     var startedUp                                            = false
 
+    // Compose BigLazyTable
     var appState: AppState<BaseModel<*>>? = null
     abstract val displayedAttributesInTable: List<Attribute<*,*,*>>?
     abstract val id: Attribute<*,*,*>
@@ -289,7 +290,7 @@ abstract class BaseModel<L>(private val title: L,
      * In addition, allChangedAttributesAreValid and if changesExist are updated.
      */
     override fun updateChanges(){
-        // BLT
+        // Compose BigLazyTable
         if (appState?.changedTableModels?.contains(this) == false) {
             appState?.changedTableModels?.add(this)
         }
