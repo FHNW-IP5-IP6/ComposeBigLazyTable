@@ -16,7 +16,7 @@ import kotlin.collections.ArrayList
  *
  * @author Marco Sprenger, Livio Näf
  */
-// TableState
+// TODO-Future: Could be renamed to TableState
 class AppState<T: BaseModel<*>>(pagingService: IPagingService<*>, defaultModel: T, pageSize: Int) {
 
     /**
