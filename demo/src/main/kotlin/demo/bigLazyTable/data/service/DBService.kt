@@ -29,47 +29,21 @@ object DBService : IPagingService<Playlist> {
         if (startIndex < 0) throw IllegalArgumentException("only positive values are allowed for startIndex")
 
         val start: Long = startIndex.toLong()
-        println("Offset: Start = $start")
         if (sort == null) {
-            println("Inside getPage transaction without sort")
-            val start1 = System.currentTimeMillis()
-            val rv = transaction {
+            return transaction {
                 DatabasePlaylists
                     .selectWithAllFilters(filters)
                     .limit(n = pageSize, offset = start)
-                    .map {
-                        println("Inside map of getPage without sort")
-                        val start2 = System.currentTimeMillis()
-                        val rv = PlaylistDto(it).toPlaylist()
-                        val end = System.currentTimeMillis()
-                        println("map of getPage without sort needed ${end - start2} ms")
-                        rv
-                    }
+                    .map { PlaylistDto(it).toPlaylist() }
             }
-            val end = System.currentTimeMillis()
-            println("getPage transaction without sort needed ${end - start1} ms")
-            return rv
         } else {
-            println("Inside getPage transaction with sort")
-            val start1 = System.currentTimeMillis()
-            val rv = transaction {
+            return transaction {
                 DatabasePlaylists
                     .selectWithAllFilters(filters)
                     .orderBy(sort.dbField as Column<String> to sort.sortOrder) // TODO-Future: Remove Column<String> cast
                     .limit(n = pageSize, offset = start)
-                    .map {
-                        println("Inside map of getPage with sort")
-                        val start2 = System.currentTimeMillis()
-                        val rv = PlaylistDto(it).toPlaylist()
-                        val end = System.currentTimeMillis()
-                        println("map of getPage with sort needed ${end - start2} ms")
-                        rv
-                    }
+                    .map { PlaylistDto(it).toPlaylist() }
             }
-
-            val end = System.currentTimeMillis()
-            println("getPage transaction without sort needed ${end - start1} ms")
-            return rv
         }
     }
 

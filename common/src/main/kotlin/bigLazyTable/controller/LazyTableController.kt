@@ -117,6 +117,7 @@ class LazyTableController<T: BaseModel<*>>(
      * Load the initial data for first start. Loads the first cache size pages.
      */
     private fun initialDataLoading() {
+        val start = System.currentTimeMillis()
         isLoading = true
         for (pageNr in firstPageNr until cacheSize) {
             val startIndexOfPage = pageNr * pageSize
@@ -127,6 +128,8 @@ class LazyTableController<T: BaseModel<*>>(
 
         forceRecompose()
 
+        val end = System.currentTimeMillis()
+        Log.info("initialDataLoading: The request took ${end - start} milliseconds.")
         addNewModelsToAppState()
     }
 
@@ -232,7 +235,7 @@ class LazyTableController<T: BaseModel<*>>(
         )
 
         val end = System.currentTimeMillis()
-        Log.info("The request took ${end - start} milliseconds.")
+        Log.info("getPageFromService: The request took ${end - start} milliseconds.")
 
         return mapToModels(page, appState as AppState<BaseModel<*>>)
     }
@@ -397,24 +400,16 @@ class LazyTableController<T: BaseModel<*>>(
     }
 
     fun onFilterChanged() {
-        println("Inside onFiltersChanged")
-        val start = System.currentTimeMillis()
-
         filters = attributeFilter.values.filterNotNull()
-        println("Filters in onNumberFilterChanged: $filters")
+        Log.info {"Filters in onNumberFilterChanged: $filters" }
 
         isFiltering = filters.isNotEmpty()
         if (isFiltering) {
             filterScheduler.scheduleTask {
-                println("Before getFilteredCountNew")
-                val start1 = System.currentTimeMillis()
                 // getFilteredCountNew needed 617 ms
                 filteredCount = pagingService.getFilteredCount(filters = filters)
-                println("filtered count = $filteredCount")
-                val end1 = System.currentTimeMillis()
-                println("getFilteredCountNew needed ${end1 - start1} ms")
 
-                println("filtered Count = $filteredCount")
+                Log.info { "filtered Count = $filteredCount" }
                 appState.filteredTableModelList = ArrayList(Collections.nCopies(filteredCount, null))
 
                 initialDataLoading()
@@ -423,9 +418,6 @@ class LazyTableController<T: BaseModel<*>>(
             // Make sure that after last filter removed sort order stays
             scheduler.scheduleTask { initialDataLoading() }
         }
-
-        val end = System.currentTimeMillis()
-        println("onFiltersChanged needed ${end - start} ms")
     }
 
     /**
