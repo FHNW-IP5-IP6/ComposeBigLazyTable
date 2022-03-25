@@ -130,38 +130,38 @@ object FilterUtil {
     }
 
     private fun filterBetweenBothIncluded(filter: Filter): Op<Boolean> = when (filter) {
-        is LongFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
-        is IntFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
-        is DoubleFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
-        is FloatFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
-        is ShortFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
+        is LongFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLessEquals(filter.between.toFilter)
+        is IntFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLessEquals(filter.between.toFilter)
+        is DoubleFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLessEquals(filter.between.toFilter)
+        is FloatFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLessEquals(filter.between.toFilter)
+        is ShortFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLessEquals(filter.between.toFilter)
         else -> throw IllegalArgumentException("Only number filters can be called with this function, but received $filter")
     }
 
     private fun filterBetweenBothNotIncluded(filter: Filter): Op<Boolean> = when (filter) {
-        is LongFilter -> filterGreater(filter.between!!.fromFilter) and filterLess(filter.between!!.toFilter)
-        is IntFilter -> filterGreater(filter.between!!.fromFilter) and filterLess(filter.between!!.toFilter)
-        is DoubleFilter -> filterGreater(filter.between!!.fromFilter) and filterLess(filter.between!!.toFilter)
-        is FloatFilter -> filterGreater(filter.between!!.fromFilter) and filterLess(filter.between!!.toFilter)
-        is ShortFilter -> filterGreater(filter.between!!.fromFilter) and filterLess(filter.between!!.toFilter)
+        is LongFilter -> filterGreater(filter.between!!.fromFilter) and filterLess(filter.between.toFilter)
+        is IntFilter -> filterGreater(filter.between!!.fromFilter) and filterLess(filter.between.toFilter)
+        is DoubleFilter -> filterGreater(filter.between!!.fromFilter) and filterLess(filter.between.toFilter)
+        is FloatFilter -> filterGreater(filter.between!!.fromFilter) and filterLess(filter.between.toFilter)
+        is ShortFilter -> filterGreater(filter.between!!.fromFilter) and filterLess(filter.between.toFilter)
         else -> throw IllegalArgumentException("Only number filters can be called with this function, but received $filter")
     }
 
     private fun filterBetweenFromIncluded(filter: Filter): Op<Boolean> = when (filter) {
-        is LongFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLess(filter.between!!.toFilter)
-        is IntFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLess(filter.between!!.toFilter)
-        is DoubleFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLess(filter.between!!.toFilter)
-        is FloatFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLess(filter.between!!.toFilter)
-        is ShortFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLess(filter.between!!.toFilter)
+        is LongFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLess(filter.between.toFilter)
+        is IntFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLess(filter.between.toFilter)
+        is DoubleFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLess(filter.between.toFilter)
+        is FloatFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLess(filter.between.toFilter)
+        is ShortFilter -> filterGreaterEquals(filter.between!!.fromFilter) and filterLess(filter.between.toFilter)
         else -> throw IllegalArgumentException("Only number filters can be called with this function, but received $filter")
     }
 
     private fun filterBetweenToIncluded(filter: Filter): Op<Boolean> = when (filter) {
-        is LongFilter -> filterGreater(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
-        is IntFilter -> filterGreater(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
-        is DoubleFilter -> filterGreater(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
-        is FloatFilter -> filterGreater(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
-        is ShortFilter -> filterGreater(filter.between!!.fromFilter) and filterLessEquals(filter.between!!.toFilter)
+        is LongFilter -> filterGreater(filter.between!!.fromFilter) and filterLessEquals(filter.between.toFilter)
+        is IntFilter -> filterGreater(filter.between!!.fromFilter) and filterLessEquals(filter.between.toFilter)
+        is DoubleFilter -> filterGreater(filter.between!!.fromFilter) and filterLessEquals(filter.between.toFilter)
+        is FloatFilter -> filterGreater(filter.between!!.fromFilter) and filterLessEquals(filter.between.toFilter)
+        is ShortFilter -> filterGreater(filter.between!!.fromFilter) and filterLessEquals(filter.between.toFilter)
         else -> throw IllegalArgumentException("Only number filters can be called with this function, but received $filter")
     }
 
