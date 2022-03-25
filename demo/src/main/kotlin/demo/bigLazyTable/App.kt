@@ -2,16 +2,12 @@ package demo.bigLazyTable
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.runtime.remember
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
-import bigLazyTable.controller.AppState
 import bigLazyTable.controller.LazyTableController
 import bigLazyTable.data.database.SqliteDb
 import demo.bigLazyTable.data.service.DBService
 import demo.bigLazyTable.model.PlaylistModel
 import bigLazyTable.view.BigLazyTableUI
-import composeForms.model.BaseModel
 import demo.bigLazyTable.data.service.Playlist
 import java.awt.Dimension
 
@@ -27,14 +23,12 @@ fun main() {
         caseSensitiveFiltering = true
     ).initializeConnection()
 
-    val mapToPlaylistModels: (List<Any?>, AppState<BaseModel<*>>) -> List<PlaylistModel> = { page, appState ->
-        page.map { PlaylistModel(it as Playlist).apply { this.appState = appState } }
-    }
-
     val controller = LazyTableController(
         pagingService = DBService,
         defaultModel = PlaylistModel(Playlist()),
-        mapToModels = mapToPlaylistModels
+        mapToModels = { page, appState ->
+            page.map { PlaylistModel(it as Playlist).apply { this.appState = appState } }
+        }
     ) // side effect: init loads first data to display
 
     application {

@@ -30,15 +30,13 @@ internal class LazyTableControllerTest {
 
     @BeforeEach
     fun setUp() {
-        val mapToPlaylistModels: (List<Any?>, AppState<BaseModel<*>>) -> List<PlaylistModel> = { page, appState ->
-            page.map { PlaylistModel(it as Playlist).apply { this.appState = appState } }
-        }
-        
         controller = LazyTableController(
             pagingService = pagingService,
             pageSize = pageSize,
             defaultModel = PlaylistModel(Playlist()),
-            mapToModels = mapToPlaylistModels
+            mapToModels = { page, appState ->
+                page.map { PlaylistModel(it as Playlist).apply { this.appState = appState } }
+            }
         )
     }
 
