@@ -286,8 +286,12 @@ abstract class BaseModel<L>(private val title: L,
     //Internal functions:
 
     /**
+     * BigLazyTable:
      * This method updates the list of all changed unsaved attributes.
      * In addition, allChangedAttributesAreValid and if changesExist are updated.
+     *
+     * Forms:
+     * Validates the Attribute.
      */
     override fun updateChanges(){
         // Compose BigLazyTable
