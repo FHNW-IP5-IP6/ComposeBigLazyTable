@@ -1,9 +1,11 @@
 package bigLazyTable.view.table.header
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DisabledByDefault
 import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -12,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
 import bigLazyTable.controller.LazyTableController
 import bigLazyTable.data.paging.StringFilter
 import bigLazyTable.view.theme.ContentDescriptionCaseSensitiveIcon
@@ -30,7 +34,11 @@ fun FilterTextField(
             attribute = attribute,
             controller = controller
         )
-    } else FilterDisabledTextField(attribute) // TODO@Marco: Blank textfield or just show nothing?
+    }
+    else FilterDisabledTextField(
+        attribute = attribute,
+        showDisabledTextField = false
+    )
 }
 
 @Composable
@@ -136,12 +144,17 @@ fun TrailingIcon(
 }
 
 @Composable
-fun FilterDisabledTextField(attribute: Attribute<*, *, *>) {
-    TextField(
-        modifier = Modifier.width(attribute.tableColumnWidth),
-        value = "",
-        onValueChange = {},
-        singleLine = true,
-        enabled = false
-    )
+fun FilterDisabledTextField(attribute: Attribute<*, *, *>, showDisabledTextField: Boolean) {
+    if (showDisabledTextField) {
+        TextField(
+            modifier = Modifier.width(attribute.tableColumnWidth),
+            value = "Disabled",
+            onValueChange = {},
+            singleLine = true,
+            enabled = false,
+            readOnly = true,
+            textStyle = TextStyle(color = Color.LightGray),
+            leadingIcon = { Icon(Icons.Default.DisabledByDefault, null, tint = Color.LightGray) }
+        )
+    }
 }
