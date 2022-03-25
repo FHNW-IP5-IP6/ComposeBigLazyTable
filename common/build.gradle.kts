@@ -55,13 +55,12 @@ sourceSets {
     }
 }
 
-tasks {
-    test {
+tasks.apply {
+    withType<Test> {
         useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
     }
-}
-
-
-tasks.withType<KotlinCompile>() {
-    kotlinOptions.jvmTarget = "11"
+    withType<KotlinCompile> { kotlinOptions.jvmTarget = "11" }
 }
