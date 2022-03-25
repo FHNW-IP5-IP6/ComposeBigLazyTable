@@ -83,5 +83,3 @@ scenicView.properties
 nbproject/
 local.properties
 
-# Datasets
-*/src/main/resources/spotify_playlist_dataset.db

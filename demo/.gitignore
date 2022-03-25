@@ -81,6 +81,3 @@ scenicView.properties
 # NetBeans
 .nb-gradle/
 nbproject/
-
-# Datasets
-*/src/main/resources/spotify_playlist_dataset.db
