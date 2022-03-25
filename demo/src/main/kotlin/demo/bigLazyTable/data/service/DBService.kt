@@ -72,7 +72,7 @@ object DBService : IPagingService<Playlist> {
             .let { PlaylistDto(it).toPlaylist() }
     }
 
-    override fun indexOf(id: Long, filter: String): Int {
+    override fun indexOf(id: Long, filters: List<Filter>): Int {
         if (id < 0) throw IllegalArgumentException("only positive id as parameter is allowed")
         transaction {
             // TODO-Future: How can we determine what the gui index is of a given index?

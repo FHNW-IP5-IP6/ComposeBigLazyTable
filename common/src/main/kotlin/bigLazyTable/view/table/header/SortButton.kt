@@ -10,6 +10,9 @@ import bigLazyTable.controller.BLTSortOrder
 import bigLazyTable.view.theme.ContentDescriptionSortIcon
 import composeForms.model.attributes.Attribute
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 @Composable
 fun SortButton(
     modifier: Modifier,

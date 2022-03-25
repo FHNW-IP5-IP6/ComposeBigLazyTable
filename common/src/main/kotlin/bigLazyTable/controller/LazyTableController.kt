@@ -20,9 +20,8 @@ import kotlin.properties.Delegates
 private val Log = KotlinLogging.logger {}
 
 /**
- * TODO: Guet so?
  * This class manages everything that happens in the BigLazyTable.
- * It loads ned Pages, caches loaded Pages, merges changed models, handles all filter input and
+ * It loads new Pages, caches loaded Pages, merges changed models, handles all filter input and
  * controls the sort mechanism.
  *
  * @param pagingService used to load Pages
@@ -372,7 +371,6 @@ class LazyTableController<T : BaseModel<*>>(
     }
 
     /**
-     * TODO: Guet so?
      * Handles click on sort icon and sets the [newSortOrder] to the [attribute].
      *
      * @param attribute the attribute on which the sort changed
@@ -390,7 +388,6 @@ class LazyTableController<T : BaseModel<*>>(
     }
 
     /**
-     * TODO: Guet so?
      * Checks if the [newAttribute] is different from the [lastSortedAttribute]
      * and resets the sort order of the [lastSortedAttribute].
      *

@@ -1,5 +1,8 @@
 package bigLazyTable.view.theme
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 // TODO-Future: Find a Kotlin solution to internationalisation Problem
 //  that these hardcoded values are updated for multiple languages
 const val FilterLabel = "Filter"

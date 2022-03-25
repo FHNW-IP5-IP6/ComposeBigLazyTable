@@ -3,8 +3,10 @@ package bigLazyTable.data.database
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import java.sql.Connection
-import kotlin.system.exitProcess
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 class SqliteDb(
     pathToDb: String,
     caseSensitiveFiltering: Boolean = true,

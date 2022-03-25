@@ -17,6 +17,9 @@ import bigLazyTable.controller.AppState
 import bigLazyTable.controller.LazyTableController
 import bigLazyTable.view.theme.HorizontalPadding
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 @Composable
 fun <T: BaseModel<*>> TableRow(
     controller: LazyTableController<T>,

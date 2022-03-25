@@ -14,9 +14,6 @@ object DatabasePlaylists : Table() {
     val num_tracks          = integer("num_tracks")
     val num_albums          = integer("num_albums")
     val num_followers       = integer("num_followers")
-//    val num_tracks_double   = double("num_albums")
-//    val num_tracks_float    = float("num_followers")
-
     val num_edits           = integer("num_edits")
     val duration_ms         = integer("duration_ms")
     val num_artists         = integer("num_artists")

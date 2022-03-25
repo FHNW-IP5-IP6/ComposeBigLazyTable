@@ -12,6 +12,9 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.neq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.notLike
 import java.util.*
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 fun Table.selectWithAllFilters(filters: List<Filter>): Query {
     if (filters.isEmpty()) return Query(this, null)
 

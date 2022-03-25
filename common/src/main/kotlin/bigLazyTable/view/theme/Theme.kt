@@ -10,6 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import composeForms.ui.theme.*
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 private val DarkColorPalette = darkColors(
     primary = BackgroundColorGroups,
     primaryVariant = BackgroundColorGroups,

@@ -9,7 +9,6 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 /**
- * TODO: Guet so?
  * This class saves the state of the Table and keeps track of all changed table models.
  *
  * @param pagingService sets initial size of [tableModelList]

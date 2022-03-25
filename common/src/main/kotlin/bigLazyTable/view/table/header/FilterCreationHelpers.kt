@@ -4,6 +4,9 @@ import bigLazyTable.controller.LazyTableController
 import bigLazyTable.data.paging.*
 import composeForms.model.attributes.*
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 fun createFilter(
     controller: LazyTableController<*>,
     attribute: Attribute<*, *, *>,

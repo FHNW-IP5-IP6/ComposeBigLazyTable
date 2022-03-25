@@ -2,6 +2,9 @@ package bigLazyTable.data.paging
 
 import org.jetbrains.exposed.sql.Column
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 enum class FilterOperation {
     EQUALS,
     NOT_EQUALS,

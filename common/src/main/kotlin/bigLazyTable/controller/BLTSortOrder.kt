@@ -9,6 +9,9 @@ import bigLazyTable.data.paging.Sort
 import composeForms.model.attributes.Attribute
 import org.jetbrains.exposed.sql.SortOrder
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 sealed class BLTSortOrder(
     var sortOrder: SortOrder?,
     var isSorting: Boolean,

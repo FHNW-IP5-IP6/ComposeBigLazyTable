@@ -14,6 +14,9 @@ import bigLazyTable.controller.LazyTableController
 import bigLazyTable.view.table.HeaderCell
 import bigLazyTable.view.theme.HorizontalPadding
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 @Composable
 fun <T: BaseModel<*>> HeaderRow(
     horizontalScrollState: ScrollState,

@@ -43,8 +43,6 @@ internal class SchedulerTest {
         }
     }
 
-    // TODO@Marco: Check why this fails when running all tests
-    @Disabled("when running all tests this one doesn't work - but on its own it works")
     @Test
     fun processOnlyNewestTask() {
         var result = 0
@@ -56,13 +54,12 @@ internal class SchedulerTest {
         scheduler!!.scheduleTask { task2() }
         scheduler!!.scheduleTask { task3() }
 
-        Thread.sleep(1000)
+        Thread.sleep(10000)
 
         assertEquals(1000, result)
     }
 
-    // TODO@Marco: Check why this fails when running all tests
-    @Disabled("when running all tests this one doesn't work - but on its own it works")
+
     @Test
     fun processOnlyOneTaskInDelayTime() {
         var result = 0
@@ -72,15 +69,14 @@ internal class SchedulerTest {
             scheduler!!.scheduleTask { task() }
         }
 
-        Thread.sleep(1000)
+        Thread.sleep(10000)
 
         assertEquals(1, result)
     }
 
-    // TODO@Marco: 1 Mio im Disabled Text aber unten sind nur 100_000?
     @Disabled(
         "Enable only after bigger changes in scheduler. Takes a lot of time to execute, because the scheduler " +
-        "is waiting 1mio times 10milliseconds and 1mio times a 5millisecond sleep before schedule a new task."
+        "is waiting 1mio times 10milliseconds and 100'000 times a 5millisecond sleep before schedule a new task."
     )
     @Test
     fun scheduleTaskOverflowWithDelay() {
@@ -98,8 +94,6 @@ internal class SchedulerTest {
         assertEquals(1, result)
     }
 
-    // TODO@Marco: Check why this fails when running all tests
-    @Disabled("when running all tests this one doesn't work - but on its own it works")
     @Test
     fun delayIsConsidered() {
         var result = 0
@@ -113,7 +107,7 @@ internal class SchedulerTest {
         Thread.sleep(155)
         scheduler!!.scheduleTask { task() }
 
-        Thread.sleep(1000)
+        Thread.sleep(10000)
 
         assertEquals(3, result)
     }

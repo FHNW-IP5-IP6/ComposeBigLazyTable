@@ -16,8 +16,12 @@ import composeForms.model.BaseModel
 import bigLazyTable.controller.AppState
 import bigLazyTable.controller.LazyTableController
 import bigLazyTable.view.theme.CustomScrollbarStyle
+import bigLazyTable.view.theme.ScrollbarMinimumHeight
 import bigLazyTable.view.theme.ScrollbarThickness
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 @Composable
 fun <T: BaseModel<*>> LazyTable(
     controller: LazyTableController<T>,
@@ -38,7 +42,7 @@ fun <T: BaseModel<*>> LazyTable(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 14.dp) // TODO@Marco: Auf ScrollbarMinimumHeight bezogen?
+                .padding(bottom = ScrollbarMinimumHeight)
         ) {
             val firstVisibleItemIndex = verticalLazyListState.firstVisibleItemIndex
             if (isTimeToLoadPage(firstVisibleItemIndex)) {

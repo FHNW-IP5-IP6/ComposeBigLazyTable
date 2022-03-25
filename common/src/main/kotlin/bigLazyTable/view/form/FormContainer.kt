@@ -10,6 +10,9 @@ import composeForms.model.BaseModel
 import composeForms.ui.Form
 import bigLazyTable.controller.AppState
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable

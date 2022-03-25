@@ -10,6 +10,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import composeForms.model.attributes.Attribute
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 @Composable
 fun HeaderCell(attribute: Attribute<*, *, *>) {
     Cell(

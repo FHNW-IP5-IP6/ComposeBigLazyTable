@@ -4,6 +4,9 @@ import bigLazyTable.controller.LazyTableController
 import bigLazyTable.data.paging.FilterOperation
 import composeForms.model.attributes.Attribute
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 object NumberTextFieldUtil {
 
     // TODO-Future: Add a FilterAttribute

@@ -1,6 +1,5 @@
 package bigLazyTable.view.table.header
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -14,8 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
 import bigLazyTable.controller.LazyTableController
 import bigLazyTable.data.paging.StringFilter
 import bigLazyTable.view.theme.ContentDescriptionCaseSensitiveIcon
@@ -24,6 +21,9 @@ import bigLazyTable.view.theme.FilterLabel
 import composeForms.model.attributes.*
 import org.jetbrains.exposed.sql.Column
 
+/**
+ * @author Marco Sprenger, Livio Näf
+ */
 @Composable
 fun FilterTextField(
     attribute: Attribute<*, *, *>,

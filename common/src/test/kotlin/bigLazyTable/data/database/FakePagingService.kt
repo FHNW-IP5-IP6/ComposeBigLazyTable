@@ -102,7 +102,7 @@ class FakePagingService(val numberOfPlaylists: Int, val pageSize: Int) : IPaging
         return playlist
     }
 
-    override fun indexOf(id: Long, filter: String): Int {
+    override fun indexOf(id: Long, filters: List<Filter>): Int {
         TODO("Not yet implemented")
     }
 

@@ -33,9 +33,6 @@ kotlin {
                 implementation("org.jetbrains.exposed:exposed-core:0.37.3")
                 implementation("org.jetbrains.exposed:exposed-dao:0.37.3")
                 implementation("org.jetbrains.exposed:exposed-jdbc:0.37.3")
-
-                // CSV Library
-                implementation("com.opencsv:opencsv:5.5.2")
             }
         }
         named("test") {

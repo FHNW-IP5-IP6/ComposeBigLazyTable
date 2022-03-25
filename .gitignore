@@ -84,5 +84,4 @@ nbproject/
 local.properties
 
 # Datasets
-*/src/main/resources/spotify_playlist_dataset.csv
 */src/main/resources/spotify_playlist_dataset.db

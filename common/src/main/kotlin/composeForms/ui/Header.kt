@@ -274,7 +274,7 @@ private fun WizardModeButtons(model: IModel<*>, ctrlString: String, changeShowEr
                 val isLastWizardGroup = isLastWizardGroup()
                 save()
                 if (isLastWizardGroup) {
-                    // TODO: Not supported in newest Compose version. Find other solution.
+                    // TODO-Future: Not supported in newest Compose version. Find other solution.
                     //AppManager.focusedWindow?.close()
                 }
             },
