@@ -51,7 +51,7 @@ class FakePagingService(val numberOfPlaylists: Int, val pageSize: Int) : IPaging
             var filteredData = playlists
             adjustedFilters.forEach { filter ->
                 filter as StringFilter
-                filteredData = filteredData.filter { it.getField<String>(filter.dbField?.name ?: "") == filter.filter }
+                filteredData = filteredData.filter { it.getField<String>(filter.dbField.name) == filter.filter }
             }
             allDataFiltered.addAll(filteredData)
         }
@@ -84,7 +84,7 @@ class FakePagingService(val numberOfPlaylists: Int, val pageSize: Int) : IPaging
             var filteredData = playlists
             adjustedFilters.forEach { filter ->
                 filter as StringFilter
-                filteredData = filteredData.filter { it.getField<String>(filter.dbField?.name ?: "") == filter.filter }
+                filteredData = filteredData.filter { it.getField<String>(filter.dbField.name) == filter.filter }
             }
             count += filteredData.size
         }
