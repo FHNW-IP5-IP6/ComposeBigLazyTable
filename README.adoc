@@ -2,7 +2,7 @@ https://github.com/FHNW-IP5-IP6/ComposeBigLazyTable/actions/workflows/sonarqube.
 
 = Compose BigLazyTable (Compose BLT)
 Author M. Sprenger, L. Näf
-v1.0, 2022-03-04
+v1.0, 2022-03-25
 
 == Demo Applications
 * *ComposeForms* _(demo > src > main > kotlin > demo > composeForms)_ +
@@ -10,3 +10,5 @@ Demo project for a sample of compose Forms
 
 * *BigLazyTable* _(demo > src > main > kotlin > demo > bigLazyTable)_ +
 Demo project for a sample of a bigLazyTable combined with a compose form
+
+Readme will be finished until 14.04.2022.
