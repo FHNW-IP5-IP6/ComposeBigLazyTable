@@ -17,6 +17,7 @@ import bigLazyTable.controller.LazyTableController
 import bigLazyTable.data.paging.StringFilter
 import bigLazyTable.view.theme.ContentDescriptionCaseSensitiveIcon
 import bigLazyTable.view.theme.ContentDescriptionClearFilterIcon
+import bigLazyTable.view.theme.DisabledText
 import bigLazyTable.view.theme.FilterLabel
 import composeForms.model.attributes.*
 import org.jetbrains.exposed.sql.Column
@@ -148,7 +149,7 @@ fun FilterDisabledTextField(attribute: Attribute<*, *, *>, showDisabledTextField
     if (showDisabledTextField) {
         TextField(
             modifier = Modifier.width(attribute.tableColumnWidth),
-            value = "Disabled",
+            value = DisabledText,
             onValueChange = {},
             singleLine = true,
             enabled = false,
