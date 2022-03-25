@@ -1,31 +1,66 @@
 package demo.bigLazyTable.model
 
+import androidx.compose.ui.unit.dp
 import composeForms.model.BaseModel
 import composeForms.model.attributes.*
 import composeForms.model.modelElements.Field
 import composeForms.model.modelElements.FieldSize
 import composeForms.model.modelElements.Group
 import composeForms.model.modelElements.HeaderGroup
-import java.util.*
+import bigLazyTable.controller.AppState
+import demo.bigLazyTable.data.database.DatabasePlaylists
+import demo.bigLazyTable.data.service.Playlist
+import org.jetbrains.exposed.sql.Column
 
 /**
  * @author Marco Sprenger, Livio Näf
  */
-class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTLabels>(title = BLTLabels.TITLE) {
+class PlaylistModel(playlist: Playlist) : BaseModel<BLTLabels>(title = BLTLabels.TITLE) {
 
-    val uniqueID: String = UUID.randomUUID().toString()
-
-    val id = LongAttribute(
+    override val id = LongAttribute(
         model = this,
         label = BLTLabels.ID,
         value = playlist.id,
-        readOnly = true
+        readOnly = true,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.id,
+        tableColumnWidth = 100.dp
+    )
+
+    private val numEdits = IntegerAttribute(
+        model = this,
+        label = BLTLabels.NUM_EDITS,
+        value = playlist.numEdits,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.num_edits,
+        tableColumnWidth = 200.dp
     )
 
     private val name = StringAttribute(
         model = this,
         label = BLTLabels.NAME,
-        value = playlist.name
+        value = playlist.name,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.name,
+        tableColumnWidth = 200.dp
+    )
+
+    private val modifiedAt = IntegerAttribute(
+        model = this,
+        label = BLTLabels.MODIFIED_AT,
+        required = true,
+        value = playlist.modifiedAt,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.modified_at,
+        tableColumnWidth = 80.dp
+    )
+
+    private val track0ArtistName = StringAttribute(
+        model = this,
+        label = BLTLabels.TRACK_ARTIST_NAME,
+        value = playlist.track0ArtistName,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.track0_artist_name
     )
 
     private val collaborative = BooleanAttribute(
@@ -33,56 +68,53 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         label = BLTLabels.COLLABORATIVE,
         trueText = BLTLabels.SELECTION_YES,
         falseText = BLTLabels.SELECTION_NO,
-        value = playlist.collaborative
-    )
-
-    private val modifiedAt = StringAttribute(
-        model = this,
-        label = BLTLabels.MODIFIED_AT,
-        required = true,
-        value = playlist.modifiedAt
+        value = playlist.collaborative,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.collaborative,
+        tableColumnWidth = 150.dp
     )
 
     private val numTracks = IntegerAttribute(
         model = this,
         label = BLTLabels.NUM_TRACKS,
-        value = playlist.numTracks
-    )
-
-    private val numAlbums = IntegerAttribute(
-        model = this,
-        label = BLTLabels.NUM_ALBUMS,
-        value = playlist.numAlbums
-    )
-
-    private val numFollowers = IntegerAttribute(
-        model = this,
-        label = BLTLabels.NUM_FOLLOWERS,
-        value = playlist.numFollowers
-    )
-
-    private val numEdits = IntegerAttribute(
-        model = this,
-        label = BLTLabels.NUM_EDITS,
-        value = playlist.numEdits
+        value = playlist.numTracks,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.num_tracks
     )
 
     private val durationMs = IntegerAttribute(
         model = this,
         label = BLTLabels.DURATION_MS,
-        value = playlist.durationMs
+        value = playlist.durationMs,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.duration_ms
     )
 
-    private val numArtists = IntegerAttribute(
+    private val numFollowers = DoubleAttribute(
+        model = this,
+        label = BLTLabels.NUM_FOLLOWERS,
+        value = playlist.numFollowers.toDouble(),
+        databaseField = DatabasePlaylists.num_followers as Column<Double>
+    )
+
+    private val numArtists = FloatAttribute(
         model = this,
         label = BLTLabels.NUM_ARTISTS,
-        value = playlist.numArtists
+        value = playlist.numArtists.toFloat(),
+        databaseField = DatabasePlaylists.num_artists as Column<Float>
     )
 
-    private val track0ArtistName = StringAttribute(
-        model = this,
-        label = BLTLabels.TRACK_ARTIST_NAME,
-        value = playlist.track0ArtistName
+    override val displayedAttributesInTable = listOf(
+        id,
+        numEdits,
+        name,
+        modifiedAt,
+        track0ArtistName,
+        collaborative,
+        numTracks,
+        durationMs,
+        numFollowers,
+        numArtists
     )
 
     private val track0TrackName = StringAttribute(
@@ -199,21 +231,6 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         value = playlist.track4AlbumName
     )
 
-    //    val lazyListAttributes = listOf<Attribute<*, *, *>>(id, name, numTracks, numFollowers, durationMs)
-    val lazyListAttributes = listOf(
-        id,
-        name,
-        numTracks,
-        numFollowers,
-        durationMs,
-        numEdits,
-        numAlbums,
-        numArtists,
-        numFollowers,
-        numFollowers,
-        numTracks
-    )
-
     private val headerGroup = HeaderGroup(
         model = this,
         title = BLTLabels.HEADER_GROUP,
@@ -228,8 +245,6 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         Field(collaborative, FieldSize.SMALL),
         Field(modifiedAt, FieldSize.SMALL),
         Field(numTracks, FieldSize.SMALL),
-        Field(numAlbums, FieldSize.SMALL),
-        Field(numFollowers, FieldSize.SMALL),
         Field(numEdits, FieldSize.SMALL),
         Field(numArtists, FieldSize.SMALL),
         Field(durationMs, FieldSize.SMALL),
@@ -279,12 +294,5 @@ class PlaylistModel(playlist: Playlist, val appState: AppState) : BaseModel<BLTL
         Field(track4AlbumName, FieldSize.NORMAL),
         Field(track4DurationMs, FieldSize.SMALL)
     )
-
-    override fun updateChanges() {
-        if (!appState.changedPlaylistModels.contains(this)) {
-            appState.changedPlaylistModels.add(this)
-        }
-        super.updateChanges()
-    }
 
 }

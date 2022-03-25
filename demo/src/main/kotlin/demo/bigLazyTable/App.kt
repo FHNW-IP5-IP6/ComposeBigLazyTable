@@ -2,16 +2,13 @@ package demo.bigLazyTable
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.runtime.remember
-import androidx.compose.ui.window.FrameWindowScope
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowPlacement
-import androidx.compose.ui.window.application
-import demo.bigLazyTable.data.database.DBService
-import demo.bigLazyTable.data.database.SqliteDb
-import demo.bigLazyTable.model.AppState
-import demo.bigLazyTable.model.LazyTableViewModel
-import demo.bigLazyTable.ui.BigLazyTableUI
+import androidx.compose.ui.window.*
+import bigLazyTable.controller.LazyTableController
+import bigLazyTable.data.database.SqliteDb
+import demo.bigLazyTable.data.service.DBService
+import demo.bigLazyTable.model.PlaylistModel
+import bigLazyTable.view.BigLazyTableUI
+import demo.bigLazyTable.data.service.Playlist
 import java.awt.Dimension
 
 /**
@@ -19,43 +16,30 @@ import java.awt.Dimension
  */
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
-fun main() = application {
-    Window(
-        onCloseRequest = ::exitApplication,
-        title = "ComposeLists"
-    ) {
-        // Needs remember. Without it, the first language change in no full-screen leads to a full-screen window
-        remember { initializeWindowSize() }
+fun main() {
 
-        // Needs remember. Without it, initializeConnection would be called again (f.e. on language change)
-        remember {
-            SqliteDb(
-                pathToDb = "./demo/src/main/resources/spotify_playlist_dataset.db",
-                caseSensitiveFiltering = true
-            ).initializeConnection()
+    SqliteDb(
+        pathToDb = "./demo/src/main/resources/spotify_playlist_dataset.db",
+        caseSensitiveFiltering = true
+    ).initializeConnection()
+
+    val controller = LazyTableController(
+        pagingService = DBService,
+        defaultModel = PlaylistModel(Playlist()),
+        mapToModels = { page, appState ->
+            page.map { PlaylistModel(it as Playlist).apply { this.appState = appState } }
         }
+    ) // side effect: init loads first data to display
 
-        val service = DBService
+    application {
+        Window(
+            onCloseRequest = ::exitApplication,
+            state = rememberWindowState(placement = WindowPlacement.Maximized),
+            title = "ComposeLists"
+        ) {
+            window.minimumSize = Dimension(1000, 800)
 
-        // Needs remember. Without it, the view just shows empty (...) Items (happens after language change)
-        val appState = remember { AppState(pagingService = service) }
-
-        val viewModel = remember {
-            LazyTableViewModel(
-                pagingService = service,
-                appState = appState
-            ) // side effect: init loads first data to display
+            BigLazyTableUI(controller = controller)
         }
-        BigLazyTableUI(
-            viewModel = viewModel,
-            appState = appState
-        )
-    }
-}
-
-fun FrameWindowScope.initializeWindowSize() {
-    window.apply {
-        minimumSize = Dimension(1000, 800)
-        placement = WindowPlacement.Maximized
     }
 }

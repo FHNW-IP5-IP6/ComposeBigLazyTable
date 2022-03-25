@@ -66,7 +66,7 @@ import javax.net.ssl.HttpsURLConnection
  * @author Louisa Reinger
  * @author Steve Vogel
  */
-class ComposeFormsPersonModel : BaseModel<ComposeFormsPersonLabels>(title = ComposeFormsPersonLabels.TITLE, smartphoneOption = true, wizardMode = false) {
+class ComposeFormsPersonModel(override val displayedAttributesInTable: List<Attribute<*, *, *>>? = null) : BaseModel<ComposeFormsPersonLabels>(title = ComposeFormsPersonLabels.TITLE, smartphoneOption = true, wizardMode = false) {
 
     //*****************************************************************************************************************
     // Create attributes: (required)
@@ -171,13 +171,14 @@ class ComposeFormsPersonModel : BaseModel<ComposeFormsPersonLabels>(title = Comp
     //*********************************
     //additional attributes (for header group)
 
-    val id              = IntegerAttribute(model = this, label = ComposeFormsPersonLabels.ID,
+    override val id              = IntegerAttribute(model = this, label = ComposeFormsPersonLabels.ID,
                             value = Random().nextInt(20), readOnly = true)
 
     val age             = LongAttribute(this, ComposeFormsPersonLabels.AGE,
-                            observedAttributes = listOf(
-                                birthDate addOnChangeListener { ageAttr, birthDateVal -> ageAttr.setValueAsText(updateBirthDate(birthDateVal)) }
-                            ))
+        observedAttributes = listOf(
+            birthDate addOnChangeListener { ageAttr, birthDateVal -> ageAttr.setValueAsText(updateBirthDate(birthDateVal)) }
+        ),
+        tableColumnWidth = 150.dp)
 
 
     //*****************************************************************************************************************
@@ -306,7 +307,7 @@ class ComposeFormsPersonModel : BaseModel<ComposeFormsPersonLabels>(title = Comp
                     println("Downloading")
                     connect()
                     val allBytes = inputStream.readBytes()
-                    personPicture.value = org.jetbrains.skija.Image.makeFromEncoded(allBytes).asImageBitmap()
+                    personPicture.value = org.jetbrains.skia.Image.makeFromEncoded(allBytes).asImageBitmap()
                 }
             } catch (e: Exception) {
                 personPicture.value = ImageBitmap( 256, 256, ImageBitmapConfig.Alpha8, colorSpace = ColorSpaces.LinearExtendedSrgb)
