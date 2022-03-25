@@ -1,7 +1,5 @@
 package bigLazyTable
 
-import org.jetbrains.exposed.sql.ResultRow
-
 /**
  * @author Marco Sprenger, Livio Näf
  */
@@ -15,11 +13,8 @@ data class Playlist(
     val collaborative: Boolean = false,
     val modifiedAt: Int = loadingPlaceholderNumber,
     val numTracks: Int = loadingPlaceholderNumber,
-//    val numTracksDouble: Double = loadingPlaceholderNumber.toDouble(),
-//    val numTracksFloat: Float = loadingPlaceholderNumber.toFloat(),
     val numAlbums: Int = loadingPlaceholderNumber,
     val numFollowers: Int = loadingPlaceholderNumber,
-
     val numEdits: Int = loadingPlaceholderNumber,
     val durationMs: Int = loadingPlaceholderNumber,
     val numArtists: Int = loadingPlaceholderNumber,
