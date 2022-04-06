@@ -1,8 +1,58 @@
+
+
 https://github.com/FHNW-IP5-IP6/ComposeBigLazyTable/actions/workflows/sonarqube.yml[image:https://github.com/FHNW-IP5-IP6/ComposeBigLazyTable/actions/workflows/sonarqube.yml/badge.svg[.github/workflows/sonarqube.yml]]
 
 = Compose BigLazyTable (Compose BLT)
+TODO: Description what Compose BigLazyTable is
+
+Example: ExoPlayer is an application level media player for Android. It provides an alternative to Android’s MediaPlayer API for playing audio and video both locally and over the Internet. ExoPlayer supports features not currently supported by Android’s MediaPlayer API, including DASH and SmoothStreaming adaptive playbacks. Unlike the MediaPlayer API, ExoPlayer is easy to customize and extend, and can be updated through Play Store application updates.
+
 Author M. Sprenger, L. Näf
 v1.0, 2022-03-25
+
+== (Maybe) Why does this Library exist?
+Describe why Compose BigLazyTable was very much needed!
+
+== Using Compose BigLazyTable
+Compose BigLazyTable can be obtained from ...
+
+see: https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/
+
+.Gradle-Groovy-DSL:
+[source,groovy]
+----
+implementation 'com.github.fhnw-ip5-ip6:composebiglazytable:1.0.0'
+----
+
+.Gradle-Kotlin-DSL:
+[source,groovy]
+----
+implementation("com.github.fhnw-ip5-ip6:composebiglazytable:1.0.0")
+----
+
+.Reference Kotlin File
+:sourcedir: common/src/main/kotlin
+
+[source,kotlin]
+----
+include::{sourcedir}/bigLazyTable/controller/Scheduler.kt[]
+----
+
+
+== Documentation / Developer Guide
+Use a table of contents with a lot of subtitles!
+
+* See https://github.com/FHNW-IP5-IP6/ComposeBigLazyTable/wiki[Wiki] for detailed information.
+* Or just show everything in this section
+
+
+.Reference Startup from App.kt
+:sourcedir: demo/src/main/kotlin/demo
+
+[source,kotlin]
+----
+include::{sourcedir}/bigLazyTable/App.kt[]
+----
 
 == Demo Applications
 * *ComposeForms* _(demo > src > main > kotlin > demo > composeForms)_ +
@@ -12,3 +62,4 @@ Demo project for a sample of compose Forms
 Demo project for a sample of a bigLazyTable combined with a compose form
 
 Readme will be finished until 14.04.2022.
+
