@@ -17,6 +17,7 @@ Describe why Compose BigLazyTable was very much needed!
 Compose BigLazyTable can be obtained from ...
 
 see: https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/
+see: https://gist.github.com/powerman/d56b2675dfed38deb298
 
 .Gradle-Groovy-DSL:
 [source,groovy]
@@ -31,11 +32,11 @@ implementation("com.github.fhnw-ip5-ip6:composebiglazytable:1.0.0")
 ----
 
 .Reference Kotlin File
-:sourcedir: common/src/main/kotlin
+:sourcedir: https://github.com/FHNW-IP5-IP6/ComposeBigLazyTable/common/src/main/kotlin
 
 [source,kotlin]
 ----
-include::{sourcedir}/bigLazyTable/controller/Scheduler.kt[]
+include::common/src/main/kotlin/bigLazyTable/controller/Scheduler.kt[]
 ----
 
 
@@ -47,7 +48,7 @@ Use a table of contents with a lot of subtitles!
 
 
 .Reference Startup from App.kt
-:sourcedir: demo/src/main/kotlin/demo
+:sourcedir: https://github.com/FHNW-IP5-IP6/ComposeBigLazyTable/demo/src/main/kotlin/demo
 
 [source,kotlin]
 ----
