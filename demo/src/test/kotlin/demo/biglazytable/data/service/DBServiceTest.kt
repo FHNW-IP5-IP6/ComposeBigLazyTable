@@ -1,9 +1,9 @@
 package demo.biglazytable.data.service
 
 import bigLazyTable.data.paging.*
-import demo.bigLazyTable.data.database.DatabasePlaylists
-import demo.bigLazyTable.data.service.DBService
-import demo.bigLazyTable.data.service.Playlist
+import demo.bigLazyTable.spotifyPlaylists.data.database.DatabasePlaylists
+import demo.bigLazyTable.spotifyPlaylists.data.service.DBService
+import demo.bigLazyTable.spotifyPlaylists.data.service.Playlist
 import demo.biglazytable.utils.printTestMethodName
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
