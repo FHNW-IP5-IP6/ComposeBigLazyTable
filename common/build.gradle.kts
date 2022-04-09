@@ -6,6 +6,21 @@ plugins {
     id("org.jetbrains.compose") version "1.1.0"
     kotlin("plugin.serialization") version("1.4.32")
     id("org.sonarqube") version "3.3"
+    `maven-publish`
+}
+
+// maven publish
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "com.github.fhnw-ip5-ip6"
+            artifactId = "compose-biglazytable"
+            version = "1.0.0"
+
+            from(components["java"])
+//            from(components["kotlin"])
+        }
+    }
 }
 
 // sonarqube configuration
