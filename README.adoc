@@ -1,6 +1,10 @@
-
-
+[.clearfix]
+--
+[.left]
+https://jitpack.io/#FHNW-IP5-IP6/ComposeBigLazyTable[image:https://jitpack.io/v/FHNW-IP5-IP6/ComposeBigLazyTable.svg[]]
+[.right]
 https://github.com/FHNW-IP5-IP6/ComposeBigLazyTable/actions/workflows/sonarqube.yml[image:https://github.com/FHNW-IP5-IP6/ComposeBigLazyTable/actions/workflows/sonarqube.yml/badge.svg[.github/workflows/sonarqube.yml]]
+--
 
 = Compose BigLazyTable (Compose BLT)
 TODO: Description what Compose BigLazyTable is
@@ -52,7 +56,7 @@ Use a table of contents with a lot of subtitles!
 
 [source,kotlin]
 ----
-include::{sourcedir}/bigLazyTable/App.kt[]
+include::demo/src/main/kotlin/demo/bigLazyTable/spotifyPlaylists/App.kt[]
 ----
 
 == Demo Applications
