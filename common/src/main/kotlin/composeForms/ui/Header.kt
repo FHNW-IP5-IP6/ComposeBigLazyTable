@@ -428,8 +428,8 @@ private fun openQrCodeWindow(model: IModel<*>, size : Int){
             Window(onCloseRequest = ::exitApplication, title = "QR Code") {
                 window.size = Dimension(size, size)
                 val img = remember { mutableStateOf(ImageBitmap(size,size)) }
-                val ip = getIPAdress()
-                QRCodeService().getQRCode("https://stevevogel1.github.io/ComposeForms/$ip", size){ img.value = it}
+//                val ip = getIPAdress()
+//                QRCodeService().getQRCode("https://stevevogel1.github.io/ComposeForms/$ip", size){ img.value = it}
 
                 Row(modifier = Modifier.fillMaxSize(),
                     horizontalArrangement = Arrangement.Center,

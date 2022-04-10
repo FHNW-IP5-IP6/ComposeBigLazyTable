@@ -873,20 +873,20 @@ abstract class BaseModel<L>(private val title: L,
      */
     override fun getIPAdress(): String {
         // Filter only addresses that are running and open
-        val interfaces: List<NetworkInterface> = Collections.list(NetworkInterface.getNetworkInterfaces()).filter{
-            !(it.isLoopback || !it.isUp || it.isVirtual || it.displayName.lowercase(Locale.getDefault()).contains("virtual"))
-        }
-        for(interFace: NetworkInterface in interfaces){
-            val addresses = interFace.inetAddresses()
-            for(addr in addresses){
-                val sAddr = addr.hostAddress
-                val isIPv4 = sAddr.indexOf(':')<0
-
-                if(isIPv4) {
-                    return sAddr
-                }
-            }
-        }
+//        val interfaces: List<NetworkInterface> = Collections.list(NetworkInterface.getNetworkInterfaces()).filter{
+//            !(it.isLoopback || !it.isUp || it.isVirtual || it.displayName.lowercase(Locale.getDefault()).contains("virtual"))
+//        }
+//        for(interFace: NetworkInterface in interfaces){
+//            val addresses = interFace.inetAddresses()
+//            for(addr in addresses){
+//                val sAddr = addr.hostAddress
+//                val isIPv4 = sAddr.indexOf(':')<0
+//
+//                if(isIPv4) {
+//                    return sAddr
+//                }
+//            }
+//        }
         throw RuntimeException("IP not found")
     }
 
