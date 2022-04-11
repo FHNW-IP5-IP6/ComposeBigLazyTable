@@ -25,8 +25,8 @@ kotlin {
                 implementation(compose.desktop.currentOs)
 
                 // import common biglazytable functionality
-//                implementation(project(":common"))
-                implementation("com.github.FHNW-IP5-IP6:ComposeBigLazyTable:v1.0.2")
+                //implementation(project(":common"))
+                implementation("com.github.FHNW-IP5-IP6:ComposeBigLazyTable:v1.0.3")
 
                 // Logging Library
                 implementation("io.github.microutils:kotlin-logging:1.12.5")
