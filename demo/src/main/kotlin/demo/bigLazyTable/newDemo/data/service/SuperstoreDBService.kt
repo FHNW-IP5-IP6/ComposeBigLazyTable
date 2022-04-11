@@ -6,7 +6,6 @@ import bigLazyTable.data.paging.Sort
 import bigLazyTable.data.paging.selectWithAllFilters
 import demo.bigLazyTable.newDemo.data.database.SuperstoreDatabase
 import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction

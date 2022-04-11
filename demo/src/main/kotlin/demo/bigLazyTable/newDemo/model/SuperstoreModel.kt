@@ -1,8 +1,6 @@
 package demo.bigLazyTable.newDemo.model
 
-import androidx.compose.ui.unit.dp
 import composeForms.model.BaseModel
-import composeForms.model.attributes.Attribute
 import composeForms.model.attributes.DoubleAttribute
 import composeForms.model.attributes.IntegerAttribute
 import composeForms.model.attributes.StringAttribute
@@ -12,8 +10,6 @@ import composeForms.model.modelElements.Group
 import composeForms.model.modelElements.HeaderGroup
 import demo.bigLazyTable.newDemo.data.database.SuperstoreDatabase
 import demo.bigLazyTable.newDemo.data.service.Superstore
-import demo.bigLazyTable.spotifyPlaylists.data.database.DatabasePlaylists
-import demo.bigLazyTable.spotifyPlaylists.model.BLTLabels
 
 class SuperstoreModel(superstore: Superstore) : BaseModel<SuperstoreLabels>(SuperstoreLabels.TITLE) {
 
@@ -207,49 +203,4 @@ class SuperstoreModel(superstore: Superstore) : BaseModel<SuperstoreLabels>(Supe
         Field(Profit, FieldSize.SMALL),
         Field(Discount, FieldSize.SMALL),
     )
-
-//    private val track0Group = Group(
-//        model = this,
-//        title = BLTLabels.TRACK0_GROUP,
-//        Field(track0TrackName, FieldSize.BIG),
-//        Field(track0ArtistName, FieldSize.NORMAL),
-//        Field(track0AlbumName, FieldSize.NORMAL),
-//        Field(track0DurationMs, FieldSize.SMALL)
-//    )
-//
-//    private val track1Group = Group(
-//        model = this,
-//        title = BLTLabels.TRACK1_GROUP,
-//        Field(track1TrackName, FieldSize.BIG),
-//        Field(track1ArtistName, FieldSize.NORMAL),
-//        Field(track1AlbumName, FieldSize.NORMAL),
-//        Field(track1DurationMs, FieldSize.SMALL)
-//    )
-//
-//    private val track2Group = Group(
-//        model = this,
-//        title = BLTLabels.TRACK2_GROUP,
-//        Field(track2TrackName, FieldSize.BIG),
-//        Field(track2ArtistName, FieldSize.NORMAL),
-//        Field(track2AlbumName, FieldSize.NORMAL),
-//        Field(track2DurationMs, FieldSize.SMALL)
-//    )
-//
-//    private val track3Group = Group(
-//        model = this,
-//        title = BLTLabels.TRACK3_GROUP,
-//        Field(track3TrackName, FieldSize.BIG),
-//        Field(track3ArtistName, FieldSize.NORMAL),
-//        Field(track3AlbumName, FieldSize.NORMAL),
-//        Field(track3DurationMs, FieldSize.SMALL)
-//    )
-//
-//    private val track4Group = Group(
-//        model = this,
-//        title = BLTLabels.TRACK4_GROUP,
-//        Field(track4TrackName, FieldSize.BIG),
-//        Field(track4ArtistName, FieldSize.NORMAL),
-//        Field(track4AlbumName, FieldSize.NORMAL),
-//        Field(track4DurationMs, FieldSize.SMALL)
-//    )
 }
