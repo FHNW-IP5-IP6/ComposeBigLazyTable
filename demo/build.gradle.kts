@@ -26,7 +26,7 @@ kotlin {
 
                 // import common biglazytable functionality
                 //implementation(project(":common"))
-                implementation("com.github.FHNW-IP5-IP6:ComposeBigLazyTable:v1.0.3")
+                implementation("com.github.FHNW-IP5-IP6:ComposeBigLazyTable:master-SNAPSHOT")
 
                 // Logging Library
                 implementation("io.github.microutils:kotlin-logging:1.12.5")
