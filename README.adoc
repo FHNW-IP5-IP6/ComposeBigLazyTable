@@ -1,11 +1,12 @@
+:source-highlighter: rouge
+
 = Compose BigLazyTable (Compose BLT)
 :description: Compose BigLazyTable (Compose BLT) is a library that efficiently supports the handling of large amounts of data end-to-end in Compose for Desktop
 :keywords: kotlin, lazy-loading, compose, compose-for-desktop
 :author: Marco Sprenger; Livio Näf
 :revnumber: v1.0.2
 :revdate: 2022-04-11
-[.clearfix]
---
+
 https://jitpack.io/#FHNW-IP5-IP6/ComposeBigLazyTable[image:https://jitpack.io/v/FHNW-IP5-IP6/ComposeBigLazyTable.svg[]]
 https://github.com/FHNW-IP5-IP6/ComposeBigLazyTable/actions/workflows/sonarqube.yml[image:https://github.com/FHNW-IP5-IP6/ComposeBigLazyTable/actions/workflows/sonarqube.yml/badge.svg[.github/workflows/sonarqube.yml]]
 
@@ -16,29 +17,480 @@ Many desktop business applications today consist of a table showing all the data
 
 For developers, there are appropriate building blocks in older programming languages, such as Java with JavaFX, to build such applications. Most of these applications are specially adapted to a company and come in a design that is no longer so up-to-date. In addition, with a JavaFX solution, the lazy loading, as well as a connection to a form, must still be programmed by the user. With Compose BigLazyTable, a library was developed using Kotlin and Compose for Desktop, with that developers can easily create a basic application, consisting of a table and a form for processing the data. Compose for Desktop uses Material Design for the UI building blocks by default, which offers a much more modern look. The table is provided with filters, sorting options and a lazy loading mechanism. Combined with a form from the ComposeForms library, Compose BigLazyTable offers the necessary functionalities familiar to users of JavaFX.
 
-== Import Compose BigLazyTable
-Compose BigLazyTable can be obtained from JitPack:
+see: https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/
 
-.Gradle-Groovy-DSL:
+see: https://gist.github.com/powerman/d56b2675dfed38deb298
+>>>>>>> Stashed changes
+
+TODO: Add table of contents!
+
+== Adding Compose BigLazyTable
+
+Compose BigLazyTable can be obtained from https://jitpack.io/#FHNW-IP5-IP6/ComposeBigLazyTable/v1.0.2[Jitpack.io] with the following entries in your build.gradle / build.gradle.kts.
+
+.Gradle-Groovy-DSL (build.gradle):
 [source,groovy]
 ----
-implementation 'com.github.FHNW-IP5-IP6:ComposeBigLazyTable:v1.0.2'
+allprojects {
+	repositories {
+		...
+		maven { url 'https://jitpack.io' }
+	}
+}
+
+...
+
+dependencies {
+    ...
+    implementation 'com.github.FHNW-IP5-IP6:ComposeBigLazyTable:v1.0.4'
+    implementation 'org.jetbrains.exposed:exposed-jdbc:0.37.3'
+}
 ----
 
-.Gradle-Kotlin-DSL:
-[source,groovy]
+.Gradle-Kotlin-DSL (build.gradle.kts):
+[source,kotlin]
 ----
-implementation("com.github.FHNW-IP5-IP6:ComposeBigLazyTable:v1.0.2")
+allprojects {
+    repositories {
+        ...
+        maven("https://jitpack.io")
+    }
+}
+
+...
+
+dependencies {
+    ...
+    implementation("com.github.FHNW-IP5-IP6:ComposeBigLazyTable:v1.0.4")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.37.3")
+}
 ----
 
-== Developer Guide
+.The Project was tested with the following setup:
+[source,kotlin]
+----
+plugins {
+    ...
+    kotlin("jvm") version "1.6.10"
+    id("org.jetbrains.compose") version "1.1.0"
+}
 
-* xxx
+kotlin {
+    sourceSets {
+        named("main") {
+            dependencies {
+                implementation(compose.desktop.currentOs)
+                ...
+            }
+        }
+    }
+}
 
-=== xxx
-xxx
+tasks.withType<KotlinCompile> { kotlinOptions.jvmTarget = "11" }
+----
+
+== Using Compose BigLazyTable
+In this section it will be explained in more detail on how to use the Compose BigLazyTable Library. It is described which classes must be used and how they should be implemented by a developer.
+
+For a better understanding and a feel on how to use Compose BigLazyTable checkout the project and see how the two demo projects 'spotifyPlaylists' and 'newDemo' in demo/main/kotlin/demo/bigLazyTable are implemented.
+
+=== Setup
+To set up Compose BigLazyTable, let's take a look at the main function of one of the project's demos.
+
+.Setup of Compose BigLazyTable
+[source,kotlin]
+----
+@ExperimentalFoundationApi
+@ExperimentalMaterialApi
+fun main() {
+
+    SqliteDb( // <1>
+        pathToDb = "./demo/src/main/resources/spotify_playlist_dataset.db",
+        caseSensitiveFiltering = true
+    ).initializeConnection()
+
+    val controller = LazyTableController( // <2>
+        pagingService = DBService, // <3>
+        defaultModel = PlaylistModel(Playlist()), // <4>
+        mapToModels = { page, appState -> // <5>
+            page.map { PlaylistModel(it as Playlist).apply { this.appState = appState } }
+        }
+    ) // side effect: init loads first data to display
+
+    application {
+        Window(
+            onCloseRequest = ::exitApplication,
+            state = rememberWindowState(placement = WindowPlacement.Maximized),
+            title = "ComposeLists"
+        ) {
+            window.minimumSize = Dimension(1000, 800)
+
+            BigLazyTableUI(controller = controller) // <6>
+        }
+    }
+}
+
+----
+<1> Define the SQLite Database with a path to the databbase file. Per default it is case sensitive when using the predefined SqliteDb class: caseSensitiveFiltering = true could be removed and is just here for descriptive purposes.
+<2> Define the LazyTableController included in the BigLazyTable Library.
+<3> Pass your own Paging Service which implements the IPagingService Interface.
+<4> Pass your Presentation Model with the data class which holds all your data as a parameter.
+<5> Pass following Lambda which takes your Presentation Model and cast 'it' to the data class which holds all your data. The rest can be copy-pasted from here.
+<6> Call the BigLazyTableUI Composable function and pass the before defined controller.
+
+=== Database Table
+
+.Setup of Database Table
+[source,kotlin]
+----
+object DatabasePlaylists : Table() { // <1>
+    val id                  = long("id") // <2>
+    val name                = varchar("name", length = 100)
+    val modified_at         = integer("modified_at")
+    val collaborative       = bool("collaborative")
+    ...
+}
+----
+<1> The object name must be exactly the same as the database table name! see exposed for more.
+<2> Define all Columns of your database with the Type (long, varchar, integer, ...) and the exact name of the Column.
+
+=== Data class & DTO
+
+.Setup of the data class (here: Playlist)
+[source,kotlin]
+----
+const val loadingPlaceholderString = "..."
+const val loadingPlaceholderNumber = -999_999 // <1>
+
+data class Playlist(
+    val id: Long = loadingPlaceholderNumber.toLong(),
+    val name: String = loadingPlaceholderString,
+    val modifiedAt: Int = loadingPlaceholderNumber,
+    val collaborative: Boolean = false,
+    ...
+}
+----
+<1> Use default values so that it is possible to create a data class just with Playlist(). TODO: Needed?
+
+.Setup of the DTO (here: PlaylistDto)
+[source,kotlin]
+----
+data class PlaylistDto(val resultRow: ResultRow) { // <1>
+
+    /**
+     * Helper function to map an Exposed [resultRow] into a Playlist
+     * @param resultRow the return type of a query from the Exposed framework
+     * @return a Playlist filled with all the needed attributes from the [resultRow]
+     */
+    fun toPlaylist(): Playlist = resultRow.let { // <2>
+        Playlist(
+            it[DatabasePlaylists.id],
+            it[DatabasePlaylists.name],
+            it[DatabasePlaylists.modified_at],
+            it[DatabasePlaylists.collaborative],
+            ...
+        )
+    }
+}
+----
+<1> An exposed ResultRow is passed as parameter. A ResultRow is the return value of an exposed Query.
+<2> From the ResultRow, map all the Columns with it[TableName.field] into the data class.
+
+=== Paging Service
+
+.The given Paging Service Interface
+[source,kotlin]
+----
+interface IPagingService<T> { // <1>
+
+    /**
+     * Load a Page beginning from [startIndex] with size of [pageSize]
+     * and given [filters] and [sort] objects.
+     */
+    fun getPage(
+        startIndex: Int,
+        pageSize: Int,
+        filters: List<Filter> = emptyList(),
+        sort: Sort? = null
+    ): List<T>
+
+    /**
+     * Get number of elements with given [filters].
+     */
+    fun getFilteredCount(filters: List<Filter>): Int
+
+    /**
+     * Get total number of elements.
+     */
+    fun getTotalCount(): Int
+
+    /**
+     * Get element by [id].
+     */
+    fun get(id: Long): T
+
+    /**
+     * Get index of element with given [id] and [filters].
+     */
+    fun indexOf(id: Long, filters: List<Filter> = emptyList()): Int
+
+}
+----
+<1> Implement this interface with your own specific Service.
+
+.Setup of the Service (here: DBService)
+[source,kotlin]
+----
+object DBService : IPagingService<Playlist> { // <1>
+
+    private val lastIndex by lazy { getTotalCount() - 1 } // <2>
+
+    override fun getPage(
+        startIndex: Int,
+        pageSize: Int,
+        filters: List<Filter>,
+        sort: Sort?
+    ): List<Playlist> {
+        if (startIndex > lastIndex)
+            throw IllegalArgumentException(
+                "startIndex must be smaller than/equal to the lastIndex and not $startIndex"
+            )
+        if (startIndex < 0)
+            throw IllegalArgumentException("only positive values are allowed for startIndex")
+
+        val start: Long = startIndex.toLong()
+        if (sort == null) { // <3>
+            return transaction {
+                DatabasePlaylists
+                    .selectWithAllFilters(filters) // <5>
+                    .limit(n = pageSize, offset = start)
+                    .map { PlaylistDto(it).toPlaylist() } // <6>
+            }
+        } else { // <4>
+            return transaction {
+                DatabasePlaylists
+                    .selectWithAllFilters(filters)
+                    .orderBy(sort.dbField as Column<String> to sort.sortOrder) // <7>
+                    .limit(n = pageSize, offset = start)
+                    .map { PlaylistDto(it).toPlaylist() }
+            }
+        }
+    }
+
+    override fun getTotalCount(): Int = transaction {
+        DatabasePlaylists
+            .selectAll()
+            .count()
+            .toInt()
+    }
+
+    override fun getFilteredCount(filters: List<Filter>): Int {
+        if (filters.isEmpty())
+            throw IllegalArgumentException(
+                "A Filter must be set - Passed an empty filter list to getFilteredCountNew"
+            )
+
+        return transaction {
+            DatabasePlaylists
+                .selectWithAllFilters(filters)
+                .count()
+                .toInt()
+        }
+    }
+
+    override fun get(id: Long): Playlist = transaction {
+        DatabasePlaylists
+            .select { DatabasePlaylists.id eq id }
+            .single()
+            .let { PlaylistDto(it).toPlaylist() }
+    }
+
+    override fun indexOf(id: Long, filters: List<Filter>): Int { ... }
+}
+----
+<1> Pass your data class as the generic type of IPagingService.
+<2> Helper to know last index.
+<3> Without sort.
+<4> With sort.
+<5> Use the pre-defined selectWithAllFilters(filters) function.
+<6> Map from your Dto to your data class.
+<7> Cast to Column<String> needed.
+
+=== Labels
+
+.Setup of the Labels (here: BLTLabels)
+[source,kotlin]
+----
+enum class BLTLabels(val deutsch: String, val english: String) : ILabel { // <1>
+    TITLE("Spotify Daten","Spotify data"),
+    HEADER_GROUP("Playlist Übersicht", "Playlist Overview"),
+    PLAYLIST_INFO_GROUP("Playlist Informationen", "Playlist Informations"),
+    TRACK0_GROUP("Song 0", "Track 0"),
+    TRACK1_GROUP("Song 1", "Track 1"),
+    TRACK2_GROUP("Song 2", "Track 2"),
+    TRACK3_GROUP("Song 3", "Track 3"),
+    TRACK4_GROUP("Song 4", "Track 4"),
+
+    ID("ID", "ID"),
+    NAME("Name", "Name"),
+    COLLABORATIVE("Gemeinsam", "Collaborative"),
+    SELECTION_YES("Ja", "Yes"),
+    SELECTION_NO("Nein", "No"),
+    MODIFIED_AT("Geändert am", "Modified at"),
+    NUM_TRACKS("Anz. Songs", "No. of tracks"),
+    NUM_ALBUMS("Anz. Alben", "No. of albums"),
+    NUM_FOLLOWERS("Anz. Follower", "No. of followers"),
+    NUM_EDITS("Anz. Änderungen", "No. of edits"),
+    DURATION_MS("Länge in ms", "Duration in ms"),
+    NUM_ARTISTS("Anz. Künstler", "No. of artists"),
+    TRACK_ARTIST_NAME("Song Künstler", "Track artist"),
+    TRACK_TRACK_NAME("Song Name", "Track name"),
+    TRACK_DURATION_MS("Song Länge in ms", "Track duration in ms"),
+    TRACK_ALBUM_NAME("Song Album", "Track album")
+}
+----
+<1> Define your Labels in different languages (here: german & english).
+
+=== Presentation Model
+
+.Setup of the PresentationModel (here: PlaylistModel)
+[source,kotlin]
+----
+class PlaylistModel(playlist: Playlist) : BaseModel<BLTLabels>(title = BLTLabels.TITLE) { // <1>
+
+    override val id = LongAttribute( // <2>
+        model = this,
+        label = BLTLabels.ID,
+        value = playlist.id,
+        readOnly = true,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.id,
+        tableColumnWidth = 100.dp
+    )
+
+    private val name = StringAttribute( // <3>
+        model = this,
+        label = BLTLabels.NAME, // <4>
+        value = playlist.name, // <5>
+        canBeFiltered = true, // <6>
+        databaseField = DatabasePlaylists.name, // <7>
+        tableColumnWidth = 200.dp
+    )
+
+    private val modifiedAt = IntegerAttribute(
+        model = this,
+        label = BLTLabels.MODIFIED_AT,
+        required = true,
+        value = playlist.modifiedAt,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.modified_at,
+        tableColumnWidth = 80.dp // <8>
+    )
+
+    private val collaborative = BooleanAttribute(
+        model = this,
+        label = BLTLabels.COLLABORATIVE,
+        trueText = BLTLabels.SELECTION_YES,
+        falseText = BLTLabels.SELECTION_NO,
+        value = playlist.collaborative,
+        canBeFiltered = true,
+        databaseField = DatabasePlaylists.collaborative,
+        tableColumnWidth = 150.dp
+    )
+
+    ...
+
+    override val displayedAttributesInTable = listOf( // <9>
+        id,
+        name,
+        modifiedAt,
+        collaborative,
+        ...
+    )
+
+    private val headerGroup = HeaderGroup( // <10>
+        model = this,
+        title = BLTLabels.HEADER_GROUP,
+        Field(id, FieldSize.SMALL),
+        Field(name, FieldSize.NORMAL)
+    )
+
+    private val playlistInfoGroup = Group( // <11>
+        model = this,
+        title = BLTLabels.PLAYLIST_INFO_GROUP,
+        Field(name, FieldSize.NORMAL),
+        Field(collaborative, FieldSize.SMALL),
+        Field(modifiedAt, FieldSize.SMALL),
+        Field(numTracks, FieldSize.SMALL),
+        Field(numEdits, FieldSize.SMALL),
+        Field(numArtists, FieldSize.SMALL),
+        Field(durationMs, FieldSize.SMALL),
+    )
+
+    ...
+}
+
+----
+<1> Pass your data class as parameter and your Labels as Type Parameter.
+<2> Define an id Attribute which (override from BaseModel)
+<3> Define all other Attributes.
+<4> Pass the corresponding Label from your defined Labels.
+<5> Pass the corresponding data class field.
+<6> Define if Attribute can be filtered or not (default: true).
+<7> Pass the corresponding database field.
+<8> Define a specific table column width in Dp (default: 150.dp, values below result in default)
+<9> Override displayedAttributesInTable from BaseModel and pass all Attributes you want to display in the table.
+<10> Define at least one Header Group.
+<11> Define at least one Group with Attributes.
+
+=== Other Database than SQLite
+
+.Implementation of the SqliteDb class
+[source,kotlin]
+----
+class SqliteDb( // <1>
+    pathToDb: String,
+    caseSensitiveFiltering: Boolean = true,
+    listOfPragmas: List<String>? = null
+) {
+    private val makeSqliteCaseSensitive = "?case_sensitive_like=true"
+
+    private val handleCaseSensitive = { caseSensitive: Boolean ->
+        if (caseSensitive) makeSqliteCaseSensitive else ""
+    }
+    private val handlePragmas = { pragmas: List<String>? ->
+        var params = ""
+        pragmas?.onEach { param -> params += "&$param" }
+        params
+    }
+
+    private val url =
+        "jdbc:sqlite:$pathToDb${handleCaseSensitive(caseSensitiveFiltering)}${handlePragmas(listOfPragmas)}"
+    private val driver = "org.sqlite.JDBC"
+    private val isolationLevel = Connection.TRANSACTION_SERIALIZABLE
+
+    fun initializeConnection() {
+        println(url)
+        Database.connect(url = url, driver = driver) // <2>
+        TransactionManager.manager.defaultIsolationLevel = isolationLevel // <2>
+    }
+}
+----
+<1> Let you inspire by the implementation of the built-in SqliteDb class.
+<2> The absolute minimum you need are those two lines.
+
+== Licenses
+bla bla bla
+
+
+
+
+
+
+
 
 == Demo Applications
+
 * *ComposeForms* _(demo > src > main > kotlin > demo > composeForms)_ +
 Demo project for Compose Forms
 
@@ -46,3 +498,12 @@ Demo project for Compose Forms
 Demo projects for Compose BigLazyTable combined with Compose Forms
 
 
+
+
+.Reference Kotlin File
+:sourcedir: https://github.com/FHNW-IP5-IP6/ComposeBigLazyTable/common/src/main/kotlin
+
+[source,kotlin]
+----
+include::common/src/main/kotlin/bigLazyTable/controller/Scheduler.kt[]
+----

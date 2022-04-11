@@ -25,7 +25,7 @@ object SuperstoreDatabase: Table() {
     val ShipDate: Column<String> = varchar("ShipDate", length = 100)
     val ShipMode: Column<String> = varchar("ShipMode", length = 100)
     val State: Column<String> = varchar("State", length = 100)
-//    val SubCategory: Column<String> = varchar("SubCategory", length = 100)
+    val SubCategory: Column<String> = varchar("Sub-Category", length = 100)
 
     override val primaryKey = PrimaryKey(SuperstoreDatabase.RowID, name = "PK_SuperstoreDatabase_ID")
 }

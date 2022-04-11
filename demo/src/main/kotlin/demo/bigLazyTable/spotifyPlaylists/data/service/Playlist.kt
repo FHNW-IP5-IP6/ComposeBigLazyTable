@@ -16,6 +16,7 @@ data class Playlist(
     val collaborative: Boolean = false,
     val modifiedAt: Int = loadingPlaceholderNumber,
     val numTracks: Int = loadingPlaceholderNumber,
+    // TODO: 11.04.2022 Remove or comment back in!
 //    val numTracksDouble: Double = loadingPlaceholderNumber.toDouble(),
 //    val numTracksFloat: Float = loadingPlaceholderNumber.toFloat(),
     val numAlbums: Int = loadingPlaceholderNumber,

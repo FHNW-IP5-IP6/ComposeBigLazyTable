@@ -29,12 +29,12 @@ kotlin {
                 implementation("com.github.FHNW-IP5-IP6:ComposeBigLazyTable:master-SNAPSHOT")
 
                 // Logging Library
-                implementation("io.github.microutils:kotlin-logging:1.12.5")
+//                implementation("io.github.microutils:kotlin-logging:1.12.5") todo: is this needed? else remove
 
                 // SQLite Database & Exposed Library
-                implementation("org.xerial:sqlite-jdbc:3.36.0.3")
-                implementation("org.jetbrains.exposed:exposed-core:0.37.3")
-                implementation("org.jetbrains.exposed:exposed-dao:0.37.3")
+//                implementation("org.xerial:sqlite-jdbc:3.36.0.3") todo: not needed can be deleted
+//                implementation("org.jetbrains.exposed:exposed-core:0.37.3") todo: not needed can be deleted
+//                implementation("org.jetbrains.exposed:exposed-dao:0.37.3") todo: not needed can be deleted
                 implementation("org.jetbrains.exposed:exposed-jdbc:0.37.3")
             }
         }
