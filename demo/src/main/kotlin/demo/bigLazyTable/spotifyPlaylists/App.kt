@@ -19,7 +19,7 @@ import java.awt.Dimension
 fun main() {
 
     SqliteDb(
-        pathToDb = "./demo/src/main/resources/spotify_playlist_dataset.db",
+        pathToDb = "./demo/src/main/resources/spotify_playlist_dataset_1000_entries.db",
         caseSensitiveFiltering = true
     ).initializeConnection()
 

@@ -35,7 +35,7 @@ internal class DBServiceTest {
     fun setupDatabase() {
         val makeSqliteCaseSensitive = "?case_sensitive_like=true"
         Database.connect(
-            "jdbc:sqlite:./src/test/resources/test_spotify_playlist_dataset.db$makeSqliteCaseSensitive",
+            "jdbc:sqlite:./src/test/resources/test_spotify_playlist_dataset_1000_entries.db$makeSqliteCaseSensitive",
             "org.sqlite.JDBC"
         )
         TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
