@@ -164,7 +164,7 @@ data class Playlist(
     ...
 }
 ----
-<1> Use default values so that it is possible to create a data class just with Playlist(). TODO: Needed?
+<1> Use default values so that it is possible to create a data class just with Playlist().
 
 .Setup of the DTO (here: PlaylistDto)
 [source,kotlin]
