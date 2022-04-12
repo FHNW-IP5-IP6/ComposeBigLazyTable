@@ -6,6 +6,7 @@
 :author: Marco Sprenger; Livio Näf
 :revnumber: v1.0.2
 :revdate: 2022-04-11
+:toc:
 
 https://jitpack.io/#FHNW-IP5-IP6/ComposeBigLazyTable[image:https://jitpack.io/v/FHNW-IP5-IP6/ComposeBigLazyTable.svg[]]
 https://github.com/FHNW-IP5-IP6/ComposeBigLazyTable/actions/workflows/sonarqube.yml[image:https://github.com/FHNW-IP5-IP6/ComposeBigLazyTable/actions/workflows/sonarqube.yml/badge.svg[.github/workflows/sonarqube.yml]]
@@ -16,13 +17,6 @@ Compose BigLazyTable (Compose BLT) is a library that efficiently supports the ha
 Many desktop business applications today consist of a table showing all the data records and an appropriate form for editing the data. These applications need to provide appropriate functionality for the end user to work efficiently and comfortably.
 
 For developers, there are appropriate building blocks in older programming languages, such as Java with JavaFX, to build such applications. Most of these applications are specially adapted to a company and come in a design that is no longer so up-to-date. In addition, with a JavaFX solution, the lazy loading, as well as a connection to a form, must still be programmed by the user. With Compose BigLazyTable, a library was developed using Kotlin and Compose for Desktop, with that developers can easily create a basic application, consisting of a table and a form for processing the data. Compose for Desktop uses Material Design for the UI building blocks by default, which offers a much more modern look. The table is provided with filters, sorting options and a lazy loading mechanism. Combined with a form from the ComposeForms library, Compose BigLazyTable offers the necessary functionalities familiar to users of JavaFX.
-
-see: https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/
-
-see: https://gist.github.com/powerman/d56b2675dfed38deb298
->>>>>>> Stashed changes
-
-TODO: Add table of contents!
 
 == Adding Compose BigLazyTable
 
@@ -478,6 +472,103 @@ class SqliteDb( // <1>
 ----
 <1> Let you inspire by the implementation of the built-in SqliteDb class.
 <2> The absolute minimum you need are those two lines.
+
+== Filter Synthax
+
+In this section the filter synthax, which is used by Compose BigLazyTable to filter results, is explained.
+
+=== Number Filter
+
+.Number Filter Synthax
+
+[cols="1,1,1,1"]
+|===
+|Filter Operation | Meaning | Example | Result
+
+|=
+|Equals
+|=5
+|Only value 5 is displayed
+
+|!=
+|Not Equals
+|!=5
+|Only value 5 is not displayed
+
+|>
+|Greater than
+|>5
+|Values greater than 5 are displayed
+
+|>=
+|Greater Equals
+|>=5
+|Values greater or equals 5 are displayed
+
+|<
+|Less than
+|<5
+|Values smaller than 5 are displayed
+
+|<=
+|Less Equals
+|<=5
+|Values smaller or equals 5 are displayed
+
+|[a,b]
+|Between Both Included
+|[1,5]
+|Values from 1 to 5 are displayed
+
+|]a,b[
+|Between Both Not Included
+|]1,5[
+|Values from 2 to 4 are displayed
+
+|[a,b[
+|Between From Included
+|[1,5[
+|Values from 1 to 4 are displayed
+
+|]a,b]
+|Between To Included
+|]1,5]
+|Values from 2 to 5 are displayed
+|===
+
+=== String Filter
+The String Filter uses the SQL like Synthax under the hood (see also: https://www.w3schools.com/sql/sql_like.asp[SQL LIKE Operator])
+
+.String Filter Synthax
+[cols="1,1,1,1"]
+|===
+|Filter Operation | Meaning | Example | Result
+
+|
+|Equals
+|test
+|Only values which equals test are displayed
+
+|!
+|Not Equals
+|!test
+|Only values which are not equals test are displayed
+
+|..%
+|Starts with
+|test%
+|Values which start with test are displayed
+
+|%..
+|Ends with
+|%test
+|Values which end with test are displayed
+
+|%..%
+|Contains
+|%test%
+|Values which contain test are displayed
+|===
 
 == Licenses
 bla bla bla
