@@ -13,6 +13,8 @@ https://github.com/FHNW-IP5-IP6/ComposeBigLazyTable/actions/workflows/sonarqube.
 
 Compose BigLazyTable (Compose BLT) is a library that efficiently supports the handling of large amounts of data end-to-end in Compose for Desktop.
 
+image::Compose BigLazyTable Demo Applikation.png[]
+
 == Why does this Library exist?
 Many desktop business applications today consist of a table showing all the data records and an appropriate form for editing the data. These applications need to provide appropriate functionality for the end user to work efficiently and comfortably.
 
@@ -570,31 +572,10 @@ The String Filter uses the SQL like Synthax under the hood (see also: https://ww
 |Values which contain test are displayed
 |===
 
-== Licenses
-bla bla bla
-
-
-
-
-
-
-
-
 == Demo Applications
 
 * *ComposeForms* _(demo > src > main > kotlin > demo > composeForms)_ +
 Demo project for Compose Forms
 
-* *BigLazyTable* _(demo > src > main > kotlin > demo > bigLazyTable)_ +
+* *BigLazyTable* _(demo > src > main > kotlin > demo > bigLazyTable > spotifyPlaylist/newDemo)_ +
 Demo projects for Compose BigLazyTable combined with Compose Forms
-
-
-
-
-.Reference Kotlin File
-:sourcedir: https://github.com/FHNW-IP5-IP6/ComposeBigLazyTable/common/src/main/kotlin
-
-[source,kotlin]
-----
-include::common/src/main/kotlin/bigLazyTable/controller/Scheduler.kt[]
-----
